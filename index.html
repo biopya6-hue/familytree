@@ -387,21 +387,21 @@ function nextBaruId(people){
   return `BARU-${String(next).padStart(3,'0')}`;
 }
 
-/* Given a childId, find the Bani prefix by walking up through parents */
+/* Given parentIds, find what Bani prefix the child should get */
 function getBaniPrefixFromParents(parentIds, allPeople){
   for(const pid of parentIds){
     const p=allPeople.find(x=>x.id===pid);
     if(!p) continue;
-    // If parent has a real ID (not BARU), extract prefix
+    // If parent has a real non-KSR, non-BARU ID → inherit their prefix
     if(p.baniId&&!p.baniId.startsWith('BARU')&&!p.baniId.startsWith('KSR')){
       const m=p.baniId.match(/^([A-Z]+)-/);
       if(m) return m[1];
     }
-    // If parent is KSR (child of Kasirin) → use their name as new Bani prefix
-    if(p.baniId&&p.baniId.startsWith('KSR')){
-      // This child becomes a new Bani head — prefix from their name
-      // Find their own blood children to determine if they are a bani head
-      return makePrefix(p.fullName);
+    // If parent IS Kasirin (KSR-000) or Kasirin's wife (KSR-Wx)
+    // → this child becomes a NEW Bani Head — prefix from child's own name
+    // We don't know child's name here, so return a special marker
+    if(p.baniId&&p.baniId.match(/^KSR-/)){
+      return 'NEW_BANI_HEAD'; // caller will use child's name
     }
   }
   return null;
@@ -429,6 +429,7 @@ function App(){
   const [edgeSel,setEdgeSel] = useState(null);
   const [showRotHint,setShowRotHint] = useState(false);
   const [showSearch,setShowSearch]   = useState(false);
+  const [registryFilter,setRegistryFilter] = useState(null); // null = no bani selected yet
   const dragging=useRef(null), dragOff=useRef({});
   const panning=useRef(false), panStart=useRef({});
   const vpRef=useRef();
@@ -814,19 +815,26 @@ function App(){
       if(!child) return prev;
       const alreadyReal=child.baniId&&!child.baniId.startsWith('BARU');
       if(alreadyReal) return prev;
-      // Get prefix from parents
-      const prefix=getBaniPrefixFromParents(parentIds, prev);
-      if(!prefix) return prev;
-      // Determine if blood: if any blood parent has prefix without -X, child is blood
-      const bloodParent=parentIds.find(pid=>{
+
+      // Get prefix signal from parents
+      let prefixSignal=getBaniPrefixFromParents(parentIds, prev);
+      let finalPrefix;
+
+      if(prefixSignal==='NEW_BANI_HEAD'){
+        // Child of Kasirin → becomes a new Bani Head, use their own name as prefix
+        finalPrefix=makePrefix(child.nickname||child.fullName);
+      } else if(prefixSignal){
+        finalPrefix=prefixSignal;
+      } else {
+        return prev; // can't determine, leave as BARU
+      }
+
+      // Determine blood status: child of KSR or of a blood parent = blood descendant
+      const isBlood=parentIds.some(pid=>{
         const p=prev.find(x=>x.id===pid);
-        return p&&p.baniId&&!p.baniId.endsWith('-X')&&!p.baniId.startsWith('KSR');
+        return p&&p.baniId&&(p.baniId.match(/^KSR-/)||!p.baniId.endsWith('-X'));
       });
-      const isBlood=!!bloodParent||parentIds.some(pid=>{
-        const p=prev.find(x=>x.id===pid);
-        return p&&p.baniId&&p.baniId.startsWith('KSR');
-      });
-      const newId=nextBaniId(prefix, prev, isBlood);
+      const newId=nextBaniId(finalPrefix, prev, isBlood);
       return prev.map(p=>p.id===childId?{...p,baniId:newId}:p);
     });
   }
@@ -878,25 +886,70 @@ function App(){
     setSel(null);setSbMode('view');
   }
 
-  /* ── BANI LABEL — trace top ancestor from selected person ── */
-  function getTopAncestor(pid,visited=new Set()){
-    if(visited.has(pid))return pid; // cycle guard
+  /* ── BANI LABEL ──
+     Rules:
+     1. No selection → "Bani Kasirin"
+     2. Person IS Kasirin or their spouse (KSR ID) → "Bani Kasirin"
+     3. Person is a direct child of Kasirin → "Bani [their nickname]"
+     4. Everyone else → find their Bani Head by walking up active parents,
+        stopping at the direct child of Kasirin.
+        If no parent chain found (married-in with no parents set) →
+        try partner's Bani Head.
+  ── */
+  function getBaniHead(pid, visited=new Set()){
+    if(visited.has(pid)) return null;
     visited.add(pid);
+    const p=people.find(x=>x.id===pid);
+    if(!p) return null;
+    // Root (Kasirin) → return Kasirin itself
+    if(p.baniId==='KSR-000') return p;
     const parents=getActiveParents(pid);
-    if(!parents.length) return pid;
-    // climb up via first active parent
-    return getTopAncestor(parents[0],visited);
+    if(!parents.length){
+      // No parents → this person is either a Bani Head or unconnected
+      // Check if they have a KSR spouse (married into Kasirin family)
+      return null;
+    }
+    // Check if any parent is Kasirin (KSR-000) → this person IS a Bani Head
+    const parentPeople=parents.map(id=>people.find(x=>x.id===id)).filter(Boolean);
+    if(parentPeople.some(par=>par.baniId==='KSR-000'||par.baniId?.startsWith('KSR'))){
+      return p; // this person is a direct child of Kasirin = Bani Head
+    }
+    // Walk up to parent's Bani Head
+    for(const parentId of parents){
+      const head=getBaniHead(parentId, visited);
+      if(head) return head;
+    }
+    return null;
   }
+
   const baniLabel=useMemo(()=>{
     if(!people.length) return 'Bani Kasirin';
     if(!sel){
-      // homepage: find true root (Kasirin if present)
-      const root=people.find(p=>p.id==='p0a')||people.find(p=>getActiveParents(p.id).length===0);
-      return root?`Bani ${nn(root)}`:'Bani Kasirin';
+      return 'Bani Kasirin';
     }
-    const topId=getTopAncestor(sel);
-    const top=people.find(p=>p.id===topId);
-    return top?`Bani ${nn(top)}`:'Bani Kasirin';
+    const selPerson=people.find(p=>p.id===sel);
+    if(!selPerson) return 'Bani Kasirin';
+
+    // Kasirin or their spouse → Bani Kasirin
+    if(selPerson.baniId==='KSR-000'||selPerson.baniId==='KSR-W1'||
+       selPerson.baniId?.match(/^KSR-W\d+$/)) return 'Bani Kasirin';
+
+    // Try to find Bani Head via parent chain
+    let head=getBaniHead(sel);
+
+    // If not found (married-in, no parents set), try via partner
+    if(!head){
+      const partnerIds=getPartners(sel);
+      for(const pid of partnerIds){
+        head=getBaniHead(pid);
+        if(head) break;
+      }
+    }
+
+    if(!head) return 'Bani Kasirin';
+    // If head is Kasirin himself → show Bani Kasirin
+    if(head.baniId==='KSR-000') return 'Bani Kasirin';
+    return `Bani ${nn(head)}`;
   },[sel,people,rels]);
 
   /* ── SEARCH ── */
@@ -1389,16 +1442,15 @@ function App(){
     </div>}
 
     {/* ── ID REGISTRY PANEL ── */}
-    {modal==='registry'&&<div className="overlay" onClick={()=>setModal(null)}>
-      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
-        <div style={{display:'flex',alignItems:'center',marginBottom:16}}>
+    {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}>
+      <div className="modal" style={{maxWidth:420}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'center',marginBottom:14}}>
           <h3 style={{flex:1,marginBottom:0}}>ID Registry</h3>
-          <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setModal(null)}>✕ Tutup</button>
+          <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>{setModal(null);setRegistryFilter(null);}}>✕ Tutup</button>
         </div>
         {(()=>{
-          // Group by prefix
+          // Build groups
           const groups={};
-          // Special KSR group first
           people.forEach(p=>{
             if(!p.baniId){groups['?']=groups['?']||[];groups['?'].push(p);return;}
             const m=p.baniId.match(/^([A-Z]+)-/);
@@ -1406,52 +1458,101 @@ function App(){
             groups[prefix]=groups[prefix]||[];
             groups[prefix].push(p);
           });
-          // Sort: KSR first, then BARU last, then alphabetical
-          const order=Object.keys(groups).sort((a,b)=>{
-            if(a==='KSR') return -1; if(b==='KSR') return 1;
-            if(a==='BARU') return 1; if(b==='BARU') return -1;
-            return a.localeCompare(b);
+          const sortedMembers=arr=>arr.sort((a,b)=>{
+            const na=parseInt((a.baniId||'').replace(/\D/g,''))||999;
+            const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999;
+            return na-nb;
           });
-          return order.map(prefix=>{
-            const members=groups[prefix].sort((a,b)=>{
-              // Sort by numeric part of baniId
-              const na=parseInt((a.baniId||'').replace(/\D/g,''))||999;
-              const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999;
-              return na-nb;
-            });
-            const isBaru=prefix==='BARU';
-            const isKsr=prefix==='KSR';
+
+          // Bani prefixes = non-KSR, non-BARU, non-?
+          const baniPrefixes=Object.keys(groups)
+            .filter(k=>k!=='KSR'&&k!=='BARU'&&k!=='?')
+            .sort();
+
+          // Table renderer
+          function MemberTable({members, color}){
             return(
-              <div key={prefix} style={{marginBottom:16}}>
-                <div style={{
-                  fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
-                  color:isBaru?'#a05030':isKsr?'#6a5020':'#4a7a9b',
-                  borderBottom:`2px solid ${isBaru?'#f0d8c8':isKsr?'#e8d8a0':'#d0e4f0'}`,
-                  paddingBottom:4,marginBottom:6
-                }}>
-                  {isBaru?'⏳ Belum ada relasi orang tua':isKsr?'🌳 Leluhur Utama (Kasirin)':`Bani ${prefix}`}
-                  <span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{members.length} orang</span>
-                </div>
-                <table style={{width:'100%',borderCollapse:'collapse'}}>
-                  <tbody>
-                    {members.map(p=>(
-                      <tr key={p.id} style={{borderBottom:'1px solid #f5f2ee'}}>
-                        <td style={{
-                          fontFamily:'monospace',fontSize:11,fontWeight:700,
-                          color:isBaru?'#a05030':isKsr?'#8a6020':'#4a7a9b',
-                          padding:'5px 10px 5px 0',whiteSpace:'nowrap',width:1
-                        }}>{p.baniId||'—'}</td>
-                        <td style={{fontSize:12,color:'#2a2018',padding:'5px 0'}}>{nn(p)}</td>
-                        <td style={{fontSize:10,color:'#b0a898',padding:'5px 0 5px 8px',textAlign:'right',whiteSpace:'nowrap'}}>
-                          {p.baniId?.endsWith('-X')&&<span style={{color:'#9a7050'}}>luar darah</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <tbody>
+                  {sortedMembers([...members]).map(p=>(
+                    <tr key={p.id} style={{borderBottom:'1px solid #f5f2ee'}}>
+                      <td style={{fontFamily:'monospace',fontSize:11,fontWeight:700,color,
+                        padding:'5px 10px 5px 0',whiteSpace:'nowrap',width:1}}>
+                        {p.baniId||'—'}
+                      </td>
+                      <td style={{fontSize:12,color:'#2a2018',padding:'5px 0'}}>{nn(p)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             );
-          });
+          }
+
+          return <>
+            {/* KSR — always shown */}
+            {groups['KSR']&&(
+              <div style={{marginBottom:16}}>
+                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
+                  color:'#6a5020',borderBottom:'2px solid #e8d8a0',paddingBottom:4,marginBottom:6}}>
+                  🌳 Leluhur Utama (Kasirin)
+                  <span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['KSR'].length} orang</span>
+                </div>
+                <MemberTable members={groups['KSR']} color="#8a6020"/>
+              </div>
+            )}
+
+            {/* BARU — always shown if any */}
+            {groups['BARU']&&(
+              <div style={{marginBottom:16}}>
+                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
+                  color:'#a05030',borderBottom:'2px solid #f0d8c8',paddingBottom:4,marginBottom:6}}>
+                  ⏳ Belum ada relasi orang tua
+                  <span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['BARU'].length} orang</span>
+                </div>
+                <MemberTable members={groups['BARU']} color="#a05030"/>
+              </div>
+            )}
+
+            {/* Bani selector */}
+            {baniPrefixes.length>0&&(
+              <div style={{marginBottom:registryFilter?12:0}}>
+                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
+                  color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:10}}>
+                  Pilih Bani
+                </div>
+                <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                  {baniPrefixes.map(prefix=>(
+                    <button key={prefix}
+                      onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)}
+                      style={{
+                        padding:'5px 12px',borderRadius:20,fontSize:11,fontWeight:700,
+                        border:`1.5px solid ${registryFilter===prefix?'#4a7a9b':'#d0cbc2'}`,
+                        background:registryFilter===prefix?'#4a7a9b':'#fff',
+                        color:registryFilter===prefix?'#fff':'#4a7a9b',
+                        cursor:'pointer',fontFamily:'inherit'
+                      }}>
+                      Bani {prefix}
+                      <span style={{fontWeight:400,fontSize:10,marginLeft:4,opacity:.7}}>
+                        {groups[prefix]?.length||0}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Selected Bani members */}
+            {registryFilter&&groups[registryFilter]&&(
+              <div style={{marginTop:12}}>
+                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
+                  color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:6}}>
+                  Bani {registryFilter}
+                  <span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups[registryFilter].length} orang</span>
+                </div>
+                <MemberTable members={groups[registryFilter]} color="#4a7a9b"/>
+              </div>
+            )}
+          </>;
         })()}
       </div>
     </div>}
