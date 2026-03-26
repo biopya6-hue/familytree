@@ -354,67 +354,57 @@ const SPOS={
 };
 
 /* ══════════════════════════════════════════
-   ID SYSTEM
-   - KSR-000  : Kasirin (root)
-   - KSR-W1   : Istri ke-N Kasirin
-   - BPJ-001  : keturunan darah Bani Panidjan
-   - BPJ-002-X: masuk via pernikahan (luar darah)
-   Prefix 3 huruf dari nama kepala Bani
+   ID SYSTEM v2
+   - Orang baru → BARU-xxx (sementara)
+   - Saat relasi parent-child dikonfirmasi
+     → ID otomatis diperbarui ke prefix Bani
+   - Pasangan (married) → prefix Bani pasangan + -X
+   - KSR-000 / KSR-W1 tetap fixed
 ══════════════════════════════════════════ */
 function makePrefix(name){
-  // Take up to 3 significant letters: skip spaces, take chars at pos 0,2,4 of cleaned name
   const clean=name.replace(/[^a-zA-Z]/g,'').toUpperCase();
   if(clean.length>=5) return clean[0]+clean[2]+clean[4];
   if(clean.length>=3) return clean[0]+clean[1]+clean[2];
   return clean.padEnd(3,'X');
 }
 
-function nextBaniId(prefix,people,isBlood){
-  // Find all existing IDs with this prefix
+function nextBaniId(prefix, people, isBlood){
+  // Only count IDs with this exact prefix (ignore BARU- etc)
   const re=new RegExp(`^${prefix}-(\\d+)(-X)?$`);
   const nums=people
     .map(p=>p.baniId||'')
-    .map(id=>{ const m=id.match(re); return m?parseInt(m[1]):0; })
-    .filter(n=>n>0);
+    .filter(id=>re.test(id))
+    .map(id=>parseInt(id.match(re)[1]));
   const next=(nums.length?Math.max(...nums):0)+1;
   const num=String(next).padStart(3,'0');
   return `${prefix}-${num}${isBlood?'':'-X'}`;
 }
 
-/* Determine the Bani prefix for a new person.
-   Logic:
-   1. If no active parents → they are a root/Bani head, get their own prefix
-   2. If active parents exist → inherit prefix from the blood parent
-   3. If the person has no blood link to Bani → use partner's prefix + -X
-*/
-function assignBaniId(person, allPeople, allRels, isBloodDescendant){
-  // Special case: root ancestor
-  if(person.id==='p0a') return 'KSR-000';
-  if(person.id==='p0b') return 'KSR-W1';
+function nextBaruId(people){
+  const re=/^BARU-(\d+)$/;
+  const nums=people.map(p=>p.baniId||'').filter(id=>re.test(id)).map(id=>parseInt(id.match(re)[1]));
+  const next=(nums.length?Math.max(...nums):0)+1;
+  return `BARU-${String(next).padStart(3,'0')}`;
+}
 
-  // Find which prefix to use
-  // Walk up active parent chain to find Bani head
-  function getBaniPrefix(pid, visited=new Set()){
-    if(visited.has(pid)) return null;
-    visited.add(pid);
+/* Given a childId, find the Bani prefix by walking up through parents */
+function getBaniPrefixFromParents(parentIds, allPeople){
+  for(const pid of parentIds){
     const p=allPeople.find(x=>x.id===pid);
-    if(!p) return null;
-    if(p.baniId){
-      // Extract prefix from existing baniId
+    if(!p) continue;
+    // If parent has a real ID (not BARU), extract prefix
+    if(p.baniId&&!p.baniId.startsWith('BARU')&&!p.baniId.startsWith('KSR')){
       const m=p.baniId.match(/^([A-Z]+)-/);
-      return m?m[1]:null;
+      if(m) return m[1];
     }
-    const parentRels=allRels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
-    if(!parentRels.length){
-      // This person is a Bani head — make prefix from their name
+    // If parent is KSR (child of Kasirin) → use their name as new Bani prefix
+    if(p.baniId&&p.baniId.startsWith('KSR')){
+      // This child becomes a new Bani head — prefix from their name
+      // Find their own blood children to determine if they are a bani head
       return makePrefix(p.fullName);
     }
-    const bloodParent=parentRels[0].pids[0];
-    return getBaniPrefix(bloodParent, visited);
   }
-
-  const prefix=getBaniPrefix(person.id)||makePrefix(person.fullName);
-  return nextBaniId(prefix, allPeople, isBloodDescendant);
+  return null;
 }
 
 /* ── APP ── */
@@ -431,7 +421,7 @@ function App(){
   const [pinVal,setPinVal]   = useState('');
   const [pinErr,setPinErr]   = useState('');
   const [editF,setEditF]     = useState({});
-  const [addF,setAddF]       = useState({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',isBlood:true});
+  const [addF,setAddF]       = useState({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:''});
   const [relF,setRelF]       = useState({type:'married',pid:'',isActive:true});
   const [relSearchQ,setRelSearchQ]=useState('');
   const [pendingRel,setPendingRel] = useState(null); // {type,pids,isActive} awaiting confirm
@@ -777,14 +767,13 @@ function App(){
     const internalId='p'+Date.now();
     const xs=Object.values(pos).map(p=>p.x);
     const maxX=xs.length?Math.max(...xs):200;
-    // Build the new person object first (without baniId) to pass to assignBaniId
-    const base={id:internalId,...addF};
-    const baniId=assignBaniId(base,people,rels,addF.isBlood);
-    const newPerson={...base,baniId};
+    // Assign temporary BARU ID — will be resolved when parent-child relation is set
+    const baniId=nextBaruId([...people, {baniId:'BARU-000'}]); // include dummy to start from 001
+    const newPerson={id:internalId,...addF,baniId};
     setPeople(prev=>[...prev,newPerson]);
     setPos(prev=>({...prev,[internalId]:{x:maxX+160,y:320}}));
     setSel(internalId);setSbMode('view');setModal(null);
-    setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',isBlood:true});
+    setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:''});
   }
 
   /* ── ADD RELATION with auto-detect partner ── */
@@ -792,7 +781,7 @@ function App(){
     if(!relF.pid||!sel)return;
     const isActive=!!relF.isActive;
     if(relF.type==='married'){
-      setRels(prev=>[...prev,{id:'r'+Date.now(),type:'married',pids:[sel,relF.pid],isActive:true}]);
+      commitMarriage(sel, relF.pid);
       setRelF({type:'married',pid:'',isActive:true});setModal(null);return;
     }
     // parent-child: determine parent(s)
@@ -817,8 +806,50 @@ function App(){
       setRelF({type:'married',pid:'',isActive:true});setModal(null);
     }
   }
-  function commitRel(parentIds,childId,isActive){
+  function commitRel(parentIds, childId, isActive){
     setRels(prev=>[...prev,{id:'r'+Date.now(),type:'parent-child',pids:[...parentIds,childId],isActive}]);
+    // Auto-resolve baniId for child if still BARU or missing
+    setPeople(prev=>{
+      const child=prev.find(p=>p.id===childId);
+      if(!child) return prev;
+      const alreadyReal=child.baniId&&!child.baniId.startsWith('BARU');
+      if(alreadyReal) return prev;
+      // Get prefix from parents
+      const prefix=getBaniPrefixFromParents(parentIds, prev);
+      if(!prefix) return prev;
+      // Determine if blood: if any blood parent has prefix without -X, child is blood
+      const bloodParent=parentIds.find(pid=>{
+        const p=prev.find(x=>x.id===pid);
+        return p&&p.baniId&&!p.baniId.endsWith('-X')&&!p.baniId.startsWith('KSR');
+      });
+      const isBlood=!!bloodParent||parentIds.some(pid=>{
+        const p=prev.find(x=>x.id===pid);
+        return p&&p.baniId&&p.baniId.startsWith('KSR');
+      });
+      const newId=nextBaniId(prefix, prev, isBlood);
+      return prev.map(p=>p.id===childId?{...p,baniId:newId}:p);
+    });
+  }
+
+  /* Auto-assign -X ID to new spouse when married relation is committed */
+  function commitMarriage(pid1, pid2){
+    setRels(prev=>[...prev,{id:'r'+Date.now(),type:'married',pids:[pid1,pid2],isActive:true}]);
+    setPeople(prev=>{
+      // Find which one has BARU or missing ID → they are the newcomer
+      const p1=prev.find(p=>p.id===pid1);
+      const p2=prev.find(p=>p.id===pid2);
+      if(!p1||!p2) return prev;
+      const newcomer=p1.baniId?.startsWith('BARU')?p1:p2.baniId?.startsWith('BARU')?p2:null;
+      const existing=newcomer?.id===pid1?p2:p1;
+      if(!newcomer||!existing) return prev;
+      // Get prefix from existing spouse
+      if(!existing.baniId||existing.baniId.startsWith('BARU')) return prev;
+      const m=existing.baniId.match(/^([A-Z]+)-/);
+      if(!m) return prev;
+      const prefix=m[1];
+      const newId=nextBaniId(prefix, prev, false); // married in = -X
+      return prev.map(p=>p.id===newcomer.id?{...p,baniId:newId}:p);
+    });
   }
   function confirmBothParents(){
     commitRel(pendingRel.parentIds,pendingRel.childId,pendingRel.isActive);
@@ -934,6 +965,7 @@ function App(){
       <div className="spacer"/>
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
+      {isAdmin&&<button className="btn" style={{fontSize:11}} onClick={()=>setModal('registry')}>🪪 ID</button>}
       <button className={`btn${isAdmin?' adm':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>
         {isAdmin?'Admin ✓':'Login Admin'}
       </button>
@@ -1104,11 +1136,6 @@ function App(){
           <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSbMode('view')}>Batal</button>
         </div>
         <div className="sb-body" style={{paddingTop:14}}>
-          <div className="fg">
-            <label>ID <span style={{fontWeight:400,color:'#b0a898'}}>(bisa diubah jika perlu)</span></label>
-            <input value={editF.baniId||''} onChange={e=>setEditF(f=>({...f,baniId:e.target.value.toUpperCase()}))}
-              placeholder="misal: PAN-003" style={{fontFamily:'monospace',letterSpacing:'.06em',fontSize:13,fontWeight:700,color:'#4a7a9b'}}/>
-          </div>
           {[['fullName','Nama Lengkap','text'],['nickname','Nama Panggilan','text'],['birthPlace','Tempat Lahir','text'],['birthDate','Tanggal Lahir','date'],['deathDate','Tanggal Wafat','date'],['domicile','Domisili','text']].map(([k,lbl,t])=>(
             <div className="fg" key={k}><label>{lbl}</label>
               <input type={t} value={editF[k]||''} onChange={e=>setEditF(f=>({...f,[k]:e.target.value}))}
@@ -1314,6 +1341,9 @@ function App(){
     {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <h3>Tambah Anggota Baru</h3>
+        <div style={{background:'#f0f7ee',border:'1px solid #c8e0c8',borderRadius:8,padding:'7px 11px',fontSize:11,color:'#3a6030',marginBottom:12}}>
+          🪪 ID akan di-assign otomatis saat relasi orang tua ditetapkan
+        </div>
         <div className="fg"><label>Nama Lengkap *</label><input value={addF.fullName} autoFocus onChange={e=>setAddF(f=>({...f,fullName:e.target.value}))}/></div>
         <div className="fg"><label>Nama Panggilan</label><input value={addF.nickname} placeholder={addF.fullName.split(' ')[0]||'opsional'} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
         <div className="fg"><label>Jenis Kelamin</label>
@@ -1324,12 +1354,6 @@ function App(){
         <div className="fg"><label>Status</label>
           <select value={addF.status} onChange={e=>setAddF(f=>({...f,status:e.target.value}))}>
             <option>Hidup</option><option>Wafat</option><option>Cerai</option>
-          </select>
-        </div>
-        <div className="fg"><label>Garis Darah</label>
-          <select value={addF.isBlood?'1':'0'} onChange={e=>setAddF(f=>({...f,isBlood:e.target.value==='1'}))}>
-            <option value="1">Darah — keturunan langsung Bani</option>
-            <option value="0">Luar — masuk via pernikahan (ID akan berakhiran -X)</option>
           </select>
         </div>
         <div className="fg"><label>Tempat Lahir</label><input value={addF.birthPlace} placeholder="contoh: Blitar" onChange={e=>setAddF(f=>({...f,birthPlace:e.target.value}))}/></div>
@@ -1361,6 +1385,74 @@ function App(){
           <button className="btn primary" onClick={addPerson} disabled={!addF.fullName.trim()}>Tambah</button>
           <button className="btn" onClick={()=>setModal(null)}>Batal</button>
         </div>
+      </div>
+    </div>}
+
+    {/* ── ID REGISTRY PANEL ── */}
+    {modal==='registry'&&<div className="overlay" onClick={()=>setModal(null)}>
+      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'center',marginBottom:16}}>
+          <h3 style={{flex:1,marginBottom:0}}>ID Registry</h3>
+          <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setModal(null)}>✕ Tutup</button>
+        </div>
+        {(()=>{
+          // Group by prefix
+          const groups={};
+          // Special KSR group first
+          people.forEach(p=>{
+            if(!p.baniId){groups['?']=groups['?']||[];groups['?'].push(p);return;}
+            const m=p.baniId.match(/^([A-Z]+)-/);
+            const prefix=m?m[1]:'?';
+            groups[prefix]=groups[prefix]||[];
+            groups[prefix].push(p);
+          });
+          // Sort: KSR first, then BARU last, then alphabetical
+          const order=Object.keys(groups).sort((a,b)=>{
+            if(a==='KSR') return -1; if(b==='KSR') return 1;
+            if(a==='BARU') return 1; if(b==='BARU') return -1;
+            return a.localeCompare(b);
+          });
+          return order.map(prefix=>{
+            const members=groups[prefix].sort((a,b)=>{
+              // Sort by numeric part of baniId
+              const na=parseInt((a.baniId||'').replace(/\D/g,''))||999;
+              const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999;
+              return na-nb;
+            });
+            const isBaru=prefix==='BARU';
+            const isKsr=prefix==='KSR';
+            return(
+              <div key={prefix} style={{marginBottom:16}}>
+                <div style={{
+                  fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',
+                  color:isBaru?'#a05030':isKsr?'#6a5020':'#4a7a9b',
+                  borderBottom:`2px solid ${isBaru?'#f0d8c8':isKsr?'#e8d8a0':'#d0e4f0'}`,
+                  paddingBottom:4,marginBottom:6
+                }}>
+                  {isBaru?'⏳ Belum ada relasi orang tua':isKsr?'🌳 Leluhur Utama (Kasirin)':`Bani ${prefix}`}
+                  <span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{members.length} orang</span>
+                </div>
+                <table style={{width:'100%',borderCollapse:'collapse'}}>
+                  <tbody>
+                    {members.map(p=>(
+                      <tr key={p.id} style={{borderBottom:'1px solid #f5f2ee'}}>
+                        <td style={{
+                          fontFamily:'monospace',fontSize:11,fontWeight:700,
+                          color:isBaru?'#a05030':isKsr?'#8a6020':'#4a7a9b',
+                          padding:'5px 10px 5px 0',whiteSpace:'nowrap',width:1
+                        }}>{p.baniId||'—'}</td>
+                        <td style={{fontSize:12,color:'#2a2018',padding:'5px 0'}}>{nn(p)}</td>
+                        <td style={{fontSize:10,color:'#b0a898',padding:'5px 0 5px 8px',textAlign:'right',whiteSpace:'nowrap'}}>
+                          {p.baniId?.endsWith('-X')&&<span style={{color:'#9a7050'}}>luar darah</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          });
+        })()}
       </div>
     </div>}
   </>;
