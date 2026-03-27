@@ -443,26 +443,60 @@ function App(){
   const saveTimer = useRef(null);
   const isFirstLoad = useRef(true);
 
-  /* ── FIREBASE LOAD ── */
+  // Delta tracking — store snapshots of last-synced state
+  const lastSyncedPeople = useRef({}); // { [id]: personObj }
+  const lastSyncedRels   = useRef({}); // { [id]: relObj }
+  const lastSyncedPos    = useRef({}); // { [id]: {x,y} }
+
+  /* ══════════════════════════════════════════
+     FIREBASE — 3 COLLECTIONS ARCHITECTURE
+     members / relationships / positions
+  ══════════════════════════════════════════ */
+  const COL_MEMBERS       = ()=>db.collection('members');
+  const COL_RELATIONSHIPS = ()=>db.collection('relationships');
+  const COL_POSITIONS     = ()=>db.collection('positions');
+
+  /* ── LOAD — parallel fetch all 3 collections ── */
   useEffect(()=>{
     async function load(){
       try{
-        const doc=await db.collection('silsilah').doc('bani-panidjan').get();
-        if(doc.exists){
-          const d=doc.data();
-          setPeople(d.people||[]);
-          setRels(d.rels||[]);
-          setPos(d.pos||{});
-        } else {
-          // First time — seed data
-          await db.collection('silsilah').doc('bani-panidjan').set({people:SP,rels:SR,pos:SPOS});
+        const [mSnap, rSnap, pSnap] = await Promise.all([
+          COL_MEMBERS().get(),
+          COL_RELATIONSHIPS().get(),
+          COL_POSITIONS().get(),
+        ]);
+
+        if(mSnap.empty){
+          // First time — seed all 3 collections via batch
+          const batch=db.batch();
+          SP.forEach(p=>batch.set(COL_MEMBERS().doc(p.id), p));
+          SR.forEach(r=>batch.set(COL_RELATIONSHIPS().doc(r.id), r));
+          Object.entries(SPOS).forEach(([id,xy])=>batch.set(COL_POSITIONS().doc(id), xy));
+          await batch.commit();
           setPeople(SP);setRels(SR);setPos({...SPOS});
+          // Snapshot initial state
+          SP.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+          SR.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+          Object.entries(SPOS).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+        } else {
+          const loadedPeople=mSnap.docs.map(d=>d.data());
+          const loadedRels=rSnap.docs.map(d=>d.data());
+          const loadedPos={};
+          pSnap.docs.forEach(d=>{loadedPos[d.id]=d.data();});
+          setPeople(loadedPeople);
+          setRels(loadedRels);
+          setPos(loadedPos);
+          // Snapshot loaded state
+          loadedPeople.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+          loadedRels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+          Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
         }
+        // Also keep localStorage as offline backup
+        localStorage.setItem('silsilah_v8',JSON.stringify({people:SP,rels:SR,pos:SPOS}));
       }catch(err){
         console.error('Firebase load error:',err);
-        // Fallback to localStorage if Firebase fails (offline mode)
         try{
-          const saved=JSON.parse(localStorage.getItem('silsilah_v7')||'null');
+          const saved=JSON.parse(localStorage.getItem('silsilah_v8')||'null');
           if(saved){setPeople(saved.people);setRels(saved.rels);setPos(saved.pos);}
           else{setPeople(SP);setRels(SR);setPos({...SPOS});}
           setLoadErr('Offline — perubahan hanya tersimpan di perangkat ini.');
@@ -472,17 +506,84 @@ function App(){
     load();
   },[]);
 
-  /* ── FIREBASE SAVE (debounced 1.5s) ── */
+  /* ── DELTA SAVE — debounced 1.5s, only write changed docs ── */
   useEffect(()=>{
     if(!people.length)return;
     // Always keep localStorage as backup
-    localStorage.setItem('silsilah_v7',JSON.stringify({people,rels,pos}));
+    localStorage.setItem('silsilah_v8',JSON.stringify({people,rels,pos}));
     if(isFirstLoad.current){isFirstLoad.current=false;return;}
+
     setSaveStatus('syncing');
     if(saveTimer.current)clearTimeout(saveTimer.current);
     saveTimer.current=setTimeout(async()=>{
       try{
-        await db.collection('silsilah').doc('bani-panidjan').set({people,rels,pos});
+        const batch=db.batch();
+        let changes=0;
+
+        // ── members delta ──
+        const currentPeopleMap={};
+        people.forEach(p=>{currentPeopleMap[p.id]=p;});
+        // Write new/changed members
+        people.forEach(p=>{
+          const prev=lastSyncedPeople.current[p.id];
+          if(!prev||JSON.stringify(prev)!==JSON.stringify(p)){
+            batch.set(COL_MEMBERS().doc(p.id), p);
+            changes++;
+          }
+        });
+        // Delete removed members
+        Object.keys(lastSyncedPeople.current).forEach(id=>{
+          if(!currentPeopleMap[id]){
+            batch.delete(COL_MEMBERS().doc(id));
+            changes++;
+          }
+        });
+
+        // ── relationships delta ──
+        const currentRelsMap={};
+        rels.forEach(r=>{currentRelsMap[r.id]=r;});
+        rels.forEach(r=>{
+          const prev=lastSyncedRels.current[r.id];
+          if(!prev||JSON.stringify(prev)!==JSON.stringify(r)){
+            batch.set(COL_RELATIONSHIPS().doc(r.id), r);
+            changes++;
+          }
+        });
+        Object.keys(lastSyncedRels.current).forEach(id=>{
+          if(!currentRelsMap[id]){
+            batch.delete(COL_RELATIONSHIPS().doc(id));
+            changes++;
+          }
+        });
+
+        // ── positions delta ──
+        Object.entries(pos).forEach(([id,xy])=>{
+          const prev=lastSyncedPos.current[id];
+          if(!prev||prev.x!==xy.x||prev.y!==xy.y){
+            batch.set(COL_POSITIONS().doc(id), xy);
+            changes++;
+          }
+        });
+        Object.keys(lastSyncedPos.current).forEach(id=>{
+          if(!pos[id]){
+            batch.delete(COL_POSITIONS().doc(id));
+            changes++;
+          }
+        });
+
+        if(changes>0){
+          await batch.commit();
+          console.log(`Firebase: ${changes} doc(s) synced`);
+        }
+
+        // Update snapshots after successful save
+        people.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+        Object.keys(lastSyncedPeople.current).forEach(id=>{if(!currentPeopleMap[id])delete lastSyncedPeople.current[id];});
+        rels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+        Object.keys(lastSyncedRels.current).forEach(id=>{if(!currentRelsMap[id])delete lastSyncedRels.current[id];});
+        Object.entries(pos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+        Object.keys(lastSyncedPos.current).forEach(id=>{if(!pos[id])delete lastSyncedPos.current[id];});
+
         setSaveStatus('saved');
       }catch(err){
         console.error('Firebase save error:',err);
