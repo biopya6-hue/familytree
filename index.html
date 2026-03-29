@@ -280,7 +280,6 @@ const SP=[
   {id:'p8', fullName:'Sandra',                  nickname:'Sandra',   gender:'F',status:'Cerai', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-008-X'},
   {id:'p9', fullName:'Deny',                    nickname:'Deny',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-009-X'},
   {id:'p10',fullName:'Sriwiyanti',              nickname:'Srini',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-010'},
-  {id:'p11',fullName:'Zaenal',                  nickname:'Zaenal',   gender:'M',status:'Cerai', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-011-X'},
   {id:'p12',fullName:'Saeful',                  nickname:'Saeful',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-012-X'},
   {id:'p13',fullName:'Siti Eko Wati',           nickname:'Siti',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-013'},
   {id:'p14',fullName:'Edi Santoso',             nickname:'Santoso',  gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-014-X'},
@@ -308,7 +307,6 @@ const SR=[
   {id:'r3', type:'married',      pids:['p6','p5'],          isActive:true},
   {id:'r4', type:'married',      pids:['p8','p7'],          isActive:true},
   {id:'r5', type:'married',      pids:['p7','p9'],          isActive:true},
-  {id:'r6', type:'married',      pids:['p11','p10'],        isActive:true},
   {id:'r7', type:'married',      pids:['p10','p12'],        isActive:true},
   {id:'r8', type:'married',      pids:['p14','p13'],        isActive:true},
   {id:'r9', type:'married',      pids:['p16','p15'],        isActive:true},
@@ -328,7 +326,6 @@ const SR=[
   {id:'r22',type:'parent-child', pids:['p7','p9','p23'],    isActive:true},
   {id:'r23',type:'parent-child', pids:['p7','p9','p24'],    isActive:true},
   {id:'r24',type:'parent-child', pids:['p10','p12','p25'],  isActive:true},
-  {id:'r25',type:'parent-child', pids:['p10','p12','p26'],  isActive:false},
   {id:'r25b',type:'parent-child',pids:['p16','p15','p26'],  isActive:true},
   {id:'r26',type:'parent-child', pids:['p14','p13','p27'],  isActive:true},
   {id:'r28',type:'parent-child', pids:['p19','p20','p28'],  isActive:true},
@@ -340,7 +337,7 @@ const SPOS={
   p3:{x:80,y:320},     p4:{x:220,y:320},
   p6:{x:420,y:320},    p5:{x:560,y:320},
   p8:{x:740,y:320},    p7:{x:880,y:320},  p9:{x:1020,y:320},
-  p11:{x:1200,y:320},  p10:{x:1340,y:320},p12:{x:1480,y:320},
+  p10:{x:1340,y:320},p12:{x:1480,y:320},
   p14:{x:1640,y:320},  p13:{x:1780,y:320},
   p16:{x:1940,y:320},  p15:{x:2080,y:320},
   p17:{x:80,y:580},    p18:{x:220,y:580},
@@ -417,7 +414,7 @@ function App(){
   const [isAdmin,setIsAdmin] = useState(false);
   const [searchQ,setSearchQ] = useState('');
   const [showSR,setShowSR]   = useState(false);
-  const [modal,setModal]     = useState(null); // 'pin'|'addperson'|'addrel'|'delconfirm'|'confirm-parents'
+  const [modal,setModal]     = useState(null); // 'pin'|'addperson'|'addrel'|'delconfirm'|'confirm-parents'|'autolayout'
   const [pinVal,setPinVal]   = useState('');
   const [pinErr,setPinErr]   = useState('');
   const [editF,setEditF]     = useState({});
@@ -987,6 +984,173 @@ function App(){
     setSel(null);setSbMode('view');
   }
 
+  /* ══════════════════════════════════════════════════════
+     AUTO LAYOUT — Subtree-Width Per Bani (Bottom-Up)
+     
+     Algoritma:
+     1. Hitung generasi tiap orang (BFS dari Kasirin)
+     2. Untuk tiap Bani Head (anak langsung Kasirin):
+        - Rekursif hitung lebar subtree-nya dari bawah ke atas
+        - Posisikan anak-anak dulu, lalu orang tua di tengah mereka
+        - Pasangan diletakkan di samping (kanan dari darah)
+     3. Susun semua Bani secara horizontal kiri→kanan dengan padding
+     4. Kasirin + Istri diposisikan di tengah total lebar
+  ══════════════════════════════════════════════════════ */
+  function computeAutoLayout(){
+    const CARD_W=110, GAP_X=40, GAP_Y=160, PAD_BANI=80;
+    const START_Y=0;
+
+    // ── 1. Hitung generasi (BFS dari KSR-000) ──
+    const genMap={};
+    const root=people.find(p=>p.baniId==='KSR-000');
+    if(!root){setModal(null);return;}
+    const queue=[root.id];
+    genMap[root.id]=0;
+    while(queue.length){
+      const cur=queue.shift();
+      const g=genMap[cur];
+      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>{
+        r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}});
+      });
+      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(cur)).forEach(r=>{
+        const cid=r.pids[r.pids.length-1];
+        if(!(cid in genMap)){genMap[cid]=g+1;queue.push(cid);}
+      });
+    }
+    people.forEach(p=>{if(!(p.id in genMap))genMap[p.id]=99;});
+
+    // ── 2. Helper: dapatkan anak aktif (hanya darah, bukan pasangan) ──
+    function getBloodChildren(pid){
+      // Anak yang tercatat sebagai darah dari orang ini (pids includes pid, tapi bukan -X)
+      const childIds=new Set();
+      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid))
+        .forEach(r=>childIds.add(r.pids[r.pids.length-1]));
+      return [...childIds];
+    }
+
+    function getSpouseOf(pid){
+      // Pasangan aktif pertama yang bukan diri sendiri
+      for(const r of rels.filter(r=>r.type==='married'&&r.pids.includes(pid))){
+        const other=r.pids.find(x=>x!==pid);
+        if(other) return other;
+      }
+      return null;
+    }
+
+    // ── 3. Recursive subtree width ──
+    // Lebar subtree = max(lebar unit orang tua+pasangan, total lebar anak-anak)
+    // Unit = 1 kartu jika tidak punya pasangan, 2 kartu jika punya pasangan
+    function subtreeWidth(pid, visited=new Set()){
+      if(visited.has(pid)) return CARD_W; // cycle guard
+      visited.add(pid);
+      const spouse=getSpouseOf(pid);
+      const selfWidth=spouse?(CARD_W*2+GAP_X):CARD_W;
+      const children=getBloodChildren(pid);
+      if(!children.length) return selfWidth;
+      const childTotal=children.reduce((sum,cid)=>sum+subtreeWidth(cid,new Set([...visited])),0)
+                       +(children.length-1)*GAP_X;
+      return Math.max(selfWidth, childTotal);
+    }
+
+    // ── 4. Recursive posisi dalam satu Bani ──
+    // Letakkan semua anak dulu, lalu posisikan diri sendiri di tengah
+    function layoutSubtree(pid, centerX, gen, newPos, visited=new Set()){
+      if(visited.has(pid)) return;
+      visited.add(pid);
+      const yPos=START_Y+gen*GAP_Y;
+      const spouse=getSpouseOf(pid);
+      const children=getBloodChildren(pid);
+
+      if(children.length===0){
+        // Leaf node — taruh di centerX
+        newPos[pid]={x:Math.round(centerX-CARD_W/2), y:Math.round(yPos)};
+        if(spouse&&!newPos[spouse]){
+          newPos[spouse]={x:Math.round(centerX+GAP_X/2), y:Math.round(yPos)};
+        }
+        return;
+      }
+
+      // Hitung total lebar semua anak
+      const widths=children.map(cid=>subtreeWidth(cid,new Set([pid])));
+      const totalChildW=widths.reduce((s,w)=>s+w,0)+(children.length-1)*GAP_X;
+
+      // Posisikan anak-anak dari kiri ke kanan
+      let cx=centerX-totalChildW/2;
+      children.forEach((cid,i)=>{
+        const w=widths[i];
+        layoutSubtree(cid, cx+w/2, gen+1, newPos, new Set([...visited]));
+        cx+=w+GAP_X;
+      });
+
+      // Posisikan diri sendiri di tengah span anak paling kiri & kanan
+      const leftChild=children[0], rightChild=children[children.length-1];
+      const lcx=newPos[leftChild]?newPos[leftChild].x+CARD_W/2:centerX;
+      const rcx=newPos[rightChild]?newPos[rightChild].x+CARD_W/2:centerX;
+      const selfCX=(lcx+rcx)/2;
+
+      if(spouse){
+        // Darah di kiri, pasangan di kanan, keduanya centered di selfCX
+        newPos[pid]={x:Math.round(selfCX-CARD_W-GAP_X/2), y:Math.round(yPos)};
+        if(!newPos[spouse]) newPos[spouse]={x:Math.round(selfCX+GAP_X/2), y:Math.round(yPos)};
+      } else {
+        newPos[pid]={x:Math.round(selfCX-CARD_W/2), y:Math.round(yPos)};
+      }
+    }
+
+    // ── 5. Susun Bani kiri→kanan ──
+    const newPos={};
+    // Bani Heads = anak langsung Kasirin (gen=1)
+    const baniHeads=people.filter(p=>genMap[p.id]===1&&
+      rels.some(r=>r.type==='parent-child'&&r.isActive&&
+        r.pids.slice(0,-1).includes(root.id)&&r.pids[r.pids.length-1]===p.id)
+    );
+
+    // Urutkan berdasarkan ID relasi (urutan input) — hormati urutan kelahiran
+    baniHeads.sort((a,b)=>{
+      const ra=rels.find(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===a.id);
+      const rb=rels.find(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===b.id);
+      return (ra?.id||'').localeCompare(rb?.id||'');
+    });
+
+    let cursorX=0;
+    const baniCenters=[];
+    baniHeads.forEach((bh,i)=>{
+      const w=subtreeWidth(bh.id, new Set([root.id]));
+      const centerX=cursorX+w/2;
+      baniCenters.push(centerX);
+      layoutSubtree(bh.id, centerX, 1, newPos, new Set([root.id]));
+      cursorX+=w+(i<baniHeads.length-1?PAD_BANI:0);
+    });
+
+    const totalW=cursorX;
+
+    // ── 6. Posisikan Kasirin & Istri di tengah total ──
+    const rootCX=totalW/2;
+    const spouse=getSpouseOf(root.id);
+    if(spouse){
+      newPos[root.id]={x:Math.round(rootCX-CARD_W-GAP_X/2), y:Math.round(START_Y)};
+      newPos[spouse]={x:Math.round(rootCX+GAP_X/2), y:Math.round(START_Y)};
+    } else {
+      newPos[root.id]={x:Math.round(rootCX-CARD_W/2), y:Math.round(START_Y)};
+    }
+
+    // ── 7. Orang yang tidak terhubung → baris bawah sendiri ──
+    const unconnected=people.filter(p=>!(p.id in newPos));
+    let ux=0;
+    const maxY=Math.max(...Object.values(newPos).map(p=>p.y),0);
+    unconnected.forEach(p=>{
+      newPos[p.id]={x:Math.round(ux), y:Math.round(maxY+GAP_Y+120)};
+      ux+=CARD_W+GAP_X;
+    });
+
+    setPos(newPos);
+    if(vpRef.current){
+      const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight;
+      setVt({s:0.5,x:vw/2-rootCX*0.5,y:vh/2-START_Y*0.5+80});
+    }
+    setModal(null);
+  }
+
   /* ── BANI LABEL ──
      Rules:
      1. No selection → "Bani Kasirin"
@@ -1117,6 +1281,7 @@ function App(){
       {/* Mobile search icon */}
       <button className="search-icon-btn" onClick={()=>{setShowSearch(true);setSearchQ('');setShowSR(false);}}>🔍</button>
       <div className="spacer"/>
+      {isAdmin&&<button className="btn accent" style={{fontSize:11}} onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
       {isAdmin&&<button className="btn" style={{fontSize:11}} onClick={()=>setModal('registry')}>🪪 ID</button>}
@@ -1537,6 +1702,21 @@ function App(){
         </div>
         <div className="frow">
           <button className="btn primary" onClick={addPerson} disabled={!addF.fullName.trim()}>Tambah</button>
+          <button className="btn" onClick={()=>setModal(null)}>Batal</button>
+        </div>
+      </div>
+    </div>}
+
+    {/* ── AUTO LAYOUT MODAL ── */}
+    {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <h3>⊞ Rapikan Otomatis</h3>
+        <p className="modal-sub">Semua posisi kartu akan dihitung ulang menggunakan algoritma subtree per Bani. Posisi yang sudah kamu atur manual akan digantikan.</p>
+        <div style={{background:'#f0f7ff',border:'1px solid #c0d8f0',borderRadius:8,padding:'8px 12px',fontSize:11,color:'#3060a0',marginBottom:14,lineHeight:1.6}}>
+          ℹ️ Setelah rapikan, kamu tetap bisa drag kartu secara manual untuk fine-tuning.
+        </div>
+        <div className="frow">
+          <button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button>
           <button className="btn" onClick={()=>setModal(null)}>Batal</button>
         </div>
       </div>
