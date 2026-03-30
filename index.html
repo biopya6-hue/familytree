@@ -89,6 +89,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .card-badge{display:inline-block;font-size:8px;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:3px;letter-spacing:.04em;}
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
+.card.unknown-gender .gaccent{background:#e0c050!important}
+.card.unknown-gender .avatar span{color:#8a7020}
 
 
 
@@ -266,39 +268,146 @@ function curve(x1,y1,x2,y2,horiz){
   return `M${x1},${y1} C${x1},${m} ${x2},${m} ${x2},${y2}`;
 }
 
-/* ── SEED ── */
+/* ── SEED DATA — Complete family tree ──
+   Gender: M=Laki-laki, F=Perempuan, ?=Belum diketahui
+   BaniID: KSR=Kasirin, PAN=Panidjan, SAD=Said, SUR=Surahman, KRM=Karmilah
+   -X suffix = masuk via pernikahan (bukan darah)
+*/
 const SP=[
-  {id:'p0a',fullName:'Kasirin',                 nickname:'Kasirin',  gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-000'},
-  {id:'p0b',fullName:'Istri Mbah Kasirin',      nickname:'Mbah Putri',gender:'F',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-W1'},
-  {id:'p1', fullName:'Panidjan',                nickname:'Panidjan', gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-001'},
-  {id:'p2', fullName:'Wiji',                    nickname:'Wiji',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-002-X'},
-  {id:'p3', fullName:'Mukayani',                nickname:'Mukayani', gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-003'},
-  {id:'p4', fullName:'Ririn',                   nickname:'Ririn',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-004-X'},
-  {id:'p5', fullName:'Wiwik Rianti',            nickname:'Wiwik',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-005'},
-  {id:'p6', fullName:'Manan',                   nickname:'Manan',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-006-X'},
-  {id:'p7', fullName:'Edi Purnomo',             nickname:'Edi',      gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-007'},
-  {id:'p8', fullName:'Sandra',                  nickname:'Sandra',   gender:'F',status:'Cerai', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-008-X'},
-  {id:'p9', fullName:'Deny',                    nickname:'Deny',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-009-X'},
-  {id:'p10',fullName:'Sriwiyanti',              nickname:'Srini',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-010'},
-  {id:'p12',fullName:'Saeful',                  nickname:'Saeful',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-012-X'},
-  {id:'p13',fullName:'Siti Eko Wati',           nickname:'Siti',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-013'},
-  {id:'p14',fullName:'Edi Santoso',             nickname:'Santoso',  gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-014-X'},
-  {id:'p15',fullName:'Eny Idayanti',            nickname:'Eny',      gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-015'},
-  {id:'p16',fullName:'Zamzuri',                 nickname:'Zamzuri',  gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-016-X'},
-  {id:'p17',fullName:'M. Anas Ataroqy Isa',    nickname:'Anas',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-017'},
-  {id:'p18',fullName:'Agista Alifia Amalia',    nickname:'Agista',   gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-018'},
-  {id:'p19',fullName:'M. Khoirul Anam',         nickname:'Khoirul',  gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-019'},
-  {id:'p20',fullName:'Pramesti Tunjung Sasmita',nickname:'Tunjung',  gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-020-X'},
-  {id:'p21',fullName:'Laili Khoirur Rohmah',   nickname:'Laili',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-021'},
-  {id:'p22',fullName:'Eka',                     nickname:'Eka',      gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-022'},
-  {id:'p23',fullName:'Wildan',                  nickname:'Wildan',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-023'},
-  {id:'p24',fullName:'Azril',                   nickname:'Azril',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-024'},
-  {id:'p25',fullName:'Faiz',                    nickname:'Faiz',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-025'},
-  {id:'p26',fullName:'Hafiz',                   nickname:'Hafiz',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-026'},
-  {id:'p27',fullName:'Iqbal',                   nickname:'Iqbal',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-027'},
-  {id:'p28',fullName:'Ishita Hirya Mahesani',   nickname:'Hirya',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-028'},
-];
+  /* ── GEN 0: KASIRIN & 2 ISTRI ── */
+  {id:'p0a',fullName:'Kasirin',              nickname:'Kasirin',    gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-000'},
+  {id:'p0b',fullName:'? (Istri ke-1 Kasirin)',nickname:'Istri 1',  gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama belum diketahui. Ibu dari Karmilah.',baniId:'KSR-W1'},
+  {id:'p0c',fullName:'Paenem',               nickname:'Paenem',    gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Istri ke-2 Kasirin. Ibu dari Said, Panidjan, dan Surahman.',baniId:'KSR-W2'},
 
+  /* ── GEN 1: ANAK KASIRIN ── */
+  /* Jalur Istri ke-1 */
+  {id:'k1', fullName:'Karmilah',             nickname:'Karmilah',  gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KRM-001'},
+  {id:'k1s',fullName:'? (Suami Karmilah)',   nickname:'Suami Karmilah',gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama belum diketahui.',baniId:'KRM-002-X'},
+
+  /* Jalur Paenem — Said */
+  {id:'s1', fullName:'Said',                 nickname:'Said',      gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-001'},
+  {id:'s1w1',fullName:'? (Istri ke-1 Said)', nickname:'Istri 1 Said',gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama belum diketahui. Ibu dari Imam.',baniId:'SAD-002-X'},
+  {id:'s1w2',fullName:'Rasih',               nickname:'Rasih',     gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Istri ke-2 Said. Tidak memiliki anak.',baniId:'SAD-010-X'},
+
+  /* Jalur Paenem — Panidjan */
+  {id:'p1', fullName:'Panidjan',             nickname:'Panidjan',  gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-001'},
+  {id:'p2', fullName:'Wiji',                 nickname:'Wiji',      gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-002-X'},
+
+  /* Jalur Paenem — Surahman */
+  {id:'u1', fullName:'Surahman',             nickname:'Surahman',  gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SUR-001'},
+  {id:'u1w1',fullName:'Menik',               nickname:'Menik',     gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Istri ke-1 Surahman. Tidak memiliki anak.',baniId:'SUR-002-X'},
+  {id:'u1w2',fullName:'? (Istri ke-2 Surahman)',nickname:'Istri 2 Surahman',gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama belum diketahui.',baniId:'SUR-003-X'},
+
+  /* ── GEN 2: CUCU KASIRIN JALUR SAID ── */
+  {id:'s2', fullName:'Imam',                 nickname:'Imam',      gender:'M',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-003'},
+  {id:'s2w',fullName:'? (Istri Imam)',        nickname:'Istri Imam',gender:'F',status:'Wafat',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama belum diketahui.',baniId:'SAD-004-X'},
+
+  /* ── GEN 3: CICIT KASIRIN JALUR SAID ── */
+  {id:'s3', fullName:'? (Anak Imam)',         nickname:'Anak Imam', gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui.',baniId:'SAD-005'},
+  {id:'s3p',fullName:'? (Pasangan Anak Imam)',nickname:'Pasangan',  gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui.',baniId:'SAD-006-X'},
+
+  /* ── GEN 4: CICIT KASIRIN JALUR SAID (anak dari Anak Imam) ── */
+  {id:'s4a',fullName:'? (Anak 1)',            nickname:'Cucu Imam 1',gender:'?',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui.',baniId:'SAD-007'},
+  {id:'s4b',fullName:'? (Anak 2)',            nickname:'Cucu Imam 2',gender:'?',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui.',baniId:'SAD-008'},
+  {id:'s4c',fullName:'? (Anak 3)',            nickname:'Cucu Imam 3',gender:'?',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui.',baniId:'SAD-009'},
+
+  /* ── GEN 2: ANAK PANIDJAN (7 orang + pasangan) ── */
+  {id:'p3', fullName:'Mukayani',             nickname:'Mukayani',  gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-003'},
+  {id:'p4', fullName:'Ririn',                nickname:'Ririn',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-004-X'},
+  {id:'p5', fullName:'Wiwik Rianti',         nickname:'Wiwik',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-005'},
+  {id:'p6', fullName:'Manan',                nickname:'Manan',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-006-X'},
+  {id:'p29',fullName:'Sucipto',              nickname:'Sucipto',   gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Wafat sebelum menikah.',baniId:'PAN-029'},
+  {id:'p7', fullName:'Edi Purnomo',          nickname:'Edi',       gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-007'},
+  {id:'p8', fullName:'Sandra',               nickname:'Sandra',    gender:'F',status:'Cerai', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Istri pertama Edi (cerai).',baniId:'PAN-008-X'},
+  {id:'p9', fullName:'Deny',                 nickname:'Deny',      gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-009-X'},
+  {id:'p10',fullName:'Sriwiyanti',           nickname:'Sri',       gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-010'},
+  {id:'p12',fullName:'Saeful',               nickname:'Saeful',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-012-X'},
+  {id:'p13',fullName:'Siti Eko Wati',        nickname:'Siti',      gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-013'},
+  {id:'p14',fullName:'Edi Santoso',          nickname:'Santoso',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-014-X'},
+  {id:'p15',fullName:'Eny Idayanti',         nickname:'Eny',       gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-015'},
+  {id:'p16',fullName:'Zamzuri',              nickname:'Zamzuri',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-016-X'},
+
+  /* ── GEN 3: CUCU PANIDJAN ── */
+  {id:'p17',fullName:'M. Anas Ataroqy Isa',  nickname:'Anas',      gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-017'},
+  {id:'p18',fullName:'Agista Alifia Amalia',  nickname:'Agista',    gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-018'},
+  {id:'p19',fullName:'M. Khoirul Anam',       nickname:'Khoirul',   gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-019'},
+  {id:'p20',fullName:'Pramesti Tunjung Sasmita',nickname:'Tunjung', gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-020-X'},
+  {id:'p21',fullName:'Laili Khoirur Rohmah',  nickname:'Laili',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-021'},
+  {id:'p22',fullName:'Eka',                   nickname:'Eka',       gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-022'},
+  {id:'p23',fullName:'Wildan',                nickname:'Wildan',    gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-023'},
+  {id:'p24',fullName:'Azril',                 nickname:'Azril',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-024'},
+  {id:'p25',fullName:'Faiz',                  nickname:'Faiz',      gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-025'},
+  {id:'p26',fullName:'Hafiz',                 nickname:'Hafiz',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-026'},
+  {id:'p27',fullName:'Iqbal',                 nickname:'Iqbal',     gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-027'},
+
+  /* ── GEN 4: CICIT PANIDJAN ── */
+  {id:'p28',fullName:'Ishita Hirya Mahesani', nickname:'Hirya',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-028'},
+
+  /* ── GEN 2: ANAK SURAHMAN ── */
+  {id:'u2', fullName:'? (Anak Surahman)',     nickname:'Anak Surahman',gender:'?',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'Nama dan gender belum diketahui. Belum menikah.',baniId:'SUR-004'},
+]
+const SR=[
+  /* ── PERNIKAHAN ── */
+  {id:'r0',  type:'married',      pids:['p0a','p0b'],          isActive:true},  // Kasirin + Istri 1
+  {id:'r0c', type:'married',      pids:['p0a','p0c'],          isActive:true},  // Kasirin + Paenem
+  {id:'rk1', type:'married',      pids:['k1','k1s'],           isActive:true},  // Karmilah + Suami
+  {id:'rs1a',type:'married',      pids:['s1','s1w1'],          isActive:true},  // Said + Istri 1
+  {id:'rs1b',type:'married',      pids:['s1','s1w2'],          isActive:true},  // Said + Rasih
+  {id:'rs2', type:'married',      pids:['s2','s2w'],           isActive:true},  // Imam + Istri
+  {id:'rs3', type:'married',      pids:['s3','s3p'],           isActive:true},  // Anak Imam + Pasangan
+  {id:'ru1a',type:'married',      pids:['u1','u1w1'],          isActive:true},  // Surahman + Menik
+  {id:'ru1b',type:'married',      pids:['u1','u1w2'],          isActive:true},  // Surahman + Istri 2
+  {id:'r1',  type:'married',      pids:['p1','p2'],            isActive:true},  // Panidjan + Wiji
+  {id:'r2',  type:'married',      pids:['p3','p4'],            isActive:true},  // Mukayani + Ririn
+  {id:'r3',  type:'married',      pids:['p6','p5'],            isActive:true},  // Manan + Wiwik
+  {id:'r4',  type:'married',      pids:['p8','p7'],            isActive:true},  // Sandra + Edi (cerai)
+  {id:'r5',  type:'married',      pids:['p7','p9'],            isActive:true},  // Edi + Deny
+  {id:'r7',  type:'married',      pids:['p10','p12'],          isActive:true},  // Sri + Saeful
+  {id:'r8',  type:'married',      pids:['p14','p13'],          isActive:true},  // Santoso + Siti
+  {id:'r9',  type:'married',      pids:['p16','p15'],          isActive:true},  // Zamzuri + Eny
+  {id:'r10', type:'married',      pids:['p19','p20'],          isActive:true},  // Khoirul + Tunjung
+
+  /* ── ANAK KASIRIN ── */
+  {id:'r0a', type:'parent-child', pids:['p0a','p0b','k1'],     isActive:true},  // Karmilah ← Kasirin+Istri1
+  {id:'r0s', type:'parent-child', pids:['p0a','p0c','s1'],     isActive:true},  // Said ← Kasirin+Paenem
+  {id:'r0p', type:'parent-child', pids:['p0a','p0c','p1'],     isActive:true},  // Panidjan ← Kasirin+Paenem
+  {id:'r0u', type:'parent-child', pids:['p0a','p0c','u1'],     isActive:true},  // Surahman ← Kasirin+Paenem
+
+  /* ── JALUR SAID ── */
+  {id:'rs2c',type:'parent-child', pids:['s1','s1w1','s2'],     isActive:true},  // Imam ← Said+Istri1
+  {id:'rs3c',type:'parent-child', pids:['s2','s2w','s3'],      isActive:true},  // Anak Imam ← Imam+Istri
+  {id:'rs4a',type:'parent-child', pids:['s3','s3p','s4a'],     isActive:true},  // Cucu Imam 1
+  {id:'rs4b',type:'parent-child', pids:['s3','s3p','s4b'],     isActive:true},  // Cucu Imam 2
+  {id:'rs4c',type:'parent-child', pids:['s3','s3p','s4c'],     isActive:true},  // Cucu Imam 3
+
+  /* ── JALUR SURAHMAN ── */
+  {id:'ru2c',type:'parent-child', pids:['u1','u1w2','u2'],     isActive:true},  // Anak Surahman ← Surahman+Istri2
+
+  /* ── ANAK PANIDJAN (7 orang, urutan kelahiran) ── */
+  {id:'r11', type:'parent-child', pids:['p1','p2','p3'],       isActive:true},  // Mukayani
+  {id:'r12', type:'parent-child', pids:['p1','p2','p5'],       isActive:true},  // Wiwik
+  {id:'r29', type:'parent-child', pids:['p1','p2','p29'],      isActive:true},  // Sucipto
+  {id:'r13', type:'parent-child', pids:['p1','p2','p7'],       isActive:true},  // Edi
+  {id:'r14', type:'parent-child', pids:['p1','p2','p10'],      isActive:true},  // Sri
+  {id:'r15', type:'parent-child', pids:['p1','p2','p13'],      isActive:true},  // Siti
+  {id:'r16', type:'parent-child', pids:['p1','p2','p15'],      isActive:true},  // Eny
+
+  /* ── CUCU PANIDJAN ── */
+  {id:'r17', type:'parent-child', pids:['p3','p4','p17'],      isActive:true},  // Anas
+  {id:'r18', type:'parent-child', pids:['p3','p4','p18'],      isActive:true},  // Agista
+  {id:'r19', type:'parent-child', pids:['p6','p5','p19'],      isActive:true},  // Khoirul
+  {id:'r20', type:'parent-child', pids:['p6','p5','p21'],      isActive:true},  // Laili
+  {id:'r21', type:'parent-child', pids:['p8','p7','p22'],      isActive:false}, // Eka (bio: Sandra+Edi)
+  {id:'r21b',type:'parent-child', pids:['p7','p9','p22'],      isActive:true},  // Eka (aktif: Edi+Deny)
+  {id:'r22', type:'parent-child', pids:['p7','p9','p23'],      isActive:true},  // Wildan
+  {id:'r23', type:'parent-child', pids:['p7','p9','p24'],      isActive:true},  // Azril
+  {id:'r24', type:'parent-child', pids:['p10','p12','p25'],    isActive:true},  // Faiz
+  {id:'r25b',type:'parent-child', pids:['p16','p15','p26'],    isActive:true},  // Hafiz (diasuh Zamzuri+Eny)
+  {id:'r26', type:'parent-child', pids:['p14','p13','p27'],    isActive:true},  // Iqbal
+
+  /* ── CICIT PANIDJAN ── */
+  {id:'r28', type:'parent-child', pids:['p19','p20','p28'],    isActive:true},  // Hirya
+]
 const SR=[
   {id:'r0', type:'married',      pids:['p0a','p0b'],        isActive:true},
   {id:'r0a',type:'parent-child', pids:['p0a','p0b','p1'],   isActive:true},
@@ -332,22 +441,37 @@ const SR=[
 ];
 
 const SPOS={
-  p0a:{x:1010,y:-180}, p0b:{x:1150,y:-180},
-  p1:{x:1080,y:80},    p2:{x:1220,y:80},
-  p3:{x:80,y:320},     p4:{x:220,y:320},
-  p6:{x:420,y:320},    p5:{x:560,y:320},
-  p8:{x:740,y:320},    p7:{x:880,y:320},  p9:{x:1020,y:320},
-  p10:{x:1340,y:320},p12:{x:1480,y:320},
-  p14:{x:1640,y:320},  p13:{x:1780,y:320},
-  p16:{x:1940,y:320},  p15:{x:2080,y:320},
-  p17:{x:80,y:580},    p18:{x:220,y:580},
-  p19:{x:420,y:580},   p20:{x:560,y:580}, p21:{x:700,y:580},
-  p22:{x:870,y:580},
-  p23:{x:1000,y:580},  p24:{x:1130,y:580},
-  p25:{x:1300,y:580},
-  p26:{x:1970,y:580},
-  p27:{x:1710,y:580},
-  p28:{x:490,y:840},
+  /* Gen 0 */
+  p0a:{x:1200,y:0},   p0b:{x:1060,y:0},   p0c:{x:1340,y:0},
+  /* Gen 1 — Jalur Istri 1 */
+  k1:{x:800,y:200},   k1s:{x:940,y:200},
+  /* Gen 1 — Jalur Paenem */
+  s1:{x:1060,y:200},  s1w1:{x:1200,y:200}, s1w2:{x:1340,y:200},
+  p1:{x:1480,y:200},  p2:{x:1620,y:200},
+  u1:{x:1760,y:200},  u1w1:{x:1900,y:200}, u1w2:{x:2040,y:200},
+  /* Gen 2 — Jalur Said */
+  s2:{x:1060,y:400},  s2w:{x:1200,y:400},
+  /* Gen 2 — Jalur Panidjan */
+  p3:{x:1340,y:400},  p4:{x:1480,y:400},
+  p5:{x:1620,y:400},  p6:{x:1760,y:400},
+  p29:{x:1900,y:400},
+  p7:{x:2180,y:400},  p8:{x:2040,y:400},   p9:{x:2320,y:400},
+  p10:{x:2460,y:400}, p12:{x:2600,y:400},
+  p13:{x:2740,y:400}, p14:{x:2880,y:400},
+  p15:{x:3020,y:400}, p16:{x:3160,y:400},
+  /* Gen 2 — Jalur Surahman */
+  u2:{x:1760,y:400},
+  /* Gen 3 — Jalur Said */
+  s3:{x:1060,y:600},  s3p:{x:1200,y:600},
+  /* Gen 3 — Jalur Panidjan */
+  p17:{x:1340,y:600}, p18:{x:1480,y:600},
+  p19:{x:1620,y:600}, p20:{x:1760,y:600},  p21:{x:1900,y:600},
+  p22:{x:2040,y:600}, p23:{x:2180,y:600},  p24:{x:2320,y:600},
+  p25:{x:2600,y:600}, p26:{x:3100,y:600},  p27:{x:2810,y:600},
+  /* Gen 4 — Jalur Said */
+  s4a:{x:940,y:800},  s4b:{x:1080,y:800},  s4c:{x:1220,y:800},
+  /* Gen 4 — Jalur Panidjan */
+  p28:{x:1700,y:800},
 };
 
 /* ══════════════════════════════════════════
@@ -489,11 +613,11 @@ function App(){
           Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
         }
         // Also keep localStorage as offline backup
-        localStorage.setItem('silsilah_v8',JSON.stringify({people:SP,rels:SR,pos:SPOS}));
+        localStorage.setItem('silsilah_v9',JSON.stringify({people:loadedPeople||SP,rels:loadedRels||SR,pos:loadedPos||SPOS}));
       }catch(err){
         console.error('Firebase load error:',err);
         try{
-          const saved=JSON.parse(localStorage.getItem('silsilah_v8')||'null');
+          const saved=JSON.parse(localStorage.getItem('silsilah_v9')||'null');
           if(saved){setPeople(saved.people);setRels(saved.rels);setPos(saved.pos);}
           else{setPeople(SP);setRels(SR);setPos({...SPOS});}
           setLoadErr('Offline — perubahan hanya tersimpan di perangkat ini.');
@@ -507,7 +631,7 @@ function App(){
   useEffect(()=>{
     if(!people.length)return;
     // Always keep localStorage as backup
-    localStorage.setItem('silsilah_v8',JSON.stringify({people,rels,pos}));
+    localStorage.setItem('silsilah_v9',JSON.stringify({people,rels,pos}));
     if(isFirstLoad.current){isFirstLoad.current=false;return;}
 
     setSaveStatus('syncing');
@@ -980,7 +1104,9 @@ function App(){
   function fullReset(){
     if(!vpRef.current)return;
     const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight;
-    setVt({s:0.55,x:vw/2-(1080+CW/2)*0.55,y:vh/2-(80+CH/2)*0.55});
+    // Use actual current position of Kasirin (p0a), fallback to SPOS
+    const root=pos['p0a']||SPOS['p0a']||{x:1010,y:-180};
+    setVt({s:0.55,x:vw/2-(root.x+CW/2)*0.55,y:vh/2-(root.y+CH/2)*0.55});
     setSel(null);setSbMode('view');
   }
 
@@ -1028,23 +1154,23 @@ function App(){
       return [...childIds];
     }
 
+    // Returns array of all spouses (supports poligami)
+    function getSpousesOf(pid){
+      return rels.filter(r=>r.type==='married'&&r.pids.includes(pid))
+        .map(r=>r.pids.find(x=>x!==pid)).filter(Boolean);
+    }
+    // Backward compat — returns first spouse or null
     function getSpouseOf(pid){
-      // Pasangan aktif pertama yang bukan diri sendiri
-      for(const r of rels.filter(r=>r.type==='married'&&r.pids.includes(pid))){
-        const other=r.pids.find(x=>x!==pid);
-        if(other) return other;
-      }
-      return null;
+      return getSpousesOf(pid)[0]||null;
     }
 
-    // ── 3. Recursive subtree width ──
-    // Lebar subtree = max(lebar unit orang tua+pasangan, total lebar anak-anak)
-    // Unit = 1 kartu jika tidak punya pasangan, 2 kartu jika punya pasangan
+    // ── 3. Recursive subtree width (poligami-aware) ──
     function subtreeWidth(pid, visited=new Set()){
-      if(visited.has(pid)) return CARD_W; // cycle guard
+      if(visited.has(pid)) return CARD_W;
       visited.add(pid);
-      const spouse=getSpouseOf(pid);
-      const selfWidth=spouse?(CARD_W*2+GAP_X):CARD_W;
+      const spouses=getSpousesOf(pid);
+      // Self block = 1 card + all spouses side by side
+      const selfWidth=spouses.length>0?(CARD_W*(spouses.length+1)+GAP_X*spouses.length):CARD_W;
       const children=getBloodChildren(pid);
       if(!children.length) return selfWidth;
       const childTotal=children.reduce((sum,cid)=>sum+subtreeWidth(cid,new Set([...visited])),0)
@@ -1052,29 +1178,32 @@ function App(){
       return Math.max(selfWidth, childTotal);
     }
 
-    // ── 4. Recursive posisi dalam satu Bani ──
-    // Letakkan semua anak dulu, lalu posisikan diri sendiri di tengah
+    // ── 4. Recursive posisi dalam satu Bani (poligami-aware) ──
     function layoutSubtree(pid, centerX, gen, newPos, visited=new Set()){
       if(visited.has(pid)) return;
       visited.add(pid);
       const yPos=START_Y+gen*GAP_Y;
-      const spouse=getSpouseOf(pid);
+      const spouses=getSpousesOf(pid);
       const children=getBloodChildren(pid);
 
+      // Calculate total width of self + all spouses
+      const totalPersons=1+spouses.length;
+      const selfBlockW=totalPersons*CARD_W+(totalPersons-1)*GAP_X;
+
       if(children.length===0){
-        // Leaf node — taruh di centerX
-        newPos[pid]={x:Math.round(centerX-CARD_W/2), y:Math.round(yPos)};
-        if(spouse&&!newPos[spouse]){
-          newPos[spouse]={x:Math.round(centerX+GAP_X/2), y:Math.round(yPos)};
-        }
+        // Leaf — place person block centered at centerX
+        const blockLeft=centerX-selfBlockW/2;
+        newPos[pid]={x:Math.round(blockLeft), y:Math.round(yPos)};
+        spouses.forEach((sid,i)=>{
+          if(!newPos[sid])
+            newPos[sid]={x:Math.round(blockLeft+(i+1)*(CARD_W+GAP_X)), y:Math.round(yPos)};
+        });
         return;
       }
 
-      // Hitung total lebar semua anak
+      // Layout children first
       const widths=children.map(cid=>subtreeWidth(cid,new Set([pid])));
       const totalChildW=widths.reduce((s,w)=>s+w,0)+(children.length-1)*GAP_X;
-
-      // Posisikan anak-anak dari kiri ke kanan
       let cx=centerX-totalChildW/2;
       children.forEach((cid,i)=>{
         const w=widths[i];
@@ -1082,19 +1211,19 @@ function App(){
         cx+=w+GAP_X;
       });
 
-      // Posisikan diri sendiri di tengah span anak paling kiri & kanan
+      // Center parent block over children
       const leftChild=children[0], rightChild=children[children.length-1];
       const lcx=newPos[leftChild]?newPos[leftChild].x+CARD_W/2:centerX;
       const rcx=newPos[rightChild]?newPos[rightChild].x+CARD_W/2:centerX;
       const selfCX=(lcx+rcx)/2;
+      const blockLeft=selfCX-selfBlockW/2;
 
-      if(spouse){
-        // Darah di kiri, pasangan di kanan, keduanya centered di selfCX
-        newPos[pid]={x:Math.round(selfCX-CARD_W-GAP_X/2), y:Math.round(yPos)};
-        if(!newPos[spouse]) newPos[spouse]={x:Math.round(selfCX+GAP_X/2), y:Math.round(yPos)};
-      } else {
-        newPos[pid]={x:Math.round(selfCX-CARD_W/2), y:Math.round(yPos)};
-      }
+      // Blood person at left of block, spouses to the right
+      newPos[pid]={x:Math.round(blockLeft), y:Math.round(yPos)};
+      spouses.forEach((sid,i)=>{
+        if(!newPos[sid])
+          newPos[sid]={x:Math.round(blockLeft+(i+1)*(CARD_W+GAP_X)), y:Math.round(yPos)};
+      });
     }
 
     // ── 5. Susun Bani kiri→kanan ──
@@ -1196,8 +1325,7 @@ function App(){
     if(!selPerson) return 'Bani Kasirin';
 
     // Kasirin or their spouse → Bani Kasirin
-    if(selPerson.baniId==='KSR-000'||selPerson.baniId==='KSR-W1'||
-       selPerson.baniId?.match(/^KSR-W\d+$/)) return 'Bani Kasirin';
+    if(selPerson.baniId==='KSR-000'||selPerson.baniId?.match(/^KSR-/)) return 'Bani Kasirin';
 
     // Try to find Bani Head via parent chain
     let head=getBaniHead(sel);
@@ -1345,7 +1473,7 @@ function App(){
                 e.stopPropagation();
                 setSel(p.id);setSbMode('view');setEdgeSel(null);
               }}>
-              <div className={`card${p.status==='Wafat'?' wafat':''}${sel===p.id?' sel':''}`}
+              <div className={`card${p.status==='Wafat'?' wafat':''}${sel===p.id?' sel':''}${p.gender==='?'?' unknown-gender':''}`}
                 style={{cursor:isAdmin?'move':'pointer'}}>
                 <div className="gaccent" style={{background:MC(p.gender)}}/>
                 <div className="avatar" style={{background:MB(p.gender)}}>
@@ -1400,7 +1528,7 @@ function App(){
             <div className="profile-nick">{nn(selP)}</div>
             {selP.fullName!==nn(selP)&&<div className="profile-fullname">{selP.fullName}</div>}
             <div className="profile-gender" style={{background:MB(selP.gender),color:MC(selP.gender)}}>
-              {selP.gender==='M'?'Laki-laki':'Perempuan'}
+              {selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Belum diketahui'}
               {selP.status!=='Hidup'&&<span style={{marginLeft:6,opacity:.7}}>· {selP.status}</span>}
             </div>
           </div>
@@ -1485,7 +1613,7 @@ function App(){
           </div>
           <div className="fg"><label>Jenis Kelamin</label>
             <select value={editF.gender||'M'} onChange={e=>setEditF(f=>({...f,gender:e.target.value}))}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Laki-laki</option><option value="F">Perempuan</option><option value="?">? Belum diketahui</option>
             </select>
           </div>
           <div className="fg"><label>Status</label>
@@ -1667,7 +1795,7 @@ function App(){
         <div className="fg"><label>Nama Panggilan</label><input value={addF.nickname} placeholder={addF.fullName.split(' ')[0]||'opsional'} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
         <div className="fg"><label>Jenis Kelamin</label>
           <select value={addF.gender} onChange={e=>setAddF(f=>({...f,gender:e.target.value}))}>
-            <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+            <option value="M">Laki-laki</option><option value="F">Perempuan</option><option value="?">? Belum diketahui</option>
           </select>
         </div>
         <div className="fg"><label>Status</label>
