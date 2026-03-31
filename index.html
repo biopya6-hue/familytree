@@ -83,96 +83,104 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .card-nick{font-size:12px;font-weight:700;color:#2c2825;line-height:1.2;margin-bottom:2px}
 .card.wafat .card-nick{color:#8a8278}
 
-/* SIDEBAR */
+/* SIDEBAR & PROFIL */
 .sidebar{position:fixed;right:0;bottom:0;top:56px;width:340px;z-index:150;background:#fff;border-left:1px solid #dfdbd5;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,.05);}
 .sidebar.open{transform:translateX(0)}
 @media(max-width:500px){.sidebar{width:100vw;border-left:none;}}
-.sb-head{padding:16px 20px;border-bottom:1px solid #f4f2ef;display:flex;align-items:center;gap:10px;flex-shrink:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
-.sb-head h2{font-size:14px;font-weight:800;flex:1;color:#1a1816}
+.sb-head{padding:14px 20px;border-bottom:1px solid #f4f2ef;display:flex;align-items:center;gap:10px;flex-shrink:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
+.sb-head h2{font-size:13px;font-weight:800;flex:1;color:#1a1816;margin-bottom:0}
 .sb-body{flex:1;overflow-y:auto;padding:0 20px 24px}
 
-.profile-hero{padding:24px 0 20px;text-align:center;border-bottom:1px solid #f4f2ef;margin-bottom:16px;}
-.profile-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;overflow:hidden;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.profile-hero{padding:20px 0 16px;text-align:center;border-bottom:1px solid #f4f2ef;margin-bottom:16px;}
+.profile-avatar{width:70px;height:70px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;overflow:hidden;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.08)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-nick{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#1a1816}
-.profile-fullname{font-size:12px;color:#8a8278;margin-top:4px}
-.profile-tags{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;}
-.tag-badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.03em;}
+.profile-nick{font-size:18px;font-weight:800;letter-spacing:-.02em;color:#1a1816}
+.profile-fullname{font-size:11px;color:#8a8278;margin-top:2px}
+.profile-tags{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;}
+.tag-badge{padding:3px 8px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.03em;}
 
-.sec{margin-bottom:20px}
-.sec-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a8a29a;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f4f2ef;}
-.info-row{display:flex;align-items:flex-start;gap:12px;padding:5px 0;font-size:13px;}
-.info-label{color:#8a8278;min-width:85px;flex-shrink:0;font-size:12px;font-weight:600}
-.info-val{color:#2c2825;flex:1;line-height:1.5;word-break:break-word}
-.info-empty{font-size:12px;color:#b8b4ae;font-style:italic}
-.bio-note{font-size:11px;color:#8a8278;font-style:italic;margin-top:8px;padding-top:8px;border-top:1px dashed #f4f2ef;}
+.sec{margin-bottom:18px}
+.sec-title{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a8a29a;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f4f2ef;}
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:4px 0;}
+.info-label{color:#8a8278;min-width:80px;flex-shrink:0;font-size:11px;font-weight:600}
+.info-val{color:#2c2825;flex:1;line-height:1.5;font-size:12px;word-break:break-word}
+.info-empty{font-size:11px;color:#b8b4ae;font-style:italic}
+.bio-note{font-size:10.5px;color:#8a8278;font-style:italic;margin-top:6px;padding-top:6px;border-top:1px dashed #f4f2ef;}
 
-.chips{display:flex;flex-wrap:wrap;gap:6px;}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#fbfaf9;border-radius:20px;font-size:12px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e5e0;transition:all .15s;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#fbfaf9;border-radius:20px;font-size:11px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e5e0;transition:all .15s;}
 .chip:hover{background:#f4f2ef;border-color:#d4d0ca;transform:translateY(-1px)}
-.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 /* MODALS & FORMS */
 .overlay{position:fixed;inset:0;background:rgba(20,18,16,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
 .modal{background:#fff;border-radius:20px;padding:28px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #dfdbd5;box-shadow:0 24px 48px rgba(0,0,0,.15);}
-.modal h3{font-size:18px;font-weight:800;margin-bottom:10px;color:#1a1816;letter-spacing:-.01em}
-.modal-sub{font-size:13px;color:#7a7268;margin-bottom:20px;line-height:1.6}
-.fg{margin-bottom:14px}
-.fg label{display:block;font-size:11px;font-weight:700;color:#7a7268;margin-bottom:6px;}
-.fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #dfdbd5;font-size:13px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;color:#2c2825}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:10px;color:#1a1816;letter-spacing:-.01em}
+.modal-sub{font-size:12px;color:#7a7268;margin-bottom:20px;line-height:1.6}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:700;color:#7a7268;margin-bottom:5px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border-radius:12px;border:1px solid #dfdbd5;font-size:12px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;color:#2c2825}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
-.fg textarea{resize:vertical;min-height:70px;line-height:1.5}
-.frow{display:flex;gap:10px;margin-top:24px}
-.frow .btn{flex:1;text-align:center;padding:10px;font-size:13px}
+.frow{display:flex;gap:8px;margin-top:20px}
+.frow .btn{flex:1;text-align:center;padding:9px;font-size:12px}
 
 /* PPICKER */
 .ppicker-list{max-height:180px;overflow-y:auto;border:1px solid #dfdbd5;border-radius:12px;margin-top:6px}
-.ppicker-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f4f2ef;}
+.ppicker-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #f4f2ef;}
 .ppicker-item:hover{background:#f8f6f4;}
 .ppicker-item.selected{background:#edf4f9;font-weight:700;}
-.pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 /* EDGE POPUP */
-.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dfdbd5;border-radius:16px;padding:16px;min-width:240px;box-shadow:0 12px 32px rgba(0,0,0,.15);}
-.edge-popup h4{font-size:14px;font-weight:800;margin-bottom:10px;color:#1a1816}
+.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dfdbd5;border-radius:16px;padding:14px;min-width:220px;box-shadow:0 12px 32px rgba(0,0,0,.15);}
+.edge-popup h4{font-size:13px;font-weight:800;margin-bottom:8px;color:#1a1816}
 
 /* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */
-.legend{position:fixed;bottom:24px;left:24px;z-index:180;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;backdrop-filter:blur(8px)}
-.li{display:flex;align-items:center;gap:10px;font-size:11.5px;color:#7a7268;margin-bottom:8px;font-weight:600}
+.legend{position:fixed;bottom:24px;left:24px;z-index:180;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:16px;padding:12px 16px;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;backdrop-filter:blur(8px)}
+.li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7268;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-/* ESTETIKA STAT PILL (Poin 2) */
-.statpill{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:30px;padding:10px 24px;font-size:11.5px;font-weight:600;color:#7a7268;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;white-space:nowrap;backdrop-filter:blur(8px)}
+/* ESTETIKA STAT PILL */
+.statpill{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:30px;padding:10px 22px;font-size:11.5px;font-weight:600;color:#7a7268;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;white-space:nowrap;backdrop-filter:blur(8px)}
 .stat-val{color:#2c2825;font-weight:800;font-size:14px;margin-right:4px}
 .stat-sep{width:4px;height:4px;border-radius:50%;background:#dfdbd5;}
 
 .ctrl{position:fixed;bottom:24px;right:24px;z-index:180;display:flex;flex-direction:column;gap:8px;transition:opacity .3s, visibility .3s;}
-.cbtn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.06);backdrop-filter:blur(8px)}
+.cbtn{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.06);backdrop-filter:blur(8px)}
 .cbtn:hover{background:#f4f2ef;transform:translateY(-2px)}
 
-/* LOGIKA AUTO-HIDE MOBILE & PENYESUAIAN OVERLAP (Poin 1) */
-@media(max-width:768px){ 
+/* ── LOGIKA AUTO-HIDE & OVERLAP MOBILE ── */
+/* Mencegah tumpang tindih dalam orientasi Portrait (HP Berdiri) */
+@media(max-width:768px) and (orientation: portrait){ 
   .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; visibility:hidden; pointer-events:none;}
   
-  /* Elevasi Stat Pill agar tidak menabrak Legend/Controls di HP */
-  .statpill { bottom: 85px; padding: 8px 18px; font-size: 10.5px; }
-  .stat-val { font-size: 12.5px; }
+  /* Elevasi & Kecilkan Font agar pas secara vertikal */
+  .statpill { bottom: 85px; padding: 8px 16px; font-size: 10px; gap: 8px; }
+  .stat-val { font-size: 12px; }
   
-  /* Perkecil dan geser legend ke pojok */
-  .legend { bottom: 16px; left: 16px; padding: 12px; font-size: 10px; }
-  .legend .li { font-size: 10px; margin-bottom: 6px; }
+  .legend { bottom: 16px; left: 16px; padding: 10px; font-size: 9.5px; }
+  .legend .li { font-size: 9.5px; margin-bottom: 5px; }
   
   .ctrl { bottom: 16px; right: 16px; }
-  .cbtn { width: 38px; height: 38px; }
+  .cbtn { width: 36px; height: 36px; font-size: 16px; }
+}
+
+/* Penyesuaian saat Landscape (HP Miring) */
+@media(max-width:768px) and (orientation: landscape){
+  .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; visibility:hidden; pointer-events:none;}
+  .statpill { bottom: 16px; padding: 8px 18px; font-size: 11px; gap: 10px; }
+  .stat-val { font-size: 13px; }
+  .legend { bottom: 16px; left: 16px; padding: 10px 14px; }
+  .ctrl { bottom: 16px; right: 16px; }
 }
 
 /* REGISTRY TABLE */
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
-.reg-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
-.reg-table td{padding:10px 0;border-bottom:1px solid #f4f2ef;font-size:13px;color:#2c2825}
-.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
-.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
-::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#d4d0ca;border-radius:6px}
+.reg-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
+.reg-table td{padding:8px 0;border-bottom:1px solid #f4f2ef;font-size:12px;color:#2c2825}
+.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
+.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
+::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#d4d0ca;border-radius:6px}
 </style>
 </head>
 <body>
@@ -452,10 +460,9 @@ function App(){
     setVt({ s: scale, x: (window.innerWidth/2) - (rootP.x * scale), y: (window.innerHeight/4) - (rootP.y * scale) });
   }
 
-  /* ── 2. PAN & ZOOM CONTROLS (NATIVE TOUCH ADDED) ── */
+  /* ── 2. PAN & ZOOM CONTROLS (NATIVE TOUCH) ── */
   const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
   
-  // Mouse Events
   const panning=useRef(false), panStart=useRef({});
   function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
   function vpMove(e){
@@ -464,7 +471,6 @@ function App(){
   }
   function vpUp(){panning.current=false;dragging.current=null;}
   
-  // Wheel Events
   useEffect(()=>{
     const el=vpRef.current; if(!el)return;
     function onWheel(e){
@@ -478,7 +484,6 @@ function App(){
     return()=>el.removeEventListener('wheel',onWheel);
   },[]);
 
-  // Native Touch Events for Mobile (Swipe & Pinch)
   const lastTouch=useRef(null);
   const lastPinch=useRef(null);
   const touchStartPos=useRef(null);
@@ -547,13 +552,29 @@ function App(){
 
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-56)/vt.s-p.y};}
 
-  /* ── 3. DATA HELPERS ── */
+  /* ── 3. DATA HELPERS & SAUDARA LOGIC ── */
   const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
   const selP=people.find(p=>p.id===sel)||null;
   
   function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function getBioParents(pid){ return rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
   function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
   function getChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+  
+  // Mencari Saudara dengan menganalisa irisan Orang Tua (aktif & biologis)
+  function getSiblings(pid){
+    const sibs=new Set();
+    const myParents=new Set([...getActiveParents(pid),...getBioParents(pid)]);
+    if(myParents.size===0) return []; // Tidak ada info orang tua, tidak bisa cari saudara
+    rels.forEach(r=>{
+      if(r.type==='parent-child'){
+        const parents=r.pids.slice(0,-1), child=r.pids[r.pids.length-1];
+        if(child===pid) return; // Jangan masukkan diri sendiri
+        if(parents.some(p=>myParents.has(p))) sibs.add(child);
+      }
+    });
+    return [...sibs];
+  }
 
   /* ── 4. ORTHOGONAL LINES ── */
   function buildOrthogonalLines(){
@@ -712,7 +733,7 @@ function App(){
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
   
-  // Smart Camera Focus for Chips
+  // Kamera pintar berfokus ke Node saat di-klik
   function focusPerson(id){ 
     setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); 
     const p=pos[id]; 
@@ -722,7 +743,7 @@ function App(){
     }
   }
 
-  // Helper for rendering clickable PChip
+  // Komponen Chip yang bisa diklik
   function PChip({id,tag}){
     const pp=people.find(x=>x.id===id);if(!pp)return null;
     return(
@@ -738,6 +759,7 @@ function App(){
   const totalOrang = people.length;
   const totalWafat = people.filter(p=>p.status==='Wafat').length;
   const totalPasangan = rels.filter(r=>r.type==='married').length;
+  const siblings = sel?getSiblings(sel):[];
 
   return <>
     {loading && <div className="loading-screen"><div className="loading-spinner"/><h3>Memuat Silsilah...</h3></div>}
@@ -811,20 +833,20 @@ function App(){
       )}
     </div>
 
-    {/* SIDEBAR DENGAN PROFIL LENGKAP & CHIP CLICKABLE */}
+    {/* SIDEBAR DENGAN FONT LEBIH KECIL & LOGIKA SAUDARA */}
     <div className={`sidebar ${sel?'open':''}`}>
       {selP&&sbMode==='view'&&<>
         <div className="sb-head">
-          <h2>Profil</h2>
-          {isAdmin&&<><button className="btn" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
-          <button className="btn danger" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setModal('delconfirm')}>Hapus</button></>}
-          <button className="btn" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setSel(null)}>✕</button>
+          <h2 style={{fontSize:13}}>Profil</h2>
+          {isAdmin&&<><button className="btn" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
+          <button className="btn danger" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>setModal('delconfirm')}>Hapus</button></>}
+          <button className="btn" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>setSel(null)}>✕</button>
         </div>
         <div className="sb-body">
           <div className="profile-hero">
             <div className="profile-avatar" style={{background:MB(selP.gender)}}><span style={{color:MC(selP.gender)}}>{ini(selP.fullName)}</span></div>
-            <div className="profile-nick">{nn(selP)}</div>
-            <div className="profile-fullname">{selP.fullName}</div>
+            <div className="profile-nick" style={{fontSize:18}}>{nn(selP)}</div>
+            <div className="profile-fullname" style={{fontSize:11}}>{selP.fullName}</div>
             <div className="profile-tags">
               <span className="tag-badge" style={{background:MB(selP.gender),color:MC(selP.gender)}}>{selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Unknown'}</span>
               <span className="tag-badge" style={{background:'#f4f2ef',color:'#8a8278'}}>{selP.displayId}</span>
@@ -848,6 +870,11 @@ function App(){
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Pasangan</span><span className="info-val">
               {getPartners(selP.id).length>0?<div className="chips">{getPartners(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
             </span></div>
+
+            {/* SEKSI SAUDARA BARU */}
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Saudara</span><span className="info-val">
+              {siblings.length>0?<div className="chips">{siblings.map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum/tidak ada data.</div>}
+            </span></div>
             
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Anak</span><span className="info-val">
               {getChildren(selP.id).length>0?<div className="chips">{getChildren(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
@@ -859,7 +886,7 @@ function App(){
         </div>
       </>}
       {selP&&sbMode==='edit'&&<>
-        <div className="sb-head"><h2>Edit Profil</h2><button className="btn" onClick={()=>setSbMode('view')}>Batal</button></div>
+        <div className="sb-head"><h2 style={{fontSize:13}}>Edit Profil</h2><button className="btn" onClick={()=>setSbMode('view')}>Batal</button></div>
         <div className="sb-body" style={{paddingTop:20}}>
           <div className="fg"><label>Nama Lengkap</label><input value={editF.fullName||''} onChange={e=>setEditF({...editF,fullName:e.target.value})}/></div>
           <div className="fg"><label>Nama Panggilan</label><input value={editF.nickname||''} onChange={e=>setEditF({...editF,nickname:e.target.value})}/></div>
@@ -953,12 +980,12 @@ function App(){
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
       <div className="stat-sep"></div>
       <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div className="stat-sep hide-mob"></div>
-      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
+      <div className="stat-sep"></div>
+      <div><span className="stat-val">{totalWafat}</span> Wafat</div>
     </div>
 
     <div className={`ctrl ${sel?'sb-open':''}`}>
-      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,3)}))}>+</button>
+      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
       <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
     </div>
