@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   CSS RESET & ELEGAN TEMA MINIMALIS (Fase 4)
+   CSS RESET & ELEGAN TEMA MINIMALIS
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c2825;overflow:hidden;height:100vh;width:100vw}
@@ -55,7 +55,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .btn.danger{border-color:#e0a8a8;color:#b04040}
 .btn.danger:hover{background:#fcf2f2}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-@media(max-width:600px){ .hide-mob{display:none;} }
+@media(max-width:650px){ .hide-mob{display:none;} }
+
+/* SAVE STATUS (Relocated to Topbar) */
+.save-status{display:flex;align-items:center;gap:6px;background:#f4f2ef;border-radius:20px;padding:5px 12px;font-size:10.5px;font-weight:600;color:#7a7268;transition:opacity .3s;white-space:nowrap;border:1px solid #e8e5e0}
+.save-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.save-dot.syncing{background:#d4a373;animation:savepulse .8s ease-in-out infinite;}
+.save-dot.saved{background:#73d496}
+.save-dot.error{background:#d47373}
+@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* VIEWPORT & CANVAS */
 #vp{position:fixed;inset:0;top:56px;overflow:hidden;cursor:grab;}
@@ -96,12 +104,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .info-row{display:flex;align-items:flex-start;gap:12px;padding:5px 0;font-size:13px;}
 .info-label{color:#8a8278;min-width:85px;flex-shrink:0;font-size:12px;font-weight:600}
 .info-val{color:#2c2825;flex:1;line-height:1.5;word-break:break-word}
-.info-empty{font-size:12px;color:#b8b4ae;font-style:italic}
-
-.chips{display:flex;flex-wrap:wrap;gap:6px;}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#fbfaf9;border-radius:20px;font-size:12px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e5e0;transition:all .15s;}
-.chip:hover{background:#f4f2ef;border-color:#d4d0ca;transform:translateY(-1px)}
-.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* MODALS & FORMS */
 .overlay{position:fixed;inset:0;background:rgba(20,18,16,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
@@ -112,19 +114,45 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .fg label{display:block;font-size:11px;font-weight:700;color:#7a7268;margin-bottom:6px;}
 .fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #dfdbd5;font-size:13px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;color:#2c2825}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
-.fg textarea{resize:vertical;min-height:70px;line-height:1.5}
 .frow{display:flex;gap:10px;margin-top:24px}
 .frow .btn{flex:1;text-align:center;padding:10px;font-size:13px}
 
-/* PPICKER (Person Picker) */
-.ppicker{border:1px solid #dfdbd5;border-radius:12px;overflow:hidden;background:#fff;}
-.ppicker-search{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f4f2ef;background:#fbfaf9}
-.ppicker-search input{flex:1;border:none;outline:none;font-size:13px;font-family:inherit;color:#2c2825;background:transparent;}
-.ppicker-list{max-height:180px;overflow-y:auto;}
-.ppicker-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f4f2ef;transition:background .1s;}
+/* PPICKER */
+.ppicker-list{max-height:180px;overflow-y:auto;border:1px solid #dfdbd5;border-radius:12px;margin-top:6px}
+.ppicker-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f4f2ef;}
 .ppicker-item:hover{background:#f8f6f4;}
 .ppicker-item.selected{background:#edf4f9;font-weight:700;}
 .pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* EDGE POPUP */
+.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dfdbd5;border-radius:16px;padding:16px;min-width:240px;box-shadow:0 12px 32px rgba(0,0,0,.15);}
+.edge-popup h4{font-size:14px;font-weight:800;margin-bottom:10px;color:#1a1816}
+
+/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */
+.legend{position:fixed;bottom:24px;left:24px;z-index:180;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:16px;padding:14px 18px;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;backdrop-filter:blur(8px)}
+.li{display:flex;align-items:center;gap:10px;font-size:11.5px;color:#7a7268;margin-bottom:8px;font-weight:600}
+.li:last-child{margin-bottom:0}
+
+.statpill{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:30px;padding:10px 24px;font-size:11.5px;font-weight:600;color:#7a7268;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;white-space:nowrap;backdrop-filter:blur(8px)}
+.stat-val{color:#2c2825;font-weight:800;font-size:14px;margin-right:4px}
+
+.ctrl{position:fixed;bottom:24px;right:24px;z-index:180;display:flex;flex-direction:column;gap:8px;transition:opacity .3s, visibility .3s;}
+.cbtn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.06);backdrop-filter:blur(8px)}
+.cbtn:hover{background:#f4f2ef;transform:translateY(-2px)}
+
+/* LOGIKA AUTO-HIDE MOBILE */
+@media(max-width:768px){ 
+  .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; visibility:hidden; pointer-events:none;}
+  /* Penyesuaian posisi agar tidak bertabrakan di HP */
+  .statpill { bottom: 85px; padding: 8px 16px; font-size:10.5px }
+  .legend { bottom: 20px; left: 16px; padding: 12px; }
+  .ctrl { bottom: 20px; right: 16px; }
+}
+
+/* LOADING */
+.loading-screen{position:fixed;inset:0;z-index:1000;background:#f4f2ef;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-spinner{width:40px;height:40px;border:3px solid #dfdbd5;border-top-color:#426b8a;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* REGISTRY TABLE */
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
@@ -132,34 +160,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .reg-table td{padding:10px 0;border-bottom:1px solid #f4f2ef;font-size:13px;color:#2c2825}
 .tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
 .tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
-
-/* EDGE POPUP */
-.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dfdbd5;border-radius:16px;padding:16px;min-width:240px;box-shadow:0 12px 32px rgba(0,0,0,.15);}
-.edge-popup h4{font-size:14px;font-weight:800;margin-bottom:10px;color:#1a1816}
-.edge-info{font-size:12px;color:#7a7268;margin-bottom:14px;line-height:1.6}
-
-/* CONTROLS & STATUS */
-.ctrl{position:fixed;bottom:20px;right:20px;z-index:180;display:flex;flex-direction:column;gap:8px;transition:opacity .3s;}
-.cbtn{width:40px;height:40px;border-radius:14px;background:#fff;border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.05);}
-.cbtn:hover{background:#f4f2ef;transform:translateY(-2px)}
-@media(max-width:500px){ .ctrl.sb-open{opacity:0;pointer-events:none;} }
-
-.save-status{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border:1px solid #dfdbd5;border-radius:24px;padding:6px 16px;font-size:11px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.05);transition:opacity .3s;white-space:nowrap;}
-.save-status.hidden{opacity:0;}
-.save-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.save-dot.syncing{background:#d4a373;animation:savepulse .8s ease-in-out infinite;}
-.save-dot.saved{background:#73d496}
-.save-dot.error{background:#d47373}
-@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* LOADING */
-.loading-screen{position:fixed;inset:0;z-index:1000;background:#f4f2ef;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.loading-spinner{width:40px;height:40px;border:3px solid #dfdbd5;border-top-color:#426b8a;border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#d4d0ca;border-radius:6px}
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#d4d0ca;border-radius:6px}
 </style>
 </head>
 <body>
@@ -173,25 +174,13 @@ const MC=g=>g==='M'?'#5a9bc8':g==='F'?'#c87a9b':'#c8a830';
 const MB=g=>g==='M'?'#edf4f9':g==='F'?'#f9edf2':'#fcf8ec';
 const ini=n=>n?.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 const nn=p=>p.nickname||p.fullName?.split(' ')[0]||'Anonim';
-const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // SHA-256 of "1234"
+const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // "1234"
 
 async function checkPin(val){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')===PIN_HASH;
 }
-function fmtDate(d){
-  if(!d)return '';
-  try{return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});}
-  catch{return d;}
-}
-function fmtBirth(pl,dt){
-  const p=pl?.trim(),d=fmtDate(dt);
-  return p&&d?`${p}, ${d}`:p||d||'';
-}
 
-/* ══════════════════════════════════════════════════
-   FASE 2: CETAK BIRU DATA LACI (Atribut Bisnis Murni)
-══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat' },
   { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat' },
@@ -292,7 +281,6 @@ const SR=[
   { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
 ];
 
-/* Koordinat Awal Lengkap (Mencegah tumpukan 0,0) */
 const SPOS={
   p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
   p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
@@ -361,7 +349,6 @@ function App(){
       try{
         const [mSnap, rSnap, pSnap] = await Promise.all([COL_MEMBERS().get(), COL_RELATIONSHIPS().get(), COL_POSITIONS().get()]);
         if(mSnap.empty){
-          // First Time Setup - Upload Blueprint
           const batch=db.batch();
           SP.forEach(p=>batch.set(COL_MEMBERS().doc(p.id), p));
           SR.forEach(r=>batch.set(COL_RELATIONSHIPS().doc(r.id), r));
@@ -475,7 +462,7 @@ function App(){
   function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
   function getChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
 
-  /* ── 4. ORTHOGONAL LINES (Fase 4 & Elevasi Poligami) ── */
+  /* ── 4. ORTHOGONAL LINES ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
@@ -493,12 +480,11 @@ function App(){
         const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
         const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
         
-        // Elevasi Garis Siku (Menghindari tabrakan garis half-sibling)
         let spouseOffset = 0;
         const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.isBlood===false);
         if (spouseParent && spouseParent.spouseOrder) spouseOffset = spouseParent.spouseOrder;
         
-        const dropDepth = 25 + (spouseOffset * 15); // Semakin besar spouseOrder, semakin dalam turunnya
+        const dropDepth = 25 + (spouseOffset * 15); 
         const midY = sy + (CH/2) + dropDepth; 
         const ex = CX(pc), ey = CY(pc) - (CH/2);
         
@@ -509,15 +495,12 @@ function App(){
   }
   const lines = buildOrthogonalLines();
 
-  /* ── 5. FASE 3 LOGIC: ADD & RELATION (No Regex) ── */
+  /* ── 5. ADD & RELATION ── */
   function addPerson(){
     const tempNumber = String(Date.now()).slice(-4); 
-    const newPerson = {
-      id: 'p_'+Date.now(), displayId: `BARU-${tempNumber}`, bani: null, isBlood: true, spouseOrder: null, ...addF
-    };
+    const newPerson = { id: 'p_'+Date.now(), displayId: `BARU-${tempNumber}`, bani: null, isBlood: true, spouseOrder: null, ...addF };
     const xs=Object.values(pos).map(p=>p.x), maxX=xs.length?Math.max(...xs):200;
-    setPeople(prev=>[...prev,newPerson]);
-    setPos(prev=>({...prev,[newPerson.id]:{x:maxX+160,y:200}}));
+    setPeople(prev=>[...prev,newPerson]); setPos(prev=>({...prev,[newPerson.id]:{x:maxX+160,y:200}}));
     setSel(newPerson.id); setSbMode('view'); setModal(null);
     setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',notes:'',photo:''});
   }
@@ -561,7 +544,7 @@ function App(){
   function prepareAddRel(){
     if(!relF.pid||!sel)return;
     if(relF.type==='married') commitMarriage(sel, relF.pid);
-    else if(relF.type==='child-of') commitRel([relF.pid], sel); // simplified single parent assign
+    else if(relF.type==='child-of') commitRel([relF.pid], sel);
     else commitRel([sel], relF.pid);
     setRelF({type:'married',pid:'',isActive:true}); setModal(null);
   }
@@ -573,12 +556,11 @@ function App(){
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT (Smart Scaling) ── */
+  /* ── 6. DYNAMIC AUTO-LAYOUT ── */
   function computeAutoLayout(){
     const GAP_X=50, GAP_Y=200;
     const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
     
-    // Gen Map
     const genMap={}; const queue=[root.id]; genMap[root.id]=0;
     while(queue.length){
       const cur=queue.shift(); const g=genMap[cur];
@@ -588,18 +570,13 @@ function App(){
       });
     }
 
-    function getSpouses(pid){
-      return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99));
-    }
+    function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
     function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
 
-    // Width Calc
     function subtreeWidth(pid, visited=new Set()){
       if(visited.has(pid)) return CW; visited.add(pid);
-      const spouses=getSpouses(pid);
-      const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
-      const children=getBloodChildren(pid);
-      if(!children.length) return selfW;
+      const spouses=getSpouses(pid); const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
+      const children=getBloodChildren(pid); if(!children.length) return selfW;
       const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
       return Math.max(selfW, childTotal);
     }
@@ -635,8 +612,7 @@ function App(){
 
     const w = subtreeWidth(root.id);
     layoutSubtree(root.id, w/2, 0);
-    setPos(newPos);
-    setTimeout(autoCamera, 100); setModal(null);
+    setPos(newPos); setTimeout(autoCamera, 100); setModal(null);
   }
 
   /* ── 7. UI RENDERERS ── */
@@ -648,20 +624,30 @@ function App(){
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
   function focusPerson(id){ setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); const p=pos[id]; if(p&&vpRef.current) setVt({s:1,x:(window.innerWidth/2)-CX(p),y:(window.innerHeight/2)-CY(p)}); }
 
+  /* ── STATS CALCULATION ── */
+  const totalOrang = people.length;
+  const totalWafat = people.filter(p=>p.status==='Wafat').length;
+  const totalPasangan = rels.filter(r=>r.type==='married').length;
+  const totalBani = new Set(people.map(p=>p.bani).filter(b=>b&&b!=='BARU')).size;
+
   return <>
     {loading && <div className="loading-screen"><div className="loading-spinner"/><h3>Memuat Silsilah...</h3></div>}
 
     <div className="topbar">
-      <div>
-        <div className="brand-name">{baniTitle}</div>
-        <div className="brand-sub">Silsilah Keluarga</div>
-      </div>
+      <div><div className="brand-name">{baniTitle}</div><div className="brand-sub">Silsilah Keluarga</div></div>
       <div className="sep"/>
       <div className="search-wrap hide-mob">
         <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       </div>
       <div className="spacer"/>
-      {isAdmin&&<button className="btn accent" onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
+      
+      {/* Save Status - Relocated to Topbar */}
+      <div className="save-status hide-mob">
+        <div className={`save-dot ${saveStatus}`}/>
+        {saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal':'Tersimpan'}
+      </div>
+
+      {isAdmin&&<button className="btn accent hide-mob" onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
       <button className="btn hide-mob" onClick={()=>setModal('registry')}>🪪 Registry</button>
       <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin Aktif':'Login'}</button>
@@ -732,7 +718,7 @@ function App(){
             <div className="profile-nick">{nn(selP)}</div>
             <div className="profile-fullname">{selP.fullName}</div>
             <div className="profile-tags">
-              <span className="tag-badge" style={{background:MB(selP.gender),color:MC(selP.gender)}}>{selP.gender==='M'?'Laki-laki':'Perempuan'}</span>
+              <span className="tag-badge" style={{background:MB(selP.gender),color:MC(selP.gender)}}>{selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Unknown'}</span>
               <span className="tag-badge" style={{background:'#f4f2ef',color:'#8a8278'}}>{selP.displayId}</span>
             </div>
           </div>
@@ -821,13 +807,30 @@ function App(){
       })()}
     </div></div>}
 
-    {/* CONTROLS */}
+    {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
+    <div className={`legend ${sel?'sb-open':''}`}>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#5a9bc8'}}/> Laki-laki</div>
+      <div className="li"><div className="pi-dot" style={{background:'#c87a9b'}}/> Perempuan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#c8a830'}}/> Unknown</div>
+    </div>
+
+    <div className={`statpill ${sel?'sb-open':''}`}>
+      <div><span className="stat-val">{totalOrang}</span> Individu</div>
+      <div style={{color:'#dfdbd5'}}>|</div>
+      <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
+      <div style={{color:'#dfdbd5'}} className="hide-mob">|</div>
+      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
+      <div style={{color:'#dfdbd5'}}>|</div>
+      <div><span className="stat-val">{totalBani}</span> Cabang Bani</div>
+    </div>
+
     <div className={`ctrl ${sel?'sb-open':''}`}>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,3)}))}>+</button>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
       <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
     </div>
-    <div className={`save-status ${sel?'hidden':''}`}><div className={`save-dot ${saveStatus}`}/>{saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal Simpan':'Disimpan di Cloud'}</div>
   </>;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
