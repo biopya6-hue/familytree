@@ -57,7 +57,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .btn:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:650px){ .hide-mob{display:none;} }
 
-/* SAVE STATUS (Relocated to Topbar) */
+/* SAVE STATUS */
 .save-status{display:flex;align-items:center;gap:6px;background:#f4f2ef;border-radius:20px;padding:5px 12px;font-size:10.5px;font-weight:600;color:#7a7268;transition:opacity .3s;white-space:nowrap;border:1px solid #e8e5e0}
 .save-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .save-dot.syncing{background:#d4a373;animation:savepulse .8s ease-in-out infinite;}
@@ -104,6 +104,13 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .info-row{display:flex;align-items:flex-start;gap:12px;padding:5px 0;font-size:13px;}
 .info-label{color:#8a8278;min-width:85px;flex-shrink:0;font-size:12px;font-weight:600}
 .info-val{color:#2c2825;flex:1;line-height:1.5;word-break:break-word}
+.info-empty{font-size:12px;color:#b8b4ae;font-style:italic}
+.bio-note{font-size:11px;color:#8a8278;font-style:italic;margin-top:8px;padding-top:8px;border-top:1px dashed #f4f2ef;}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#fbfaf9;border-radius:20px;font-size:12px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e5e0;transition:all .15s;}
+.chip:hover{background:#f4f2ef;border-color:#d4d0ca;transform:translateY(-1px)}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* MODALS & FORMS */
 .overlay{position:fixed;inset:0;background:rgba(20,18,16,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
@@ -114,6 +121,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .fg label{display:block;font-size:11px;font-weight:700;color:#7a7268;margin-bottom:6px;}
 .fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #dfdbd5;font-size:13px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;color:#2c2825}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
+.fg textarea{resize:vertical;min-height:70px;line-height:1.5}
 .frow{display:flex;gap:10px;margin-top:24px}
 .frow .btn{flex:1;text-align:center;padding:10px;font-size:13px}
 
@@ -133,26 +141,30 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .li{display:flex;align-items:center;gap:10px;font-size:11.5px;color:#7a7268;margin-bottom:8px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
+/* ESTETIKA STAT PILL (Poin 2) */
 .statpill{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;border-radius:30px;padding:10px 24px;font-size:11.5px;font-weight:600;color:#7a7268;box-shadow:0 8px 24px rgba(0,0,0,.06);transition:opacity .3s, visibility .3s;white-space:nowrap;backdrop-filter:blur(8px)}
 .stat-val{color:#2c2825;font-weight:800;font-size:14px;margin-right:4px}
+.stat-sep{width:4px;height:4px;border-radius:50%;background:#dfdbd5;}
 
 .ctrl{position:fixed;bottom:24px;right:24px;z-index:180;display:flex;flex-direction:column;gap:8px;transition:opacity .3s, visibility .3s;}
 .cbtn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.96);border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.06);backdrop-filter:blur(8px)}
 .cbtn:hover{background:#f4f2ef;transform:translateY(-2px)}
 
-/* LOGIKA AUTO-HIDE MOBILE */
+/* LOGIKA AUTO-HIDE MOBILE & PENYESUAIAN OVERLAP (Poin 1) */
 @media(max-width:768px){ 
   .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; visibility:hidden; pointer-events:none;}
-  /* Penyesuaian posisi agar tidak bertabrakan di HP */
-  .statpill { bottom: 85px; padding: 8px 16px; font-size:10.5px }
-  .legend { bottom: 20px; left: 16px; padding: 12px; }
-  .ctrl { bottom: 20px; right: 16px; }
+  
+  /* Elevasi Stat Pill agar tidak menabrak Legend/Controls di HP */
+  .statpill { bottom: 85px; padding: 8px 18px; font-size: 10.5px; }
+  .stat-val { font-size: 12.5px; }
+  
+  /* Perkecil dan geser legend ke pojok */
+  .legend { bottom: 16px; left: 16px; padding: 12px; font-size: 10px; }
+  .legend .li { font-size: 10px; margin-bottom: 6px; }
+  
+  .ctrl { bottom: 16px; right: 16px; }
+  .cbtn { width: 38px; height: 38px; }
 }
-
-/* LOADING */
-.loading-screen{position:fixed;inset:0;z-index:1000;background:#f4f2ef;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.loading-spinner{width:40px;height:40px;border:3px solid #dfdbd5;border-top-color:#426b8a;border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 /* REGISTRY TABLE */
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
@@ -179,6 +191,16 @@ const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4
 async function checkPin(val){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')===PIN_HASH;
+}
+
+function fmtDate(d){
+  if(!d)return '';
+  try{return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});}
+  catch{return d;}
+}
+function fmtBirth(pl,dt){
+  const p=pl?.trim(),d=fmtDate(dt);
+  return p&&d?`${p}, ${d}`:p||d||'';
 }
 
 const SP=[
@@ -320,7 +342,7 @@ function App(){
   const [pinVal,setPinVal]   = useState('');
   const [pinErr,setPinErr]   = useState('');
   const [editF,setEditF]     = useState({});
-  const [addF,setAddF]       = useState({fullName:'',nickname:'',gender:'M',status:'Hidup',notes:'',photo:''});
+  const [addF,setAddF]       = useState({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',notes:'',bioNote:''});
   const [relF,setRelF]       = useState({type:'married',pid:'',isActive:true});
   const [relSearchQ,setRelSearchQ]=useState('');
   const [vt,setVt]           = useState({x:0,y:0,s:1});
@@ -330,7 +352,6 @@ function App(){
   const [loading,setLoading] = useState(true);
   const [saveStatus,setSaveStatus] = useState('saved');
   const dragging=useRef(null), dragOff=useRef({});
-  const panning=useRef(false), panStart=useRef({});
   const vpRef=useRef();
   const saveTimer=useRef(null);
   const isFirstLoad=useRef(true);
@@ -368,7 +389,6 @@ function App(){
           Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
         }
       }catch(err){
-        console.error('Offline Mode', err);
         setPeople(SP); setRels(SR); setPos(SPOS);
       }finally{
         setLoading(false);
@@ -432,26 +452,99 @@ function App(){
     setVt({ s: scale, x: (window.innerWidth/2) - (rootP.x * scale), y: (window.innerHeight/4) - (rootP.y * scale) });
   }
 
-  /* ── 2. PAN & ZOOM CONTROLS ── */
+  /* ── 2. PAN & ZOOM CONTROLS (NATIVE TOUCH ADDED) ── */
   const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
+  
+  // Mouse Events
+  const panning=useRef(false), panStart=useRef({});
   function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
   function vpMove(e){
     if(dragging.current){ e.preventDefault(); setPos(p=>({...p,[dragging.current]:{x:e.clientX/vt.s-dragOff.current.x,y:(e.clientY-56)/vt.s-dragOff.current.y}})); return; }
     if(panning.current) setVt(t=>({...t,x:e.clientX-panStart.current.x,y:e.clientY-panStart.current.y}));
   }
   function vpUp(){panning.current=false;dragging.current=null;}
+  
+  // Wheel Events
   useEffect(()=>{
     const el=vpRef.current; if(!el)return;
     function onWheel(e){
       e.preventDefault();
       const t=vtRef.current, f=e.deltaY<0?1.1:0.9;
-      const ns=Math.min(Math.max(t.s*f,0.15),3);
+      const ns=Math.min(Math.max(t.s*f,0.15),4);
       const rect=el.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
       setVt({s:ns, x:mx-(mx-t.x)*(ns/t.s), y:my-(my-t.y)*(ns/t.s)});
     }
     el.addEventListener('wheel',onWheel,{passive:false});
     return()=>el.removeEventListener('wheel',onWheel);
   },[]);
+
+  // Native Touch Events for Mobile (Swipe & Pinch)
+  const lastTouch=useRef(null);
+  const lastPinch=useRef(null);
+  const touchStartPos=useRef(null);
+  const TAP_SLOP=8;
+
+  function onTouchStart(e){
+    const tag=e.target.tagName;
+    if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
+    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup'))return;
+
+    if(e.touches.length===1){
+      const t=e.touches[0];
+      touchStartPos.current={x:t.clientX,y:t.clientY};
+      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastPinch.current=null;
+    } else if(e.touches.length>=2){
+      e.preventDefault(); 
+      const t0=e.touches[0],t1=e.touches[1];
+      const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+      lastPinch.current={
+        dist:Math.hypot(dx,dy), s:vtRef.current.s, x:vtRef.current.x, y:vtRef.current.y,
+        mx:(t0.clientX+t1.clientX)/2, my:(t0.clientY+t1.clientY)/2,
+      };
+      lastTouch.current=null; touchStartPos.current=null;
+    }
+  }
+  function onTouchMove(e){
+    if(e.touches.length===1&&lastTouch.current){
+      const t=e.touches[0]; const sp=touchStartPos.current;
+      const moved=sp?Math.hypot(t.clientX-sp.x,t.clientY-sp.y):TAP_SLOP+1;
+      if(moved<TAP_SLOP)return;
+      e.preventDefault();
+      const nx=t.clientX-lastTouch.current.x; const ny=t.clientY-lastTouch.current.y;
+      if(isFinite(nx)&&isFinite(ny)) setVt(prev=>({...prev,x:nx,y:ny}));
+    } else if(e.touches.length>=2&&lastPinch.current){
+      e.preventDefault();
+      const t0=e.touches[0],t1=e.touches[1];
+      const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+      const dist=Math.hypot(dx,dy); if(!dist)return;
+      const ratio=dist/lastPinch.current.dist;
+      const ns=Math.min(Math.max(lastPinch.current.s*ratio,0.15),4);
+      const {mx,my,x:ox,y:oy,s:os}=lastPinch.current;
+      const nx=mx-(mx-ox)*(ns/os); const ny=my-(my-oy)*(ns/os);
+      if(isFinite(ns)&&isFinite(nx)&&isFinite(ny)) setVt({s:ns,x:nx,y:ny});
+    }
+  }
+  function onTouchEnd(e){
+    if(e.touches.length===0){ lastTouch.current=null;lastPinch.current=null;touchStartPos.current=null; } 
+    else if(e.touches.length===1){
+      const t=e.touches[0];
+      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastPinch.current=null; touchStartPos.current={x:t.clientX,y:t.clientY};
+    }
+  }
+  useEffect(()=>{
+    const el=vpRef.current;if(!el)return;
+    el.addEventListener('touchstart',onTouchStart,{passive:true});
+    el.addEventListener('touchmove',onTouchMove,{passive:false});
+    el.addEventListener('touchend',onTouchEnd,{passive:true});
+    return()=>{
+      el.removeEventListener('touchstart',onTouchStart);
+      el.removeEventListener('touchmove',onTouchMove);
+      el.removeEventListener('touchend',onTouchEnd);
+    };
+  },[]);
+
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-56)/vt.s-p.y};}
 
   /* ── 3. DATA HELPERS ── */
@@ -502,7 +595,7 @@ function App(){
     const xs=Object.values(pos).map(p=>p.x), maxX=xs.length?Math.max(...xs):200;
     setPeople(prev=>[...prev,newPerson]); setPos(prev=>({...prev,[newPerson.id]:{x:maxX+160,y:200}}));
     setSel(newPerson.id); setSbMode('view'); setModal(null);
-    setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',notes:'',photo:''});
+    setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',notes:'',bioNote:''});
   }
 
   function commitMarriage(pid1, pid2){
@@ -513,10 +606,8 @@ function App(){
       const isP1New = !p1.bani || p1.bani==='BARU';
       const newcomer = isP1New ? p1 : p2; const host = isP1New ? p2 : p1;
       if(!host.bani || host.bani==='BARU') return prev;
-
       const spousesCount = prev.filter(p=>p.bani===host.bani && p.isBlood===false).length;
       const sOrder = spousesCount + 1;
-
       return prev.map(p=>{
         if(p.id===newcomer.id) return {...p, bani:host.bani, isBlood:false, spouseOrder:sOrder, displayId:`${host.displayId}-S${sOrder}`};
         return p;
@@ -530,10 +621,8 @@ function App(){
       const child=prev.find(p=>p.id===childId);
       const hostParent=parentIds.map(id=>prev.find(p=>p.id===id)).find(p=>p&&p.isBlood===true);
       if(!child || !hostParent || !hostParent.bani) return prev;
-
       const bloodsInBani = prev.filter(p=>p.bani===hostParent.bani && p.isBlood===true).length;
       const childNum = String(bloodsInBani+1).padStart(3,'0');
-
       return prev.map(p=>{
         if(p.id===child.id) return {...p, bani:hostParent.bani, isBlood:true, displayId:`${hostParent.bani}-${childNum}`};
         return p;
@@ -622,13 +711,33 @@ function App(){
   },[selP]);
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
-  function focusPerson(id){ setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); const p=pos[id]; if(p&&vpRef.current) setVt({s:1,x:(window.innerWidth/2)-CX(p),y:(window.innerHeight/2)-CY(p)}); }
+  
+  // Smart Camera Focus for Chips
+  function focusPerson(id){ 
+    setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); 
+    const p=pos[id]; 
+    if(p&&vpRef.current){
+      const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
+      setVt(prev=>({s:prev.s, x:vw/2 - CX(p)*prev.s, y:vh/2 - CY(p)*prev.s}));
+    }
+  }
+
+  // Helper for rendering clickable PChip
+  function PChip({id,tag}){
+    const pp=people.find(x=>x.id===id);if(!pp)return null;
+    return(
+      <div className="chip" onClick={()=>focusPerson(id)}>
+        <div className="chip-dot" style={{background:MC(pp.gender)}}/>
+        {nn(pp)}
+        {tag&&<span className="chip-tag">{tag}</span>}
+      </div>
+    );
+  }
 
   /* ── STATS CALCULATION ── */
   const totalOrang = people.length;
   const totalWafat = people.filter(p=>p.status==='Wafat').length;
   const totalPasangan = rels.filter(r=>r.type==='married').length;
-  const totalBani = new Set(people.map(p=>p.bani).filter(b=>b&&b!=='BARU')).size;
 
   return <>
     {loading && <div className="loading-screen"><div className="loading-spinner"/><h3>Memuat Silsilah...</h3></div>}
@@ -641,7 +750,6 @@ function App(){
       </div>
       <div className="spacer"/>
       
-      {/* Save Status - Relocated to Topbar */}
       <div className="save-status hide-mob">
         <div className={`save-dot ${saveStatus}`}/>
         {saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal':'Tersimpan'}
@@ -703,7 +811,7 @@ function App(){
       )}
     </div>
 
-    {/* SIDEBAR */}
+    {/* SIDEBAR DENGAN PROFIL LENGKAP & CHIP CLICKABLE */}
     <div className={`sidebar ${sel?'open':''}`}>
       {selP&&sbMode==='view'&&<>
         <div className="sb-head">
@@ -722,11 +830,30 @@ function App(){
               <span className="tag-badge" style={{background:'#f4f2ef',color:'#8a8278'}}>{selP.displayId}</span>
             </div>
           </div>
-          <div className="sec"><div className="sec-title">Keluarga</div>
-            <div className="info-row"><span className="info-label">Orang Tua</span><span className="info-val">{getActiveParents(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(' & ')||'-'}</span></div>
-            <div className="info-row"><span className="info-label">Pasangan</span><span className="info-val">{getPartners(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(', ')||'-'}</span></div>
-            <div className="info-row"><span className="info-label">Anak</span><span className="info-val">{getChildren(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(', ')||'-'}</span></div>
+          
+          <div className="sec">
+            <div className="sec-title">Info</div>
+            {fmtBirth(selP.birthPlace,selP.birthDate)&&<div className="info-row"><span className="info-label">Lahir</span><span className="info-val">{fmtBirth(selP.birthPlace,selP.birthDate)}</span></div>}
+            {selP.deathDate&&<div className="info-row"><span className="info-label">Wafat</span><span className="info-val">{fmtDate(selP.deathDate)}</span></div>}
+            {selP.domicile&&<div className="info-row"><span className="info-label">Domisili</span><span className="info-val">{selP.domicile}</span></div>}
+            {!fmtBirth(selP.birthPlace,selP.birthDate)&&!selP.deathDate&&!selP.domicile&&<div className="info-empty">Belum ada info detail.</div>}
           </div>
+
+          <div className="sec"><div className="sec-title">Keluarga</div>
+            <div className="info-row"><span className="info-label">Orang Tua</span><span className="info-val">
+              {getActiveParents(selP.id).length>0?<div className="chips">{getActiveParents(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
+            {selP.bioNote&&<div className="bio-note">{selP.bioNote}</div>}
+            
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Pasangan</span><span className="info-val">
+              {getPartners(selP.id).length>0?<div className="chips">{getPartners(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
+            
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Anak</span><span className="info-val">
+              {getChildren(selP.id).length>0?<div className="chips">{getChildren(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
+          </div>
+          
           {selP.notes&&<div className="sec"><div className="sec-title">Catatan</div><div className="info-val">{selP.notes}</div></div>}
           {isAdmin&&<button className="btn primary" style={{width:'100%',marginTop:10}} onClick={()=>{setRelF({...relF,pid:''});setModal('addrel');}}>+ Tambah Relasi</button>}
         </div>
@@ -734,9 +861,15 @@ function App(){
       {selP&&sbMode==='edit'&&<>
         <div className="sb-head"><h2>Edit Profil</h2><button className="btn" onClick={()=>setSbMode('view')}>Batal</button></div>
         <div className="sb-body" style={{paddingTop:20}}>
-          <div className="fg"><label>Nama Lengkap</label><input value={editF.fullName} onChange={e=>setEditF({...editF,fullName:e.target.value})}/></div>
-          <div className="fg"><label>Nama Panggilan</label><input value={editF.nickname} onChange={e=>setEditF({...editF,nickname:e.target.value})}/></div>
-          <div className="fg"><label>Status</label><select value={editF.status} onChange={e=>setEditF({...editF,status:e.target.value})}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
+          <div className="fg"><label>Nama Lengkap</label><input value={editF.fullName||''} onChange={e=>setEditF({...editF,fullName:e.target.value})}/></div>
+          <div className="fg"><label>Nama Panggilan</label><input value={editF.nickname||''} onChange={e=>setEditF({...editF,nickname:e.target.value})}/></div>
+          <div className="fg"><label>Tempat Lahir</label><input value={editF.birthPlace||''} placeholder="contoh: Blitar" onChange={e=>setEditF({...editF,birthPlace:e.target.value})}/></div>
+          <div className="fg"><label>Tanggal Lahir</label><input type="date" value={editF.birthDate||''} onChange={e=>setEditF({...editF,birthDate:e.target.value})}/></div>
+          <div className="fg"><label>Tanggal Wafat</label><input type="date" value={editF.deathDate||''} onChange={e=>setEditF({...editF,deathDate:e.target.value})}/></div>
+          <div className="fg"><label>Domisili</label><input value={editF.domicile||''} placeholder="contoh: Malang, Jawa Timur" onChange={e=>setEditF({...editF,domicile:e.target.value})}/></div>
+          <div className="fg"><label>Status</label><select value={editF.status||'Hidup'} onChange={e=>setEditF({...editF,status:e.target.value})}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
+          <div className="fg"><label>Catatan</label><textarea value={editF.notes||''} onChange={e=>setEditF({...editF,notes:e.target.value})}/></div>
+          <div className="fg"><label>Catatan Orang Tua <span style={{fontWeight:400,color:'#b0a898'}}>(keterangan asuh/kandung)</span></label><textarea value={editF.bioNote||''} onChange={e=>setEditF({...editF,bioNote:e.target.value})}/></div>
           <div className="frow"><button className="btn primary" onClick={saveEdit}>Simpan</button></div>
         </div>
       </>}
@@ -818,12 +951,10 @@ function App(){
 
     <div className={`statpill ${sel?'sb-open':''}`}>
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
-      <div style={{color:'#dfdbd5'}}>|</div>
+      <div className="stat-sep"></div>
       <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div style={{color:'#dfdbd5'}} className="hide-mob">|</div>
+      <div className="stat-sep hide-mob"></div>
       <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
-      <div style={{color:'#dfdbd5'}}>|</div>
-      <div><span className="stat-val">{totalBani}</span> Cabang Bani</div>
     </div>
 
     <div className={`ctrl ${sel?'sb-open':''}`}>
