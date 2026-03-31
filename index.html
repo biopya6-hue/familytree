@@ -561,15 +561,14 @@ function App(){
   function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
   function getChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
   
-  // Mencari Saudara dengan menganalisa irisan Orang Tua (aktif & biologis)
   function getSiblings(pid){
     const sibs=new Set();
     const myParents=new Set([...getActiveParents(pid),...getBioParents(pid)]);
-    if(myParents.size===0) return []; // Tidak ada info orang tua, tidak bisa cari saudara
+    if(myParents.size===0) return [];
     rels.forEach(r=>{
       if(r.type==='parent-child'){
         const parents=r.pids.slice(0,-1), child=r.pids[r.pids.length-1];
-        if(child===pid) return; // Jangan masukkan diri sendiri
+        if(child===pid) return;
         if(parents.some(p=>myParents.has(p))) sibs.add(child);
       }
     });
@@ -666,7 +665,7 @@ function App(){
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT ── */
+  /* ── 6. DYNAMIC AUTO-LAYOUT DENGAN ALGORITMA BARU ── */
   function computeAutoLayout(){
     const GAP_X=50, GAP_Y=200;
     const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
@@ -697,15 +696,27 @@ function App(){
       const yPos = gen*GAP_Y;
       const spouses = getSpouses(pid), children = getBloodChildren(pid);
 
+      /* ALGORITMA PENEMPATAN KARTU TERBARU */
       function placeUnit(selfCX){
         const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
         let ux = selfCX - totalUnit/2;
-        const s1 = spouses.filter(s=>s.spouseOrder===1);
-        const s2 = spouses.filter(s=>s.spouseOrder>1);
         
-        s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
-        newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
-        s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+        if (spouses.length === 0) {
+          // Jomblo / Sendiri
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+        } else if (spouses.length === 1) {
+          // 1 Pasangan: Darah selalu KIRI, Pasangan di KANAN
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+          ux += CW + GAP_X;
+          newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
+        } else {
+          // Poligami (>1): Istri-1 di Kiri, Suami/Darah di Tengah, Istri-2+ di Kanan
+          const s1 = spouses.filter(s=>s.spouseOrder===1);
+          const s2 = spouses.filter(s=>s.spouseOrder>1);
+          s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
+          s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+        }
       }
 
       if(!children.length){ placeUnit(centerX); return; }
@@ -733,7 +744,6 @@ function App(){
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
   
-  // Kamera pintar berfokus ke Node saat di-klik
   function focusPerson(id){ 
     setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); 
     const p=pos[id]; 
@@ -743,7 +753,6 @@ function App(){
     }
   }
 
-  // Komponen Chip yang bisa diklik
   function PChip({id,tag}){
     const pp=people.find(x=>x.id===id);if(!pp)return null;
     return(
@@ -833,7 +842,7 @@ function App(){
       )}
     </div>
 
-    {/* SIDEBAR DENGAN FONT LEBIH KECIL & LOGIKA SAUDARA */}
+    {/* SIDEBAR DENGAN PROFIL & SAUDARA */}
     <div className={`sidebar ${sel?'open':''}`}>
       {selP&&sbMode==='view'&&<>
         <div className="sb-head">
@@ -871,9 +880,9 @@ function App(){
               {getPartners(selP.id).length>0?<div className="chips">{getPartners(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
             </span></div>
 
-            {/* SEKSI SAUDARA BARU */}
+            {/* SEKSI SAUDARA */}
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Saudara</span><span className="info-val">
-              {siblings.length>0?<div className="chips">{siblings.map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum/tidak ada data.</div>}
+              {siblings.length>0?<div className="chips">{siblings.map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Tidak ada / belum terdata.</div>}
             </span></div>
             
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Anak</span><span className="info-val">
