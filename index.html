@@ -24,17 +24,27 @@ const db      = firebase.firestore();
 const storage = firebase.storage();
 </script>
 <style>
-/* CSS Reset & Typography */
+/* ══════════════════════════════════════════════════
+   CSS RESET & ELEGAN TEMA MINIMALIS (Fase 4)
+══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c2825;overflow:hidden;height:100vh;width:100vw}
 
-/* Elegant Topbar */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:1px solid #e0ddd8;}
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #e0ddd8;}
 .brand-name{font-size:15px;font-weight:700;letter-spacing:-.02em;color:#1a1816}
 .brand-sub{font-size:11px;color:#8a8278;margin-top:2px;font-weight:500}
 .sep{width:1px;height:24px;background:#e0ddd8;flex-shrink:0;margin:0 4px}
 
-/* Elegant Buttons */
+/* SEARCH */
+.search-wrap{flex:1;max-width:240px;position:relative;}
+.search-wrap input{width:100%;padding:8px 14px;border-radius:20px;border:1px solid #dfdbd5;background:#fbfaf9;font-size:12px;outline:none;font-family:inherit;transition:all .2s;}
+.search-wrap input:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
+.sresults{position:fixed;top:56px;left:0;z-index:190;background:#fff;border-bottom:1px solid #dfdbd5;min-width:260px;max-width:320px;max-height:220px;overflow-y:auto;border-radius:0 0 14px 14px;box-shadow:0 12px 32px rgba(0,0,0,.1);}
+.sitem{padding:10px 16px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f4f2ef;transition:background .1s;}
+.sitem:hover{background:#f8f6f4}
+
+/* BUTTONS */
 .spacer{flex:1}
 .btn{padding:7px 15px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid #d4d0ca;background:#fff;cursor:pointer;color:#3a352f;transition:all .2s ease;white-space:nowrap;font-family:inherit;}
 .btn:hover{background:#f0edea;border-color:#b8b4ae}
@@ -45,14 +55,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .btn.danger{border-color:#e0a8a8;color:#b04040}
 .btn.danger:hover{background:#fcf2f2}
 .btn:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:600px){ .hide-mob{display:none;} }
 
-/* Canvas */
+/* VIEWPORT & CANVAS */
 #vp{position:fixed;inset:0;top:56px;overflow:hidden;cursor:grab;}
 #vp.pan{cursor:grabbing}
 #world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
-/* Node Cards (Minimalist & Proportional) */
+/* NODE CARDS */
 .node{position:absolute;z-index:10;transition:opacity .2s}
 .card{width:116px;background:#fff;border:1.5px solid #dfdbd5;border-radius:14px;text-align:center;padding:12px 8px 10px;cursor:pointer;transition:all .2s ease;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02);}
 .card:hover{border-color:#a8a29a;box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-2px)}
@@ -64,24 +75,91 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 .card-nick{font-size:12px;font-weight:700;color:#2c2825;line-height:1.2;margin-bottom:2px}
 .card.wafat .card-nick{color:#8a8278}
 
-/* Modals & Inputs */
-.overlay{position:fixed;inset:0;background:rgba(20,18,16,.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
-.modal{background:#fff;border-radius:20px;padding:24px;max-width:380px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #dfdbd5;box-shadow:0 24px 48px rgba(0,0,0,.15);}
-.modal h3{font-size:16px;font-weight:800;margin-bottom:8px;color:#1a1816}
-.modal-sub{font-size:12px;color:#7a7268;margin-bottom:16px;line-height:1.5}
-.fg{margin-bottom:12px}
-.fg label{display:block;font-size:11px;font-weight:600;color:#7a7268;margin-bottom:6px;}
-.fg input,.fg select,.fg textarea{width:100%;padding:8px 12px;border-radius:10px;border:1px solid #dfdbd5;font-size:13px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
-.frow{display:flex;gap:8px;margin-top:20px}
-.frow .btn{flex:1;text-align:center}
+/* SIDEBAR */
+.sidebar{position:fixed;right:0;bottom:0;top:56px;width:340px;z-index:150;background:#fff;border-left:1px solid #dfdbd5;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,.05);}
+.sidebar.open{transform:translateX(0)}
+@media(max-width:500px){.sidebar{width:100vw;border-left:none;}}
+.sb-head{padding:16px 20px;border-bottom:1px solid #f4f2ef;display:flex;align-items:center;gap:10px;flex-shrink:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
+.sb-head h2{font-size:14px;font-weight:800;flex:1;color:#1a1816}
+.sb-body{flex:1;overflow-y:auto;padding:0 20px 24px}
 
-/* Registry Table */
+.profile-hero{padding:24px 0 20px;text-align:center;border-bottom:1px solid #f4f2ef;margin-bottom:16px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;overflow:hidden;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-nick{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#1a1816}
+.profile-fullname{font-size:12px;color:#8a8278;margin-top:4px}
+.profile-tags{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;}
+.tag-badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.03em;}
+
+.sec{margin-bottom:20px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a8a29a;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f4f2ef;}
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:5px 0;font-size:13px;}
+.info-label{color:#8a8278;min-width:85px;flex-shrink:0;font-size:12px;font-weight:600}
+.info-val{color:#2c2825;flex:1;line-height:1.5;word-break:break-word}
+.info-empty{font-size:12px;color:#b8b4ae;font-style:italic}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#fbfaf9;border-radius:20px;font-size:12px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e5e0;transition:all .15s;}
+.chip:hover{background:#f4f2ef;border-color:#d4d0ca;transform:translateY(-1px)}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* MODALS & FORMS */
+.overlay{position:fixed;inset:0;background:rgba(20,18,16,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
+.modal{background:#fff;border-radius:20px;padding:28px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #dfdbd5;box-shadow:0 24px 48px rgba(0,0,0,.15);}
+.modal h3{font-size:18px;font-weight:800;margin-bottom:10px;color:#1a1816;letter-spacing:-.01em}
+.modal-sub{font-size:13px;color:#7a7268;margin-bottom:20px;line-height:1.6}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:700;color:#7a7268;margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #dfdbd5;font-size:13px;background:#fbfaf9;outline:none;font-family:inherit;transition:all .2s;color:#2c2825}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#a8a29a;background:#fff;box-shadow:0 0 0 3px rgba(168,162,154,.1)}
+.fg textarea{resize:vertical;min-height:70px;line-height:1.5}
+.frow{display:flex;gap:10px;margin-top:24px}
+.frow .btn{flex:1;text-align:center;padding:10px;font-size:13px}
+
+/* PPICKER (Person Picker) */
+.ppicker{border:1px solid #dfdbd5;border-radius:12px;overflow:hidden;background:#fff;}
+.ppicker-search{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f4f2ef;background:#fbfaf9}
+.ppicker-search input{flex:1;border:none;outline:none;font-size:13px;font-family:inherit;color:#2c2825;background:transparent;}
+.ppicker-list{max-height:180px;overflow-y:auto;}
+.ppicker-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f4f2ef;transition:background .1s;}
+.ppicker-item:hover{background:#f8f6f4;}
+.ppicker-item.selected{background:#edf4f9;font-weight:700;}
+.pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* REGISTRY TABLE */
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
-.reg-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:6px 0;border-bottom:1px solid #dfdbd5}
-.reg-table td{padding:8px 0;border-bottom:1px solid #f4f2ef;font-size:12px;color:#2c2825}
-.tag-blood{background:#e8f0f4;color:#3a6582;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:700}
-.tag-spouse{background:#f4f0e8;color:#8a6a3a;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:700}
+.reg-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
+.reg-table td{padding:10px 0;border-bottom:1px solid #f4f2ef;font-size:13px;color:#2c2825}
+.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
+.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
+
+/* EDGE POPUP */
+.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dfdbd5;border-radius:16px;padding:16px;min-width:240px;box-shadow:0 12px 32px rgba(0,0,0,.15);}
+.edge-popup h4{font-size:14px;font-weight:800;margin-bottom:10px;color:#1a1816}
+.edge-info{font-size:12px;color:#7a7268;margin-bottom:14px;line-height:1.6}
+
+/* CONTROLS & STATUS */
+.ctrl{position:fixed;bottom:20px;right:20px;z-index:180;display:flex;flex-direction:column;gap:8px;transition:opacity .3s;}
+.cbtn{width:40px;height:40px;border-radius:14px;background:#fff;border:1px solid #dfdbd5;font-size:18px;cursor:pointer;color:#3a352f;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.05);}
+.cbtn:hover{background:#f4f2ef;transform:translateY(-2px)}
+@media(max-width:500px){ .ctrl.sb-open{opacity:0;pointer-events:none;} }
+
+.save-status{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border:1px solid #dfdbd5;border-radius:24px;padding:6px 16px;font-size:11px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.05);transition:opacity .3s;white-space:nowrap;}
+.save-status.hidden{opacity:0;}
+.save-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.save-dot.syncing{background:#d4a373;animation:savepulse .8s ease-in-out infinite;}
+.save-dot.saved{background:#73d496}
+.save-dot.error{background:#d47373}
+@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* LOADING */
+.loading-screen{position:fixed;inset:0;z-index:1000;background:#f4f2ef;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-spinner{width:40px;height:40px;border:3px solid #dfdbd5;border-top-color:#426b8a;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d4d0ca;border-radius:6px}
 </style>
 </head>
 <body>
@@ -89,34 +167,40 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f2ef;color:#2c
 <script type="text/babel">
 const {useState,useEffect,useRef,useMemo} = React;
 
-const CW=116, CH=98; // Adjusted Card Width & Height
+const CW=116, CH=98; 
 const CX=p=>p.x+CW/2, CY=p=>p.y+CH/2;
 const MC=g=>g==='M'?'#5a9bc8':g==='F'?'#c87a9b':'#c8a830';
 const MB=g=>g==='M'?'#edf4f9':g==='F'?'#f9edf2':'#fcf8ec';
 const ini=n=>n?.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 const nn=p=>p.nickname||p.fullName?.split(' ')[0]||'Anonim';
+const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // SHA-256 of "1234"
+
+async function checkPin(val){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')===PIN_HASH;
+}
+function fmtDate(d){
+  if(!d)return '';
+  try{return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});}
+  catch{return d;}
+}
+function fmtBirth(pl,dt){
+  const p=pl?.trim(),d=fmtDate(dt);
+  return p&&d?`${p}, ${d}`:p||d||'';
+}
 
 /* ══════════════════════════════════════════════════
-   FASE 2: DATA SEED (Skema Laci Atribut / Opsi 2)
-   Tidak ada lagi regex rumit. Setiap orang punya:
-   - bani: Grup keluarga asal
-   - isBlood: Keturunan sedarah (true) / Pasangan (false)
-   - spouseOrder: Nomor istri/suami ke berapa (jika false)
+   FASE 2: CETAK BIRU DATA LACI (Atribut Bisnis Murni)
 ══════════════════════════════════════════════════ */
 const SP=[
-  // ── KASIRIN & ISTRI ──
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat' },
-  { id:'p_ksr_w1', displayId:'KSR-W1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat' },
-  { id:'p_ksr_w2', displayId:'KSR-W2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat' },
-
-  // ── BANI KRM (Karmilah) ──
+  { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat' },
+  { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat' },
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup' },
-
-  // ── BANI SAD (Said) ──
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup' },
-  { id:'p_sad_1_w1', displayId:'SAD-001-W1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup' },
-  { id:'p_sad_1_w2', displayId:'SAD-001-W2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup' },
+  { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup' },
+  { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup' },
   { id:'p_sad_2', displayId:'SAD-002', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Imam', nickname:'Imam', gender:'M', status:'Hidup' },
   { id:'p_sad_2_w1', displayId:'SAD-002-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri Imam', nickname:'Istri Imam', gender:'F', status:'Hidup' },
   { id:'p_sad_3', displayId:'SAD-003', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Anak Imam', nickname:'Anak Imam', gender:'?', status:'Hidup' },
@@ -124,44 +208,37 @@ const SP=[
   { id:'p_sad_4a', displayId:'SAD-004', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 1', nickname:'Cucu 1', gender:'?', status:'Hidup' },
   { id:'p_sad_4b', displayId:'SAD-005', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 2', nickname:'Cucu 2', gender:'?', status:'Hidup' },
   { id:'p_sad_4c', displayId:'SAD-006', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 3', nickname:'Cucu 3', gender:'?', status:'Hidup' },
-
-  // ── BANI PAN (Panidjan) ──
   { id:'p_pan_1', displayId:'PAN-001', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Panidjan', nickname:'Panidjan', gender:'M', status:'Wafat' },
-  { id:'p_pan_1_w1', displayId:'PAN-001-W1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup' },
+  { id:'p_pan_1_w1', displayId:'PAN-001-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup' },
   { id:'p_pan_2a', displayId:'PAN-002', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Mukayani', nickname:'Mukayani', gender:'M', status:'Hidup' },
   { id:'p_pan_2a_w1', displayId:'PAN-002-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Ririn', nickname:'Ririn', gender:'F', status:'Hidup' },
   { id:'p_pan_2b', displayId:'PAN-003', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Wiwik Rianti', nickname:'Wiwik', gender:'F', status:'Hidup' },
   { id:'p_pan_2b_w1', displayId:'PAN-003-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Manan', nickname:'Manan', gender:'M', status:'Hidup' },
   { id:'p_pan_2c', displayId:'PAN-004', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Sucipto', nickname:'Sucipto', gender:'M', status:'Wafat' },
   { id:'p_pan_2d', displayId:'PAN-005', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Edi Purnomo', nickname:'Edi', gender:'M', status:'Hidup' },
-  { id:'p_pan_2d_w1', displayId:'PAN-005-W1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Sandra', nickname:'Sandra', gender:'F', status:'Cerai' },
-  { id:'p_pan_2d_w2', displayId:'PAN-005-W2', bani:'PAN', isBlood:false, spouseOrder:2, fullName:'Deny', nickname:'Deny', gender:'F', status:'Hidup' },
+  { id:'p_pan_2d_w1', displayId:'PAN-005-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Sandra', nickname:'Sandra', gender:'F', status:'Cerai' },
+  { id:'p_pan_2d_w2', displayId:'PAN-005-S2', bani:'PAN', isBlood:false, spouseOrder:2, fullName:'Deny', nickname:'Deny', gender:'F', status:'Hidup' },
   { id:'p_pan_2e', displayId:'PAN-006', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Sriwiyanti', nickname:'Srini', gender:'F', status:'Hidup' },
   { id:'p_pan_2e_w1', displayId:'PAN-006-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Saeful', nickname:'Saeful', gender:'M', status:'Hidup' },
   { id:'p_pan_2f', displayId:'PAN-007', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Siti Eko Wati', nickname:'Siti', gender:'F', status:'Hidup' },
   { id:'p_pan_2f_w1', displayId:'PAN-007-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Edi Santoso', nickname:'Santoso', gender:'M', status:'Hidup' },
   { id:'p_pan_2g', displayId:'PAN-008', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Eny Idayanti', nickname:'Eny', gender:'F', status:'Hidup' },
   { id:'p_pan_2g_w1', displayId:'PAN-008-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Zamzuri', nickname:'Zamzuri', gender:'M', status:'Hidup' },
-  
-  // Gen 3 PAN
   { id:'p_pan_3a', displayId:'PAN-009', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'M. Anas Ataroqy Isa', nickname:'Anas', gender:'M', status:'Hidup' },
   { id:'p_pan_3b', displayId:'PAN-010', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Agista Alifia Amalia', nickname:'Agista', gender:'F', status:'Hidup' },
   { id:'p_pan_3c', displayId:'PAN-011', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'M. Khoirul Anam', nickname:'Khoirul', gender:'M', status:'Hidup' },
-  { id:'p_pan_3c_w1', displayId:'PAN-011-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Pramesti Tunjung', nickname:'Tunjung', gender:'F', status:'Hidup' },
-  { id:'p_pan_3d', displayId:'PAN-012', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Laili Khoirur', nickname:'Laili', gender:'F', status:'Hidup' },
+  { id:'p_pan_3c_w1', displayId:'PAN-011-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Pramesti Tunjung Sasmita', nickname:'Tunjung', gender:'F', status:'Hidup' },
+  { id:'p_pan_3d', displayId:'PAN-012', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Laili Khoirur Rohmah', nickname:'Laili', gender:'F', status:'Hidup' },
   { id:'p_pan_3e', displayId:'PAN-013', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Eka', nickname:'Eka', gender:'M', status:'Hidup' },
   { id:'p_pan_3f', displayId:'PAN-014', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Wildan', nickname:'Wildan', gender:'M', status:'Hidup' },
   { id:'p_pan_3g', displayId:'PAN-015', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Azril', nickname:'Azril', gender:'M', status:'Hidup' },
   { id:'p_pan_3h', displayId:'PAN-016', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Faiz', nickname:'Faiz', gender:'M', status:'Hidup' },
   { id:'p_pan_3i', displayId:'PAN-017', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Iqbal', nickname:'Iqbal', gender:'M', status:'Hidup' },
   { id:'p_pan_3j', displayId:'PAN-018', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Hafiz', nickname:'Hafiz', gender:'M', status:'Hidup' },
-  // Gen 4 PAN
-  { id:'p_pan_4a', displayId:'PAN-019', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Ishita Hirya', nickname:'Hirya', gender:'F', status:'Hidup' },
-
-  // ── BANI SUR (Surahman) ──
+  { id:'p_pan_4a', displayId:'PAN-019', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Ishita Hirya Mahesani', nickname:'Hirya', gender:'F', status:'Hidup' },
   { id:'p_sur_1', displayId:'SUR-001', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Surahman', nickname:'Surahman', gender:'M', status:'Hidup' },
-  { id:'p_sur_1_w1', displayId:'SUR-001-W1', bani:'SUR', isBlood:false, spouseOrder:1, fullName:'Menik', nickname:'Menik', gender:'F', status:'Hidup' },
-  { id:'p_sur_1_w2', displayId:'SUR-001-W2', bani:'SUR', isBlood:false, spouseOrder:2, fullName:'Istri ke-2 Surahman', nickname:'Istri 2', gender:'F', status:'Hidup' },
+  { id:'p_sur_1_w1', displayId:'SUR-001-S1', bani:'SUR', isBlood:false, spouseOrder:1, fullName:'Menik', nickname:'Menik', gender:'F', status:'Hidup' },
+  { id:'p_sur_1_w2', displayId:'SUR-001-S2', bani:'SUR', isBlood:false, spouseOrder:2, fullName:'Istri ke-2 Surahman', nickname:'Istri 2', gender:'F', status:'Hidup' },
   { id:'p_sur_2', displayId:'SUR-002', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Anak Surahman', nickname:'Anak Surahman', gender:'?', status:'Hidup' }
 ];
 
@@ -172,7 +249,6 @@ const SR=[
   { id:'c2', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sad_1'], isActive:true },
   { id:'c3', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_pan_1'], isActive:true },
   { id:'c4', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sur_1'], isActive:true },
-
   { id:'m3', type:'married', pids:['p_krm_1','p_krm_1_w1'], isActive:true },
   { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
   { id:'m5', type:'married', pids:['p_sad_1','p_sad_1_w2'], isActive:true },
@@ -183,7 +259,6 @@ const SR=[
   { id:'c7', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4a'], isActive:true },
   { id:'c8', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4b'], isActive:true },
   { id:'c9', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4c'], isActive:true },
-
   { id:'m8', type:'married', pids:['p_pan_1','p_pan_1_w1'], isActive:true },
   { id:'c10', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2a'], isActive:true },
   { id:'c11', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2b'], isActive:true },
@@ -192,7 +267,6 @@ const SR=[
   { id:'c14', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2e'], isActive:true },
   { id:'c15', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2f'], isActive:true },
   { id:'c16', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2g'], isActive:true },
-
   { id:'m9', type:'married', pids:['p_pan_2a','p_pan_2a_w1'], isActive:true },
   { id:'m10', type:'married', pids:['p_pan_2b','p_pan_2b_w1'], isActive:true },
   { id:'m11', type:'married', pids:['p_pan_2d','p_pan_2d_w1'], isActive:false },
@@ -200,7 +274,6 @@ const SR=[
   { id:'m13', type:'married', pids:['p_pan_2e','p_pan_2e_w1'], isActive:true },
   { id:'m14', type:'married', pids:['p_pan_2f','p_pan_2f_w1'], isActive:true },
   { id:'m15', type:'married', pids:['p_pan_2g','p_pan_2g_w1'], isActive:true },
-
   { id:'c17', type:'parent-child', pids:['p_pan_2a','p_pan_2a_w1','p_pan_3a'], isActive:true },
   { id:'c18', type:'parent-child', pids:['p_pan_2a','p_pan_2a_w1','p_pan_3b'], isActive:true },
   { id:'c19', type:'parent-child', pids:['p_pan_2b','p_pan_2b_w1','p_pan_3c'], isActive:true },
@@ -212,186 +285,551 @@ const SR=[
   { id:'c25', type:'parent-child', pids:['p_pan_2e','p_pan_2e_w1','p_pan_3h'], isActive:true },
   { id:'c26', type:'parent-child', pids:['p_pan_2f','p_pan_2f_w1','p_pan_3i'], isActive:true },
   { id:'c27', type:'parent-child', pids:['p_pan_2g','p_pan_2g_w1','p_pan_3j'], isActive:true },
-
   { id:'m16', type:'married', pids:['p_pan_3c','p_pan_3c_w1'], isActive:true },
   { id:'c28', type:'parent-child', pids:['p_pan_3c','p_pan_3c_w1','p_pan_4a'], isActive:true },
-
   { id:'m17', type:'married', pids:['p_sur_1','p_sur_1_w1'], isActive:true },
   { id:'m18', type:'married', pids:['p_sur_1','p_sur_1_w2'], isActive:true },
   { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
 ];
 
-/* Koordinat 47 Orang Lengkap (Tidak ada tumpukan di 0,0) */
+/* Koordinat Awal Lengkap (Mencegah tumpukan 0,0) */
 const SPOS={
-  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1040, y:0}, p_ksr_w2: {x:1360, y:0},
-  p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:260, y:200},
-  p_sad_1: {x:560, y:200}, p_sad_1_w1: {x:400, y:200}, p_sad_1_w2: {x:720, y:200},
-  p_sad_2: {x:400, y:400}, p_sad_2_w1: {x:560, y:400},
-  p_sad_3: {x:480, y:600}, p_sad_3_w1: {x:640, y:600},
-  p_sad_4a: {x:400, y:800}, p_sad_4b: {x:560, y:800}, p_sad_4c: {x:720, y:800},
-  p_pan_1: {x:1280, y:200}, p_pan_1_w1: {x:1440, y:200},
-  p_pan_2a: {x:900, y:400}, p_pan_2a_w1: {x:1060, y:400},
-  p_pan_2b: {x:1280, y:400}, p_pan_2b_w1: {x:1440, y:400},
+  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
+  p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
+  p_sad_1: {x:610, y:200}, p_sad_1_w1: {x:440, y:200}, p_sad_1_w2: {x:780, y:200},
+  p_sad_2: {x:440, y:400}, p_sad_2_w1: {x:610, y:400},
+  p_sad_3: {x:525, y:600}, p_sad_3_w1: {x:695, y:600},
+  p_sad_4a: {x:440, y:800}, p_sad_4b: {x:610, y:800}, p_sad_4c: {x:780, y:800},
+  p_pan_1: {x:1280, y:200}, p_pan_1_w1: {x:1450, y:200},
+  p_pan_2a: {x:900, y:400}, p_pan_2a_w1: {x:1070, y:400},
+  p_pan_2b: {x:1280, y:400}, p_pan_2b_w1: {x:1450, y:400},
   p_pan_2c: {x:1660, y:400},
-  p_pan_2d: {x:1880, y:400}, p_pan_2d_w1: {x:1720, y:400}, p_pan_2d_w2: {x:2040, y:400},
-  p_pan_2e: {x:2320, y:400}, p_pan_2e_w1: {x:2480, y:400},
-  p_pan_2f: {x:2680, y:400}, p_pan_2f_w1: {x:2840, y:400},
-  p_pan_2g: {x:3040, y:400}, p_pan_2g_w1: {x:3200, y:400},
-  p_pan_3a: {x:900, y:600}, p_pan_3b: {x:1060, y:600},
-  p_pan_3c: {x:1280, y:600}, p_pan_3c_w1: {x:1440, y:600},
+  p_pan_2d: {x:1950, y:400}, p_pan_2d_w1: {x:1780, y:400}, p_pan_2d_w2: {x:2120, y:400},
+  p_pan_2e: {x:2420, y:400}, p_pan_2e_w1: {x:2590, y:400},
+  p_pan_2f: {x:2800, y:400}, p_pan_2f_w1: {x:2970, y:400},
+  p_pan_2g: {x:3180, y:400}, p_pan_2g_w1: {x:3350, y:400},
+  p_pan_3a: {x:900, y:600}, p_pan_3b: {x:1070, y:600},
+  p_pan_3c: {x:1280, y:600}, p_pan_3c_w1: {x:1450, y:600},
   p_pan_3d: {x:1660, y:600},
-  p_pan_3e: {x:1720, y:600}, p_pan_3f: {x:1960, y:600}, p_pan_3g: {x:2120, y:600},
-  p_pan_3h: {x:2400, y:600}, p_pan_3i: {x:2760, y:600}, p_pan_3j: {x:3120, y:600},
-  p_pan_4a: {x:1360, y:800},
-  p_sur_1: {x:3600, y:200}, p_sur_1_w1: {x:3440, y:200}, p_sur_1_w2: {x:3760, y:200},
-  p_sur_2: {x:3680, y:400}
+  p_pan_3e: {x:1780, y:600}, p_pan_3f: {x:2035, y:600}, p_pan_3g: {x:2205, y:600},
+  p_pan_3h: {x:2505, y:600}, p_pan_3i: {x:2885, y:600}, p_pan_3j: {x:3265, y:600},
+  p_pan_4a: {x:1365, y:800},
+  p_sur_1: {x:3800, y:200}, p_sur_1_w1: {x:3630, y:200}, p_sur_1_w2: {x:3970, y:200},
+  p_sur_2: {x:3885, y:400}
 };
 
-/* ── APP ── */
+/* ── MAIN APP COMPONENT ── */
 function App(){
-  const [people,setPeople] = useState([]);
-  const [rels,setRels]     = useState([]);
-  const [pos,setPos]       = useState({});
-  const [vt,setVt]         = useState({x:0,y:0,s:1});
+  const [people,setPeople]   = useState([]);
+  const [rels,setRels]       = useState([]);
+  const [pos,setPos]         = useState({});
+  const [sel,setSel]         = useState(null);
+  const [sbMode,setSbMode]   = useState('view');
+  const [isAdmin,setIsAdmin] = useState(false);
+  const [searchQ,setSearchQ] = useState('');
+  const [showSR,setShowSR]   = useState(false);
+  const [modal,setModal]     = useState(null);
+  const [pinVal,setPinVal]   = useState('');
+  const [pinErr,setPinErr]   = useState('');
+  const [editF,setEditF]     = useState({});
+  const [addF,setAddF]       = useState({fullName:'',nickname:'',gender:'M',status:'Hidup',notes:'',photo:''});
+  const [relF,setRelF]       = useState({type:'married',pid:'',isActive:true});
+  const [relSearchQ,setRelSearchQ]=useState('');
+  const [vt,setVt]           = useState({x:0,y:0,s:1});
+  const [edgeSel,setEdgeSel] = useState(null);
+  const [registryFilter,setRegistryFilter] = useState(null);
+  
+  const [loading,setLoading] = useState(true);
+  const [saveStatus,setSaveStatus] = useState('saved');
+  const dragging=useRef(null), dragOff=useRef({});
+  const panning=useRef(false), panStart=useRef({});
   const vpRef=useRef();
+  const saveTimer=useRef(null);
+  const isFirstLoad=useRef(true);
+  
+  const lastSyncedPeople=useRef({});
+  const lastSyncedRels=useRef({});
+  const lastSyncedPos=useRef({});
 
-  // Load state
+  const COL_MEMBERS       = ()=>db.collection('members');
+  const COL_RELATIONSHIPS = ()=>db.collection('relationships');
+  const COL_POSITIONS     = ()=>db.collection('positions');
+
+  /* ── 1. FIREBASE LOAD & DELTA SAVE ── */
   useEffect(()=>{
-    // Di real app, gunakan db.collection('...').get()
-    // Karena ini wipeout, kita load langsung dari SP
-    setPeople(SP); setRels(SR); setPos(SPOS);
-    
-    // Auto-Kamera menyesuaikan layar (Fase 4)
-    setTimeout(()=>{
-      if(vpRef.current){
-        const isMobile = window.innerWidth < 600;
-        const scale = isMobile ? 0.35 : 0.6; // Kamera pintar
-        const root = SPOS['p_ksr'];
-        setVt({ 
-          s: scale, 
-          x: (window.innerWidth/2) - (root.x * scale), 
-          y: (window.innerHeight/4) - (root.y * scale) 
-        });
+    async function load(){
+      try{
+        const [mSnap, rSnap, pSnap] = await Promise.all([COL_MEMBERS().get(), COL_RELATIONSHIPS().get(), COL_POSITIONS().get()]);
+        if(mSnap.empty){
+          // First Time Setup - Upload Blueprint
+          const batch=db.batch();
+          SP.forEach(p=>batch.set(COL_MEMBERS().doc(p.id), p));
+          SR.forEach(r=>batch.set(COL_RELATIONSHIPS().doc(r.id), r));
+          Object.entries(SPOS).forEach(([id,xy])=>batch.set(COL_POSITIONS().doc(id), xy));
+          await batch.commit();
+          setPeople(SP); setRels(SR); setPos(SPOS);
+          SP.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+          SR.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+          Object.entries(SPOS).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+        } else {
+          const loadedPeople=mSnap.docs.map(d=>d.data());
+          const loadedRels=rSnap.docs.map(d=>d.data());
+          const loadedPos={}; pSnap.docs.forEach(d=>{loadedPos[d.id]=d.data();});
+          setPeople(loadedPeople); setRels(loadedRels); setPos(loadedPos);
+          loadedPeople.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+          loadedRels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+          Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+        }
+      }catch(err){
+        console.error('Offline Mode', err);
+        setPeople(SP); setRels(SR); setPos(SPOS);
+      }finally{
+        setLoading(false);
+        setTimeout(autoCamera, 100);
       }
-    }, 100);
+    }
+    load();
   },[]);
 
-  // ══════════════════════════════════════════════════
-  // FASE 4: GARIS SIKU (Orthogonal / Stepped)
-  // ══════════════════════════════════════════════════
+  useEffect(()=>{
+    if(!people.length)return;
+    if(isFirstLoad.current){isFirstLoad.current=false;return;}
+    setSaveStatus('syncing');
+    if(saveTimer.current)clearTimeout(saveTimer.current);
+    saveTimer.current=setTimeout(async()=>{
+      try{
+        const batch=db.batch(); let changes=0;
+        const currentPeopleMap={}; people.forEach(p=>{currentPeopleMap[p.id]=p;});
+        people.forEach(p=>{
+          const prev=lastSyncedPeople.current[p.id];
+          if(!prev||JSON.stringify(prev)!==JSON.stringify(p)){ batch.set(COL_MEMBERS().doc(p.id), p); changes++; }
+        });
+        Object.keys(lastSyncedPeople.current).forEach(id=>{
+          if(!currentPeopleMap[id]){ batch.delete(COL_MEMBERS().doc(id)); changes++; }
+        });
+
+        const currentRelsMap={}; rels.forEach(r=>{currentRelsMap[r.id]=r;});
+        rels.forEach(r=>{
+          const prev=lastSyncedRels.current[r.id];
+          if(!prev||JSON.stringify(prev)!==JSON.stringify(r)){ batch.set(COL_RELATIONSHIPS().doc(r.id), r); changes++; }
+        });
+        Object.keys(lastSyncedRels.current).forEach(id=>{
+          if(!currentRelsMap[id]){ batch.delete(COL_RELATIONSHIPS().doc(id)); changes++; }
+        });
+
+        Object.entries(pos).forEach(([id,xy])=>{
+          const prev=lastSyncedPos.current[id];
+          if(!prev||prev.x!==xy.x||prev.y!==xy.y){ batch.set(COL_POSITIONS().doc(id), xy); changes++; }
+        });
+        Object.keys(lastSyncedPos.current).forEach(id=>{
+          if(!pos[id]){ batch.delete(COL_POSITIONS().doc(id)); changes++; }
+        });
+
+        if(changes>0) await batch.commit();
+        people.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
+        Object.keys(lastSyncedPeople.current).forEach(id=>{if(!currentPeopleMap[id])delete lastSyncedPeople.current[id];});
+        rels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
+        Object.keys(lastSyncedRels.current).forEach(id=>{if(!currentRelsMap[id])delete lastSyncedRels.current[id];});
+        Object.entries(pos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+        Object.keys(lastSyncedPos.current).forEach(id=>{if(!pos[id])delete lastSyncedPos.current[id];});
+        setSaveStatus('saved');
+      }catch(err){ setSaveStatus('error'); }
+    },1500);
+  },[people,rels,pos]);
+
+  function autoCamera(){
+    if(!vpRef.current)return;
+    const isMobile = window.innerWidth < 600;
+    const scale = isMobile ? 0.35 : 0.6;
+    const rootP = pos['p_ksr'] || {x:1200, y:0};
+    setVt({ s: scale, x: (window.innerWidth/2) - (rootP.x * scale), y: (window.innerHeight/4) - (rootP.y * scale) });
+  }
+
+  /* ── 2. PAN & ZOOM CONTROLS ── */
+  const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
+  function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
+  function vpMove(e){
+    if(dragging.current){ e.preventDefault(); setPos(p=>({...p,[dragging.current]:{x:e.clientX/vt.s-dragOff.current.x,y:(e.clientY-56)/vt.s-dragOff.current.y}})); return; }
+    if(panning.current) setVt(t=>({...t,x:e.clientX-panStart.current.x,y:e.clientY-panStart.current.y}));
+  }
+  function vpUp(){panning.current=false;dragging.current=null;}
+  useEffect(()=>{
+    const el=vpRef.current; if(!el)return;
+    function onWheel(e){
+      e.preventDefault();
+      const t=vtRef.current, f=e.deltaY<0?1.1:0.9;
+      const ns=Math.min(Math.max(t.s*f,0.15),3);
+      const rect=el.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      setVt({s:ns, x:mx-(mx-t.x)*(ns/t.s), y:my-(my-t.y)*(ns/t.s)});
+    }
+    el.addEventListener('wheel',onWheel,{passive:false});
+    return()=>el.removeEventListener('wheel',onWheel);
+  },[]);
+  function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-56)/vt.s-p.y};}
+
+  /* ── 3. DATA HELPERS ── */
+  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
+  const selP=people.find(p=>p.id===sel)||null;
+  
+  function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
+  function getChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+
+  /* ── 4. ORTHOGONAL LINES (Fase 4 & Elevasi Poligami) ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
       if(r.type==='married'){
-        const [a,b] = r.pids;
-        const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
-        const key = [a,b].sort().join('-');
-        if(drawn.has(key)) return; drawn.add(key);
-        
-        // Garis Lurus Sederhana untuk Pasangan (Minimalis)
+        const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
+        const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
         const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
-        lines.push({d: `M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5});
+        lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married'});
       }
       if(r.type==='parent-child' && r.isActive){
         const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
         const pc=pos[cid]; if(!pc) return;
         const valid = pids.filter(x=>pos[x]); if(!valid.length) return;
         
-        // Titik awal orang tua (tengah-tengah jika 2 orang)
         const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
         const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
         
-        // Orthogonal: Turun 40px, Belok Kiri/Kanan, Turun ke Anak
-        const midY = sy + (CH/2) + 30; // Turun ke area kosong
-        const ex = CX(pc), ey = CY(pc) - (CH/2); // Nancap di ubun-ubun anak
+        // Elevasi Garis Siku (Menghindari tabrakan garis half-sibling)
+        let spouseOffset = 0;
+        const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.isBlood===false);
+        if (spouseParent && spouseParent.spouseOrder) spouseOffset = spouseParent.spouseOrder;
         
-        const path = `M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`;
-        lines.push({d: path, stroke:'#90a8b8', dash:undefined, w:2});
+        const dropDepth = 25 + (spouseOffset * 15); // Semakin besar spouseOrder, semakin dalam turunnya
+        const midY = sy + (CH/2) + dropDepth; 
+        const ex = CX(pc), ey = CY(pc) - (CH/2);
+        
+        lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child'});
       }
     });
     return lines;
   }
   const lines = buildOrthogonalLines();
 
-  // PAN & ZOOM
-  const panning=useRef(false), panStart=useRef({});
-  function vpDown(e){ panning.current=true; panStart.current={x:e.clientX-vt.x, y:e.clientY-vt.y}; }
-  function vpMove(e){ if(panning.current) setVt(t=>({...t, x:e.clientX-panStart.current.x, y:e.clientY-panStart.current.y})); }
-  function vpUp(){ panning.current=false; }
+  /* ── 5. FASE 3 LOGIC: ADD & RELATION (No Regex) ── */
+  function addPerson(){
+    const tempNumber = String(Date.now()).slice(-4); 
+    const newPerson = {
+      id: 'p_'+Date.now(), displayId: `BARU-${tempNumber}`, bani: null, isBlood: true, spouseOrder: null, ...addF
+    };
+    const xs=Object.values(pos).map(p=>p.x), maxX=xs.length?Math.max(...xs):200;
+    setPeople(prev=>[...prev,newPerson]);
+    setPos(prev=>({...prev,[newPerson.id]:{x:maxX+160,y:200}}));
+    setSel(newPerson.id); setSbMode('view'); setModal(null);
+    setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',notes:'',photo:''});
+  }
+
+  function commitMarriage(pid1, pid2){
+    setRels(prev=>[...prev,{id:'r_'+Date.now(),type:'married',pids:[pid1,pid2],isActive:true}]);
+    setPeople(prev=>{
+      const p1=prev.find(p=>p.id===pid1), p2=prev.find(p=>p.id===pid2);
+      if(!p1||!p2) return prev;
+      const isP1New = !p1.bani || p1.bani==='BARU';
+      const newcomer = isP1New ? p1 : p2; const host = isP1New ? p2 : p1;
+      if(!host.bani || host.bani==='BARU') return prev;
+
+      const spousesCount = prev.filter(p=>p.bani===host.bani && p.isBlood===false).length;
+      const sOrder = spousesCount + 1;
+
+      return prev.map(p=>{
+        if(p.id===newcomer.id) return {...p, bani:host.bani, isBlood:false, spouseOrder:sOrder, displayId:`${host.displayId}-S${sOrder}`};
+        return p;
+      });
+    });
+  }
+
+  function commitRel(parentIds, childId){
+    setRels(prev=>[...prev,{id:'r_'+Date.now(),type:'parent-child',pids:[...parentIds,childId],isActive:true}]);
+    setPeople(prev=>{
+      const child=prev.find(p=>p.id===childId);
+      const hostParent=parentIds.map(id=>prev.find(p=>p.id===id)).find(p=>p&&p.isBlood===true);
+      if(!child || !hostParent || !hostParent.bani) return prev;
+
+      const bloodsInBani = prev.filter(p=>p.bani===hostParent.bani && p.isBlood===true).length;
+      const childNum = String(bloodsInBani+1).padStart(3,'0');
+
+      return prev.map(p=>{
+        if(p.id===child.id) return {...p, bani:hostParent.bani, isBlood:true, displayId:`${hostParent.bani}-${childNum}`};
+        return p;
+      });
+    });
+  }
+
+  function prepareAddRel(){
+    if(!relF.pid||!sel)return;
+    if(relF.type==='married') commitMarriage(sel, relF.pid);
+    else if(relF.type==='child-of') commitRel([relF.pid], sel); // simplified single parent assign
+    else commitRel([sel], relF.pid);
+    setRelF({type:'married',pid:'',isActive:true}); setModal(null);
+  }
   
-  // Wheel Zoom
-  useEffect(()=>{
-    const el=vpRef.current; if(!el) return;
-    function onWheel(e){
-      e.preventDefault();
-      setVt(t=>{
-        const f = e.deltaY<0 ? 1.1 : 0.9;
-        const ns = Math.min(Math.max(t.s*f, 0.15), 3);
-        const rect = el.getBoundingClientRect();
-        const mx = e.clientX-rect.left, my = e.clientY-rect.top;
-        return {s:ns, x:mx-(mx-t.x)*(ns/t.s), y:my-(my-t.y)*(ns/t.s)};
+  async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
+  function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
+  function delPerson(){
+    setPeople(prev=>prev.filter(p=>p.id!==sel)); setRels(prev=>prev.filter(r=>!r.pids.includes(sel)));
+    setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
+  }
+
+  /* ── 6. DYNAMIC AUTO-LAYOUT (Smart Scaling) ── */
+  function computeAutoLayout(){
+    const GAP_X=50, GAP_Y=200;
+    const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
+    
+    // Gen Map
+    const genMap={}; const queue=[root.id]; genMap[root.id]=0;
+    while(queue.length){
+      const cur=queue.shift(); const g=genMap[cur];
+      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}}));
+      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(cur)).forEach(r=>{
+        const cid=r.pids[r.pids.length-1]; if(!(cid in genMap)){genMap[cid]=g+1;queue.push(cid);}
       });
     }
-    el.addEventListener('wheel',onWheel,{passive:false});
-    return()=>el.removeEventListener('wheel',onWheel);
-  },[]);
 
-  // ══════════════════════════════════════════════════
-  // FASE 3: Logika Bisnis (Simulasi Fungsi)
-  // ══════════════════════════════════════════════════
-  // Contoh implementasi sederhana tanpa regex:
-  // function addPerson(data) {
-  //   const newPerson = { id: 'p_'+Date.now(), isBlood: true, bani: null, spouseOrder: null, ...data };
-  //   setPeople(p => [...p, newPerson]);
-  // }
-  // function commitMarriage(hostId, newcomerId) {
-  //   // newcomer.isBlood = false; newcomer.bani = host.bani; newcomer.spouseOrder = hitung_istri + 1;
-  // }
+    function getSpouses(pid){
+      return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99));
+    }
+    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
 
-  return (
-    <>
-      <div className="topbar">
-        <div>
-          <div className="brand-name">Bani Kasirin</div>
-          <div className="brand-sub">Silsilah Keluarga</div>
-        </div>
-        <div className="spacer"/>
-        <button className="btn accent">⊞ Rapikan</button>
-        <button className="btn">🪪 Registry</button>
+    // Width Calc
+    function subtreeWidth(pid, visited=new Set()){
+      if(visited.has(pid)) return CW; visited.add(pid);
+      const spouses=getSpouses(pid);
+      const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
+      const children=getBloodChildren(pid);
+      if(!children.length) return selfW;
+      const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
+      return Math.max(selfW, childTotal);
+    }
+
+    const newPos={};
+    function layoutSubtree(pid, centerX, gen, visited=new Set()){
+      if(visited.has(pid)) return; visited.add(pid);
+      const yPos = gen*GAP_Y;
+      const spouses = getSpouses(pid), children = getBloodChildren(pid);
+
+      function placeUnit(selfCX){
+        const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
+        let ux = selfCX - totalUnit/2;
+        const s1 = spouses.filter(s=>s.spouseOrder===1);
+        const s2 = spouses.filter(s=>s.spouseOrder>1);
+        
+        s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+        newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
+        s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+      }
+
+      if(!children.length){ placeUnit(centerX); return; }
+      const widths = children.map(cid=>subtreeWidth(cid, new Set([pid])));
+      const totalChildW = widths.reduce((s,w)=>s+w,0) + (children.length-1)*GAP_X;
+      let cx = centerX - totalChildW/2;
+      children.forEach((cid,i)=>{
+        const w=widths[i]; layoutSubtree(cid, cx+w/2, gen+1, new Set([...visited])); cx+=w+GAP_X;
+      });
+      const lcx = newPos[children[0]]?newPos[children[0]].x+CW/2 : centerX;
+      const rcx = newPos[children[children.length-1]]?newPos[children[children.length-1]].x+CW/2 : centerX;
+      placeUnit((lcx+rcx)/2);
+    }
+
+    const w = subtreeWidth(root.id);
+    layoutSubtree(root.id, w/2, 0);
+    setPos(newPos);
+    setTimeout(autoCamera, 100); setModal(null);
+  }
+
+  /* ── 7. UI RENDERERS ── */
+  const baniTitle = useMemo(()=>{
+    if(!selP || !selP.bani || selP.bani==='KSR') return 'Bani Kasirin';
+    return `Bani ${selP.bani}`;
+  },[selP]);
+
+  const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
+  function focusPerson(id){ setSel(id); setSbMode('view'); setSearchQ(''); setShowSR(false); const p=pos[id]; if(p&&vpRef.current) setVt({s:1,x:(window.innerWidth/2)-CX(p),y:(window.innerHeight/2)-CY(p)}); }
+
+  return <>
+    {loading && <div className="loading-screen"><div className="loading-spinner"/><h3>Memuat Silsilah...</h3></div>}
+
+    <div className="topbar">
+      <div>
+        <div className="brand-name">{baniTitle}</div>
+        <div className="brand-sub">Silsilah Keluarga</div>
       </div>
+      <div className="sep"/>
+      <div className="search-wrap hide-mob">
+        <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
+      </div>
+      <div className="spacer"/>
+      {isAdmin&&<button className="btn accent" onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
+      {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
+      <button className="btn hide-mob" onClick={()=>setModal('registry')}>🪪 Registry</button>
+      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin Aktif':'Login'}</button>
+    </div>
 
-      <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp}>
-        <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
-          
-          {/* SVG Garis Orthogonal */}
-          <svg id="csvg">
-            {lines.map((l,i)=>(
-              <path key={i} d={l.d} stroke={l.stroke} strokeWidth={l.w} strokeDasharray={l.dash} fill="none"/>
-            ))}
-          </svg>
+    {showSR&&searchRes.length>0&&<>
+      <div className="sresults" style={{left:160}}>
+        {searchRes.map(p=>(
+          <div key={p.id} className="sitem" onClick={()=>focusPerson(p.id)}>
+            <div className="pi-dot" style={{background:MC(p.gender)}}/>
+            <div><span style={{fontWeight:700}}>{nn(p)}</span><div style={{color:'#8a8278',fontSize:10}}>{p.displayId}</div></div>
+          </div>
+        ))}
+      </div>
+      <div style={{position:'fixed',inset:0,zIndex:185}} onClick={()=>setShowSR(false)}/>
+    </>}
 
-          {/* Node Kartu (Estetika Minimalis) */}
-          {people.map(p=>{
-            const pp=pos[p.id]; if(!pp) return null;
-            return (
-              <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}}>
-                <div className={`card ${p.status==='Wafat'?'wafat':''}`}>
-                  <div className="gaccent" style={{background:MC(p.gender)}}/>
-                  <div className="avatar" style={{background:MB(p.gender)}}>
-                    <span style={{color:MC(p.gender)}}>{ini(p.fullName)}</span>
-                  </div>
-                  <div className="card-nick">{nn(p)}</div>
-                  {p.status==='Wafat'&&<div style={{fontSize:9, color:'#8a8278', marginTop:2}}>Wafat</div>}
-                </div>
+    <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp} onClick={e=>{if(e.target===vpRef.current){setSel(null);setEdgeSel(null);}}}>
+      <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
+        <svg id="csvg">
+          {lines.map((l,i)=>(
+            <g key={i}>
+              <path d={l.d} stroke={l.stroke} strokeWidth={l.w} strokeDasharray={l.dash} fill="none" strokeLinecap="round" strokeLinejoin="round" style={{pointerEvents:'none'}}/>
+              {isAdmin&&<path d={l.d} stroke="transparent" strokeWidth={18} fill="none" style={{cursor:'pointer'}} onClick={e=>{e.stopPropagation();setEdgeSel(l);}}/>}
+            </g>
+          ))}
+        </svg>
+
+        {people.map(p=>{
+          const pp=pos[p.id]; if(!pp) return null;
+          return (
+            <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{e.stopPropagation();setSel(p.id);setSbMode('view');setEdgeSel(null);}}>
+              <div className={`card ${p.status==='Wafat'?'wafat':''} ${sel===p.id?'sel':''}`}>
+                <div className="gaccent" style={{background:MC(p.gender)}}/>
+                <div className="avatar" style={{background:MB(p.gender)}}><span style={{color:MC(p.gender)}}>{ini(p.fullName)}</span></div>
+                <div className="card-nick">{nn(p)}</div>
+                {p.status==='Wafat'&&<div style={{fontSize:9, color:'#8a8278', marginTop:2, fontWeight:700}}>Wafat</div>}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
-    </>
-  );
-}
 
+      {edgeSel&&isAdmin&&(
+        <div className="edge-popup" style={{left:Math.min(edgeSel.mx*vt.s+vt.x, window.innerWidth-250), top:Math.min(edgeSel.my*vt.s+vt.y+56, window.innerHeight-150)}} onClick={e=>e.stopPropagation()}>
+          <h4>Edit Relasi</h4>
+          <div className="edge-info">Jenis: <strong>{edgeSel.label}</strong></div>
+          <div style={{display:'flex',gap:6}}>
+            <button className="btn danger" style={{fontSize:11}} onClick={()=>{setRels(prev=>prev.filter(r=>r.id!==edgeSel.rid));setEdgeSel(null);}}>Hapus Relasi</button>
+            <button className="btn" style={{fontSize:11}} onClick={()=>setEdgeSel(null)}>Tutup</button>
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* SIDEBAR */}
+    <div className={`sidebar ${sel?'open':''}`}>
+      {selP&&sbMode==='view'&&<>
+        <div className="sb-head">
+          <h2>Profil</h2>
+          {isAdmin&&<><button className="btn" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
+          <button className="btn danger" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setModal('delconfirm')}>Hapus</button></>}
+          <button className="btn" style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setSel(null)}>✕</button>
+        </div>
+        <div className="sb-body">
+          <div className="profile-hero">
+            <div className="profile-avatar" style={{background:MB(selP.gender)}}><span style={{color:MC(selP.gender)}}>{ini(selP.fullName)}</span></div>
+            <div className="profile-nick">{nn(selP)}</div>
+            <div className="profile-fullname">{selP.fullName}</div>
+            <div className="profile-tags">
+              <span className="tag-badge" style={{background:MB(selP.gender),color:MC(selP.gender)}}>{selP.gender==='M'?'Laki-laki':'Perempuan'}</span>
+              <span className="tag-badge" style={{background:'#f4f2ef',color:'#8a8278'}}>{selP.displayId}</span>
+            </div>
+          </div>
+          <div className="sec"><div className="sec-title">Keluarga</div>
+            <div className="info-row"><span className="info-label">Orang Tua</span><span className="info-val">{getActiveParents(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(' & ')||'-'}</span></div>
+            <div className="info-row"><span className="info-label">Pasangan</span><span className="info-val">{getPartners(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(', ')||'-'}</span></div>
+            <div className="info-row"><span className="info-label">Anak</span><span className="info-val">{getChildren(selP.id).map(id=>nn(people.find(p=>p.id===id))).join(', ')||'-'}</span></div>
+          </div>
+          {selP.notes&&<div className="sec"><div className="sec-title">Catatan</div><div className="info-val">{selP.notes}</div></div>}
+          {isAdmin&&<button className="btn primary" style={{width:'100%',marginTop:10}} onClick={()=>{setRelF({...relF,pid:''});setModal('addrel');}}>+ Tambah Relasi</button>}
+        </div>
+      </>}
+      {selP&&sbMode==='edit'&&<>
+        <div className="sb-head"><h2>Edit Profil</h2><button className="btn" onClick={()=>setSbMode('view')}>Batal</button></div>
+        <div className="sb-body" style={{paddingTop:20}}>
+          <div className="fg"><label>Nama Lengkap</label><input value={editF.fullName} onChange={e=>setEditF({...editF,fullName:e.target.value})}/></div>
+          <div className="fg"><label>Nama Panggilan</label><input value={editF.nickname} onChange={e=>setEditF({...editF,nickname:e.target.value})}/></div>
+          <div className="fg"><label>Status</label><select value={editF.status} onChange={e=>setEditF({...editF,status:e.target.value})}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
+          <div className="frow"><button className="btn primary" onClick={saveEdit}>Simpan</button></div>
+        </div>
+      </>}
+    </div>
+
+    {/* MODALS */}
+    {modal==='pin'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
+      <h3>Login Admin</h3><p className="modal-sub">Masukkan PIN untuk mengedit.</p>
+      <div className="fg"><input type="password" value={pinVal} autoFocus onChange={e=>setPinVal(e.target.value)} onKeyDown={e=>e.key==='Enter'&&tryPin()}/>{pinErr&&<div style={{color:'red',fontSize:11}}>{pinErr}</div>}</div>
+      <div className="frow"><button className="btn primary" onClick={tryPin}>Masuk</button></div>
+    </div></div>}
+
+    {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
+      <h3>Tambah Anggota Baru</h3><p className="modal-sub">ID akan terbuat otomatis saat relasi ditentukan.</p>
+      <div className="fg"><label>Nama Lengkap</label><input value={addF.fullName} autoFocus onChange={e=>setAddF({...addF,fullName:e.target.value})}/></div>
+      <div className="fg"><label>Panggilan</label><input value={addF.nickname} onChange={e=>setAddF({...addF,nickname:e.target.value})}/></div>
+      <div className="fg"><label>Gender</label><select value={addF.gender} onChange={e=>setAddF({...addF,gender:e.target.value})}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
+      <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+    </div></div>}
+
+    {modal==='addrel'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
+      <h3>Tambah Relasi</h3><p className="modal-sub">Untuk: {nn(selP)}</p>
+      <div className="fg"><label>Jenis Relasi</label><select value={relF.type} onChange={e=>setRelF({...relF,type:e.target.value})}><option value="married">Pasangan / Menikah</option><option value="parent-of">Orang tua dari (Pilih Anak)</option><option value="child-of">Anak dari (Pilih Ortu)</option></select></div>
+      <div className="fg"><label>Cari Orang</label><input autoFocus placeholder="Ketik nama..." value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/></div>
+      <div className="ppicker-list">{people.filter(p=>p.id!==sel && p.fullName.toLowerCase().includes(relSearchQ.toLowerCase())).slice(0,5).map(p=>(
+        <div key={p.id} className={`ppicker-item ${relF.pid===p.id?'selected':''}`} onClick={()=>setRelF({...relF,pid:p.id})}><div className="pi-dot" style={{background:MC(p.gender)}}/>{nn(p)} - <span style={{fontSize:10,color:'#8a8278'}}>{p.displayId}</span></div>
+      ))}</div>
+      <div className="frow"><button className="btn primary" onClick={prepareAddRel} disabled={!relF.pid}>Konfirmasi</button></div>
+    </div></div>}
+
+    {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
+      <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
+      <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+    </div></div>}
+
+    {modal==='delconfirm'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
+      <h3>Hapus Anggota?</h3><p className="modal-sub">Hapus {nn(selP)} secara permanen?</p>
+      <div className="frow"><button className="btn danger" onClick={delPerson}>Ya, Hapus</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+    </div></div>}
+
+    {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}><div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><h3>🪪 ID Registry</h3><button className="btn" onClick={()=>setModal(null)}>✕ Tutup</button></div>
+      {(()=>{
+        const groups={}; people.forEach(p=>{const b=p.bani||'BARU'; groups[b]=groups[b]||[]; groups[b].push(p);});
+        const baniPrefixes=Object.keys(groups).filter(k=>k!=='BARU').sort();
+        return <>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:20}}>
+            {baniPrefixes.map(prefix=><button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} className={`btn ${registryFilter===prefix?'primary':''}`}>Bani {prefix} ({groups[prefix].length})</button>)}
+            {groups['BARU']&&<button className="btn danger" onClick={()=>setRegistryFilter('BARU')}>Baru/Unlinked ({groups['BARU'].length})</button>}
+          </div>
+          {(registryFilter||baniPrefixes[0])&&(()=>{
+            const activeGrp = registryFilter||baniPrefixes[0];
+            const members = groups[activeGrp].sort((a,b)=>{
+              if(a.isBlood!==b.isBlood) return a.isBlood?-1:1;
+              if(!a.isBlood) return (a.spouseOrder||99)-(b.spouseOrder||99);
+              return a.displayId.localeCompare(b.displayId);
+            });
+            return <table className="reg-table">
+              <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
+              <tbody>{members.map(p=><tr key={p.id}>
+                <td style={{fontWeight:800,fontFamily:'monospace',color:'#426b8a'}}>{p.displayId}</td>
+                <td><div style={{fontWeight:700}}>{nn(p)}</div><div style={{fontSize:10,color:'#8a8278'}}>{p.fullName}</div></td>
+                <td>{p.isBlood?<span className="tag-blood">Keturunan Asli</span>:<span className="tag-spouse">Pasangan (Ke-{p.spouseOrder})</span>}</td>
+              </tr>)}</tbody>
+            </table>
+          })()}
+        </>;
+      })()}
+    </div></div>}
+
+    {/* CONTROLS */}
+    <div className={`ctrl ${sel?'sb-open':''}`}>
+      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,3)}))}>+</button>
+      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
+      <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
+    </div>
+    <div className={`save-status ${sel?'hidden':''}`}><div className={`save-dot ${saveStatus}`}/>{saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal Simpan':'Disimpan di Cloud'}</div>
+  </>;
+}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
