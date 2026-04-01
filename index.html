@@ -25,50 +25,55 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   CSS RESET & ELEGAN TEMA MINIMALIS
+   CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw}
 
-.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:50px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(240,237,232,0.96);backdrop-filter:blur(10px);border-bottom:1px solid #dbd6cf;}
-.brand-name{font-size:14px;font-weight:700;letter-spacing:-.03em}
-.brand-sub{font-size:10px;color:#9a9080;margin-top:1px}
-.sep{width:1px;height:20px;background:#dbd6cf;flex-shrink:0}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:52px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(240,237,232,0.96);backdrop-filter:blur(10px);border-bottom:1px solid #dbd6cf;}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:-.03em;color:#1e1a16}
+.brand-sub{font-size:10px;color:#9a9080;margin-top:2px}
+.sep{width:1px;height:22px;background:#dbd6cf;flex-shrink:0}
 
-.search-wrap{flex:1;max-width:220px;position:relative;}
-.search-wrap input{width:100%;padding:6px 11px;border-radius:20px;border:1px solid #d0cbc2;background:#fff;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s;}
+/* Search */
+.search-wrap{flex:1;max-width:220px;position:relative;z-index:201;}
+.search-wrap input{width:100%;padding:7px 14px;border-radius:20px;border:1px solid #d0cbc2;background:#fff;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s;}
 .search-wrap input:focus{border-color:#8a7a6a}
-.search-icon-btn{display:none;width:32px;height:32px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:background .12s;}
-.search-icon-btn:hover{background:#f0ebe4}
-.search-expand{display:none;position:fixed;top:0;left:0;right:0;z-index:210;height:50px;align-items:center;gap:8px;padding:0 12px;background:rgba(240,237,232,0.98);backdrop-filter:blur(10px);border-bottom:1px solid #dbd6cf;}
+.search-icon-btn{display:none;width:34px;height:34px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.search-expand{display:none;position:fixed;top:0;left:0;right:0;z-index:210;height:52px;align-items:center;gap:8px;padding:0 12px;background:rgba(240,237,232,0.98);border-bottom:1px solid #dbd6cf;}
 .search-expand.open{display:flex;}
-.search-expand input{flex:1;padding:8px 14px;border-radius:20px;border:1.5px solid #8a7a6a;background:#fff;font-size:13px;outline:none;font-family:inherit;}
-.search-expand .se-close{width:32px;height:32px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#7a7060;flex-shrink:0;}
+.search-expand input{flex:1;padding:8px 14px;border-radius:20px;border:1.5px solid #8a7a6a;background:#fff;font-size:13px;outline:none;}
+.search-expand .se-close{width:34px;height:34px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#7a7060;}
 @media(max-width:600px){ .search-wrap{display:none;} .search-icon-btn{display:flex;} }
 
+/* Save Status in Topbar */
+.save-status{display:flex;align-items:center;gap:6px;background:#f5f2ed;border-radius:20px;padding:5px 12px;font-size:10.5px;font-weight:600;color:#7a7060;border:1px solid #e8e3da;white-space:nowrap;}
+.save-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.save-dot.syncing{background:#c8a870;animation:savepulse .8s infinite;}
+.save-dot.saved{background:#6ab87a}
+.save-dot.error{background:#d06060}
+@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.3}}
+
 .spacer{flex:1}
-.btn{padding:6px 13px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid #cdc8c0;background:#fff;cursor:pointer;color:#3a3028;transition:all .12s;white-space:nowrap;font-family:inherit;flex-shrink:0;}
-.btn:hover{background:#e8e3dc;border-color:#b0a898}
+.btn{padding:6px 14px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid #cdc8c0;background:#fff;cursor:pointer;color:#3a3028;transition:all .12s;white-space:nowrap;font-family:inherit;}
+.btn:hover{background:#e8e3dc}
 .btn.primary{background:#2e2820;border-color:#2e2820;color:#fff}
 .btn.primary:hover{background:#1e1810}
 .btn.danger{border-color:#d0a0a0;color:#a03030}
 .btn.danger:hover{background:#fdf0f0}
-.btn.adm{background:#5a4e3c;border-color:#5a4e3c;color:#fff}
-.btn.adm:hover{background:#4a3e2c}
 .btn.accent{background:#4a7a9b;border-color:#4a7a9b;color:#fff}
 .btn.accent:hover{background:#3a6a8b}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-@media(max-width:420px){ .btn-home-top{display:none;} }
+@media(max-width:650px){ .hide-mob{display:none;} }
 
-#vp{position:fixed;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;}
+/* Viewport & Nodes */
+#vp{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;z-index:10;}
 #vp.pan{cursor:grabbing}
 #world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
-/* NODE */
 .node{position:absolute;z-index:10;transition:opacity .2s}
-.node.hidden{opacity:0;pointer-events:none}
-.card{width:110px;background:#fff;border:1.5px solid #dbd6cf;border-radius:14px;text-align:center;padding:10px 8px 8px;cursor:pointer;transition:box-shadow .18s,border-color .18s,transform .12s;position:relative;}
+.card{width:110px;background:#fff;border:1.5px solid #dbd6cf;border-radius:14px;text-align:center;padding:10px 8px 8px;cursor:pointer;position:relative;}
 .card:hover{border-color:#9a8e7e;box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-1px)}
 .card.sel{border-color:#6a5a48;box-shadow:0 0 0 3px rgba(106,90,72,.15),0 6px 20px rgba(0,0,0,.1)}
 .card.wafat{background:#f5f2ee}
@@ -81,142 +86,100 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
 
-/* EDGE POPUP */
-.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dbd6cf;border-radius:12px;padding:12px 14px;min-width:210px;box-shadow:0 8px 28px rgba(0,0,0,.13);}
-.edge-popup h4{font-size:12px;font-weight:700;margin-bottom:8px;color:#2a2018}
-.edge-info{font-size:11px;color:#7a7060;margin-bottom:10px;line-height:1.6}
-.edge-actions{display:flex;gap:6px;flex-wrap:wrap}
-
-/* SIDEBAR & PROFIL */
-.sidebar{position:fixed;right:0;bottom:0;width:310px;z-index:150;background:#fff;border-left:1px solid #dbd6cf;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);}
+/* Sidebar Profil */
+.sidebar{position:fixed;right:0;bottom:0;top:52px;width:310px;z-index:150;background:#fff;border-left:1px solid #dbd6cf;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease-out;box-shadow:-4px 0 24px rgba(0,0,0,.05);}
 .sidebar.open{transform:translateX(0)}
-@media(max-width:420px){ .sidebar{width:100vw;border-left:none;border-top:1px solid #dbd6cf;border-radius:18px 18px 0 0;} }
-.sb-head{padding:14px 16px;border-bottom:1px solid #ede8e0;display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.sb-head h2{font-size:13px;font-weight:700;flex:1}
-.sb-body{flex:1;overflow-y:auto;padding:0 16px 20px}
+@media(max-width:500px){.sidebar{width:100vw;border-left:none;}}
+.sb-head{padding:14px 18px;border-bottom:1px solid #ede8e0;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sb-head h2{font-size:13px;font-weight:800;flex:1;color:#1e1a16}
+.sb-body{flex:1;overflow-y:auto;padding:0 18px 24px}
 
 .profile-hero{padding:20px 0 16px;text-align:center;border-bottom:1px solid #f0ebe4;margin-bottom:14px;}
-.profile-avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;overflow:hidden;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;overflow:hidden;}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-nick{font-size:16px;font-weight:800;letter-spacing:-.02em}
-.profile-fullname{font-size:10.5px;color:#9a9080;margin-top:2px}
-.profile-gender{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:600;margin-top:6px;padding:3px 10px;border-radius:20px;}
+.profile-nick{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.profile-fullname{font-size:10.5px;color:#9a9080;margin-top:3px}
+.profile-gender{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;margin-top:6px;padding:3px 10px;border-radius:20px;}
 
 .sec{margin-bottom:16px}
-.sec-title{font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b0a898;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid #f0ebe4;}
-.info-row{display:flex;align-items:flex-start;gap:10px;padding:4px 0;font-size:11px;}
+.sec-title{font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b0a898;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #f0ebe4;}
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:3px 0;font-size:11.5px;}
 .info-label{color:#b0a898;min-width:70px;flex-shrink:0;font-size:10px;font-weight:600}
 .info-val{color:#2a2218;flex:1;line-height:1.45;word-break:break-word}
 .info-empty{font-size:10.5px;color:#c0b8ae;font-style:italic}
 .bio-note{font-size:10px;color:#9a9080;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ede8e0;}
 
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#f5f2ed;border-radius:20px;font-size:10px;font-weight:600;color:#4a4038;cursor:pointer;border:1px solid #e8e3da;transition:background .12s;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#f5f2ed;border-radius:20px;font-size:10px;font-weight:600;color:#4a4038;cursor:pointer;border:1px solid #e8e3da;transition:background .1s;}
 .chip:hover{background:#ede8e0}
 .chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .chip-tag{font-size:8px;color:#9a9080;margin-left:2px;font-weight:500;background:#ede8e0;padding:1px 5px;border-radius:8px;}
 .chip-rm{font-size:10px;color:#c07070;margin-left:3px;cursor:pointer;}
-.chip-rm:hover{color:#903030}
 
-.fg{margin-bottom:11px}
-.fg label{display:block;font-size:10.5px;font-weight:700;color:#7a7060;margin-bottom:4px;}
-.fg input,.fg select,.fg textarea{width:100%;padding:7px 11px;border-radius:10px;border:1px solid #d0cbc2;font-size:12px;background:#fff;outline:none;color:#1a1a1a;font-family:inherit;transition:border-color .15s;}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#7a6a58}
-.fg textarea{resize:vertical;min-height:56px;line-height:1.5}
-.frow{display:flex;gap:8px;margin-top:14px}
-.frow .btn{flex:1;text-align:center}
+/* Forms */
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:10.5px;font-weight:700;color:#7a7060;margin-bottom:5px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 12px;border-radius:10px;border:1px solid #d0cbc2;font-size:12px;outline:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#8a7a6a}
+.frow{display:flex;gap:8px;margin-top:16px}
+.frow .btn{flex:1;padding:8px}
 
-.overlay{position:fixed;inset:0;background:rgba(20,15,10,.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px);}
-.modal{background:#fff;border-radius:18px;padding:24px;max-width:380px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #dbd6cf;box-shadow:0 20px 60px rgba(0,0,0,.15);}
-.modal h3{font-size:15px;font-weight:800;margin-bottom:14px}
-.modal-sub{font-size:12px;color:#7a7060;margin-bottom:14px;line-height:1.5}
-.confirm-box{background:#f8f5f0;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#4a3028;line-height:1.6;border:1px solid #e8e0d8;}
-
-.sresults{position:fixed;top:50px;left:0;z-index:190;background:#fff;border-bottom:1px solid #dbd6cf;min-width:260px;max-width:320px;max-height:200px;overflow-y:auto;border-radius:0 0 14px 14px;box-shadow:0 8px 24px rgba(0,0,0,.1);}
-.sitem{padding:9px 16px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f5f2ee;transition:background .1s;}
-.sitem:hover{background:#f8f5f1}
-
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#d0cbc2;border-radius:4px}
-
-.loading-screen{position:fixed;inset:0;z-index:1000;background:#f0ede8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
-.loading-spinner{width:36px;height:36px;border:3px solid #dbd6cf;border-top-color:#7a6a58;border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-title{font-size:16px;font-weight:700;color:#2a2018;letter-spacing:-.02em}
-.loading-sub{font-size:12px;color:#9a9080}
-.loading-error{background:#fdf0f0;border:1px solid #d0a0a0;border-radius:12px;padding:14px 18px;max-width:320px;text-align:center;}
-.loading-error p{font-size:12px;color:#a03030;line-height:1.6;margin-bottom:10px;}
-
-.save-status{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:190;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:20px;padding:5px 14px;font-size:10.5px;box-shadow:0 2px 8px rgba(0,0,0,.07);transition:opacity .3s,visibility .3s;white-space:nowrap;}
-.save-status.hidden{opacity:0;visibility:hidden}
-.save-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.save-dot.syncing{background:#c8a870;animation:savepulse .8s ease-in-out infinite;}
-.save-dot.saved{background:#6ab87a}
-.save-dot.error{background:#d06060}
-@keyframes savepulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-.legend{position:fixed;bottom:16px;left:16px;z-index:180;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:12px;padding:9px 13px;box-shadow:0 2px 8px rgba(0,0,0,.07);transition:opacity .2s,visibility .2s;}
-.li{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#7a7060;margin-bottom:4px;font-weight:600}
+/* UI Melayang (Legend, Stats, Controls) */
+.legend{position:fixed;bottom:20px;left:20px;z-index:180;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:14px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;}
+.li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7060;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-.statpill{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:20px;padding:6px 18px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 2px 8px rgba(0,0,0,.07);white-space:nowrap;transition:opacity .2s,visibility .2s;}
-.stat-val{color:#2a2218;font-weight:800;font-size:13px;margin-right:3px}
-.stat-sep{width:4px;height:4px;border-radius:50%;background:#dfdbd5;}
+.statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;}
+.stat-val{color:#2a2218;font-weight:800;font-size:13.5px;margin-right:4px}
+.stat-sep{width:4px;height:4px;border-radius:50%;background:#d0cbc2;}
 
-.ctrl{position:fixed;bottom:16px;right:16px;z-index:180;display:flex;flex-direction:column;gap:5px;transition:opacity .2s,visibility .2s;}
-.cbtn{width:36px;height:36px;border-radius:12px;background:#fff;border:1px solid #d0cbc2;font-size:15px;cursor:pointer;color:#3a3028;display:flex;align-items:center;justify-content:center;transition:background .12s;box-shadow:0 2px 8px rgba(0,0,0,.07);}
-.cbtn:hover{background:#f0ebe4}
+.ctrl{position:fixed;bottom:20px;right:20px;z-index:180;display:flex;flex-direction:column;gap:6px;transition:opacity .2s;}
+.cbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;font-size:18px;cursor:pointer;color:#3a3028;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.08);}
 
-@media(max-width:520px){ .legend.sb-open,.ctrl.sb-open,.statpill.sb-open{opacity:0;visibility:hidden;pointer-events:none;} }
-
+/* Responsif Mobile (Solusi Tumpang Tindih Portrait) */
 @media(max-width:768px) and (orientation: portrait){ 
-  .statpill { bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); justify-content: space-evenly; padding: 7px 4px; font-size: 9.5px; gap: 2px; border-radius: 12px; }
-  .stat-val { font-size: 11px; margin-right: 2px; }
-  .stat-sep { display: none; } 
-  
-  .legend { bottom: 58px; left: 12px; padding: 8px 10px; }
-  .legend .li { font-size: 9.5px; margin-bottom: 4px; }
-  
-  .ctrl { bottom: 58px; right: 12px; gap: 4px; }
-  .cbtn { width: 34px; height: 34px; font-size: 14px; }
+  .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; pointer-events:none;}
+  .statpill { bottom: 14px; width: calc(100% - 28px); padding: 8px 12px; font-size: 10px; gap: 4px; justify-content: space-evenly; border-radius: 14px; }
+  .stat-val { font-size: 11.5px; margin-right: 2px; }
+  .stat-sep { display: none; } /* Hilangkan titik pemisah di HP agar hemat ruang */
+  .legend { bottom: 62px; left: 14px; padding: 10px 12px; }
+  .legend .li { font-size: 9.5px; margin-bottom: 5px; }
+  .ctrl { bottom: 62px; right: 14px; }
+  .cbtn { width: 36px; height: 36px; font-size: 16px;}
 }
-
 @media(max-width:768px) and (orientation: landscape){
-  .statpill { bottom: 12px; padding: 6px 14px; font-size: 10.5px; gap: 10px; }
+  .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; pointer-events:none;}
+  .statpill { bottom: 12px; padding: 6px 18px; font-size: 10.5px; }
   .legend { bottom: 12px; left: 12px; padding: 8px 12px; }
   .ctrl { bottom: 12px; right: 12px; }
 }
 
+/* Modals */
+.overlay{position:fixed;inset:0;background:rgba(20,15,10,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
+.modal{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #dbd6cf;box-shadow:0 24px 60px rgba(0,0,0,.15);}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:8px;color:#1e1a16}
+.modal-sub{font-size:11.5px;color:#7a7060;margin-bottom:18px;line-height:1.5}
+
+/* Registry Table */
+.reg-table{width:100%;border-collapse:collapse;margin-top:8px}
+.reg-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e3da}
+.reg-table td{padding:10px 0;border-bottom:1px solid #f5f2ed;font-size:12px;color:#2a2218}
+.tag-blood{background:#e8f2fa;color:#3a6a8b;padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700}
+.tag-spouse{background:#fdf8e8;color:#8a7030;padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d0cbc2;border-radius:5px}
+
+/* Search Results Popup */
+.sresults{position:fixed;top:52px;left:0;z-index:190;background:#fff;border-bottom:1px solid #dbd6cf;min-width:260px;max-width:320px;max-height:220px;overflow-y:auto;border-radius:0 0 14px 14px;box-shadow:0 12px 32px rgba(0,0,0,.1);}
+.sitem{padding:10px 16px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f5f2ed;}
+.sitem:hover{background:#f8f5f0}
+
+/* Photo Upload */
 .photo-upload-wrap{display:flex;gap:8px;align-items:flex-start;}
 .photo-upload-wrap input[type=text]{flex:1}
-.upload-btn{flex-shrink:0;padding:7px 11px;border-radius:10px;border:1px solid #d0cbc2;background:#f8f5f0;font-size:11px;font-weight:600;cursor:pointer;color:#5a4e3c;transition:background .12s;white-space:nowrap;font-family:inherit;}
-.upload-btn:hover{background:#ede8e0}
-.upload-btn:disabled{opacity:.5;cursor:not-allowed}
-.upload-progress{font-size:10.5px;color:#7a6a58;margin-top:4px;display:flex;align-items:center;gap:5px;}
-.upload-bar-wrap{flex:1;height:4px;background:#e8e3dc;border-radius:4px;overflow:hidden;}
-.upload-bar{height:100%;background:#6ab87a;border-radius:4px;transition:width .2s;}
-
-.ppicker{border:1px solid #d0cbc2;border-radius:10px;overflow:hidden;background:#fff;}
-.ppicker-search{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid #ede8e0;}
-.ppicker-search input{flex:1;border:none;outline:none;font-size:12px;font-family:inherit;color:#1a1a1a;background:transparent;}
-.ppicker-search .pps-ico{font-size:13px;color:#b0a898;flex-shrink:0;}
-.ppicker-list{max-height:160px;overflow-y:auto;}
-.ppicker-item{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid #f5f2ee;transition:background .1s;}
-.ppicker-item:last-child{border-bottom:none;}
-.ppicker-item:hover{background:#f8f5f1;}
-.ppicker-item.selected{background:#f0f7ee;font-weight:700;}
-.ppicker-item .pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.ppicker-item .pi-nick{font-weight:600;color:#1e1a16;}
-.ppicker-item .pi-full{font-size:10.5px;color:#9a9080;margin-left:3px;}
-.ppicker-item .pi-gen{font-size:9.5px;color:#b0a898;margin-left:auto;font-weight:500;}
-.ppicker-empty{padding:14px;font-size:11.5px;color:#b0a898;text-align:center;font-style:italic;}
-
-.reg-table{width:100%;border-collapse:collapse;margin-top:8px}
-.reg-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
-.reg-table td{padding:8px 0;border-bottom:1px solid #f4f2ef;font-size:12px;color:#2c2825}
-.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
-.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
+.upload-btn{flex-shrink:0;padding:8px 12px;border-radius:10px;border:1px solid #d0cbc2;background:#f8f5f0;font-size:11px;font-weight:600;cursor:pointer;color:#5a4e3c;}
 </style>
 </head>
 <body>
@@ -232,6 +195,7 @@ const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 const nn=p=>p.nickname||p.fullName.split(' ')[0];
 const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; 
 
+// Kamus Data untuk Translasi Nama Bani di Top Bar
 const BANI_NAMES = { 'KRM': 'Karmilah', 'SAD': 'Said', 'PAN': 'Panidjan', 'SUR': 'Surahman', 'KSR': 'Kasirin' };
 
 async function checkPin(val){
@@ -246,170 +210,140 @@ function fmtDate(d){
 }
 function fmtBirth(pl,dt){
   const p=pl?.trim(),d=fmtDate(dt);
-  if(p&&d)return `${p}, ${d}`;
-  return p||d||'';
+  return p&&d?`${p}, ${d}`:p||d||'';
 }
 
+/* ══════════════════════════════════════════════════
+   FASE 2: STRUKTUR DATA ATRIBUT LACI (Bebas Regex)
+══════════════════════════════════════════════════ */
 const SP=[
-  {id:'k0',   fullName:'Kasirin',                  nickname:'Kasirin',        gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-000'},
-  {id:'k0w1', fullName:'Istri ke-1 Kasirin',       nickname:'Mbah Putri',     gender:'F',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-W1'},
-  {id:'k0w2', fullName:'Paenem',                   nickname:'Paenem',         gender:'F',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KSR-W2'},
-  {id:'k1',   fullName:'Karmilah',                 nickname:'Karmilah',       gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KRM-001'},
-  {id:'k1h',  fullName:'Suami Karmilah',           nickname:'Suami Karmilah', gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'KRM-001-X'},
-  {id:'s1',   fullName:'Said',                     nickname:'Said',           gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-001'},
-  {id:'s1w1', fullName:'Istri ke-1 Said',          nickname:'Istri 1 Said',   gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-001-W1'},
-  {id:'s1w2', fullName:'Rasih',                    nickname:'Rasih',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-001-W2'},
-  {id:'n1',   fullName:'Panidjan',                 nickname:'Panidjan',       gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-001'},
-  {id:'n1w',  fullName:'Wiji',                     nickname:'Wiji',           gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-001-X'},
-  {id:'r1',   fullName:'Surahman',                 nickname:'Surahman',       gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SUR-001'},
-  {id:'r1w1', fullName:'Menik',                    nickname:'Menik',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SUR-001-W1'},
-  {id:'r1w2', fullName:'Istri ke-2 Surahman',      nickname:'Istri 2 Surahman',gender:'F',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SUR-001-W2'},
-  {id:'s2a',  fullName:'Imam',                     nickname:'Imam',           gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-002'},
-  {id:'s2aw', fullName:'Istri Imam',               nickname:'Istri Imam',     gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-002-X'},
-  {id:'n2a',  fullName:'Mukayani',                 nickname:'Mukayani',       gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-002'},
-  {id:'n2aw', fullName:'Ririn',                    nickname:'Ririn',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-002-X'},
-  {id:'n2b',  fullName:'Wiwik Rianti',             nickname:'Wiwik',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-003'},
-  {id:'n2bh', fullName:'Manan',                    nickname:'Manan',          gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-003-X'},
-  {id:'n2c',  fullName:'Sucipto',                  nickname:'Sucipto',        gender:'M',status:'Wafat', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-004'},
-  {id:'n2d',  fullName:'Edi Purnomo',              nickname:'Edi',            gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-005'},
-  {id:'n2dw1',fullName:'Sandra',                   nickname:'Sandra',         gender:'F',status:'Cerai', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-005-W1'},
-  {id:'n2dw2',fullName:'Deny',                     nickname:'Deny',           gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-005-W2'},
-  {id:'n2e',  fullName:'Sriwiyanti',               nickname:'Srini',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-006'},
-  {id:'n2eh', fullName:'Saeful',                   nickname:'Saeful',         gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-006-X'},
-  {id:'n2f',  fullName:'Siti Eko Wati',            nickname:'Siti',           gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-007'},
-  {id:'n2fh', fullName:'Edi Santoso',              nickname:'Santoso',        gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-007-X'},
-  {id:'n2g',  fullName:'Eny Idayanti',             nickname:'Eny',            gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-008'},
-  {id:'n2gh', fullName:'Zamzuri',                  nickname:'Zamzuri',        gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-008-X'},
-  {id:'r2a',  fullName:'Anak Surahman',            nickname:'Anak Surahman',  gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SUR-002'},
-  {id:'s3a',  fullName:'Anak Imam',                nickname:'Anak Imam',      gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-003'},
-  {id:'s3aw', fullName:'Pasangan Anak Imam',       nickname:'Pasangan',       gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-003-X'},
-  {id:'n3a',  fullName:'M. Anas Ataroqy Isa',      nickname:'Anas',           gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-009'},
-  {id:'n3b',  fullName:'Agista Alifia Amalia',     nickname:'Agista',         gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-010'},
-  {id:'n3c',  fullName:'M. Khoirul Anam',          nickname:'Khoirul',        gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-011'},
-  {id:'n3cw', fullName:'Pramesti Tunjung Sasmita', nickname:'Tunjung',        gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-011-X'},
-  {id:'n3d',  fullName:'Laili Khoirur Rohmah',     nickname:'Laili',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-012'},
-  {id:'n3e',  fullName:'Eka',                      nickname:'Eka',            gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-013'},
-  {id:'n3f',  fullName:'Wildan',                   nickname:'Wildan',         gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-014'},
-  {id:'n3g',  fullName:'Azril',                    nickname:'Azril',          gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-015'},
-  {id:'n3h',  fullName:'Faiz',                     nickname:'Faiz',           gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-016'},
-  {id:'n3i',  fullName:'Iqbal',                    nickname:'Iqbal',          gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-017'},
-  {id:'n3j',  fullName:'Hafiz',                    nickname:'Hafiz',          gender:'M',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-018'},
-  {id:'s4a',  fullName:'Cucu Said 1',              nickname:'Cucu Said 1',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-004'},
-  {id:'s4b',  fullName:'Cucu Said 2',              nickname:'Cucu Said 2',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-005'},
-  {id:'s4c',  fullName:'Cucu Said 3',              nickname:'Cucu Said 3',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-006'},
-  {id:'n4a',  fullName:'Ishita Hirya Mahesani',    nickname:'Hirya',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-019'}
+  { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
+  { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  
+  { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  
+  { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_2', displayId:'SAD-002', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Imam', nickname:'Imam', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_2_w1', displayId:'SAD-002-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri Imam', nickname:'Istri Imam', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_3', displayId:'SAD-003', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Anak Imam', nickname:'Anak Imam', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_3_w1', displayId:'SAD-003-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Pasangan Anak Imam', nickname:'Pasangan', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_4a', displayId:'SAD-004', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 1', nickname:'Cucu 1', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_4b', displayId:'SAD-005', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 2', nickname:'Cucu 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sad_4c', displayId:'SAD-006', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 3', nickname:'Cucu 3', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  
+  { id:'p_pan_1', displayId:'PAN-001', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Panidjan', nickname:'Panidjan', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_pan_1_w1', displayId:'PAN-001-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2a', displayId:'PAN-002', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Mukayani', nickname:'Mukayani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2a_w1', displayId:'PAN-002-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Ririn', nickname:'Ririn', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2b', displayId:'PAN-003', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Wiwik Rianti', nickname:'Wiwik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2b_w1', displayId:'PAN-003-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Manan', nickname:'Manan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2c', displayId:'PAN-004', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Sucipto', nickname:'Sucipto', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_pan_2d', displayId:'PAN-005', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Edi Purnomo', nickname:'Edi', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2d_w1', displayId:'PAN-005-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Sandra', nickname:'Sandra', gender:'F', status:'Cerai', notes:'', bioNote:'' },
+  { id:'p_pan_2d_w2', displayId:'PAN-005-S2', bani:'PAN', isBlood:false, spouseOrder:2, fullName:'Deny', nickname:'Deny', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2e', displayId:'PAN-006', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Sriwiyanti', nickname:'Srini', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2e_w1', displayId:'PAN-006-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Saeful', nickname:'Saeful', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2f', displayId:'PAN-007', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Siti Eko Wati', nickname:'Siti', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2f_w1', displayId:'PAN-007-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Edi Santoso', nickname:'Santoso', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2g', displayId:'PAN-008', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Eny Idayanti', nickname:'Eny', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_2g_w1', displayId:'PAN-008-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Zamzuri', nickname:'Zamzuri', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3a', displayId:'PAN-009', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'M. Anas Ataroqy Isa', nickname:'Anas', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3b', displayId:'PAN-010', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Agista Alifia Amalia', nickname:'Agista', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3c', displayId:'PAN-011', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'M. Khoirul Anam', nickname:'Khoirul', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3c_w1', displayId:'PAN-011-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Pramesti Tunjung Sasmita', nickname:'Tunjung', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3d', displayId:'PAN-012', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Laili Khoirur Rohmah', nickname:'Laili', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3e', displayId:'PAN-013', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Eka', nickname:'Eka', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3f', displayId:'PAN-014', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Wildan', nickname:'Wildan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3g', displayId:'PAN-015', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Azril', nickname:'Azril', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3h', displayId:'PAN-016', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Faiz', nickname:'Faiz', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3i', displayId:'PAN-017', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Iqbal', nickname:'Iqbal', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_3j', displayId:'PAN-018', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Hafiz', nickname:'Hafiz', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_pan_4a', displayId:'PAN-019', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Ishita Hirya Mahesani', nickname:'Hirya', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  
+  { id:'p_sur_1', displayId:'SUR-001', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Surahman', nickname:'Surahman', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sur_1_w1', displayId:'SUR-001-S1', bani:'SUR', isBlood:false, spouseOrder:1, fullName:'Menik', nickname:'Menik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sur_1_w2', displayId:'SUR-001-S2', bani:'SUR', isBlood:false, spouseOrder:2, fullName:'Istri ke-2 Surahman', nickname:'Istri 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_sur_2', displayId:'SUR-002', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Anak Surahman', nickname:'Anak Surahman', gender:'?', status:'Hidup', notes:'', bioNote:'' }
 ];
 
 const SR=[
-  {id:'m0a', type:'married',      pids:['k0','k0w1'],            isActive:true},
-  {id:'m0b', type:'married',      pids:['k0','k0w2'],            isActive:true},
-  {id:'c0a', type:'parent-child', pids:['k0','k0w1','k1'],       isActive:true},
-  {id:'c0b', type:'parent-child', pids:['k0','k0w2','s1'],       isActive:true},
-  {id:'c0c', type:'parent-child', pids:['k0','k0w2','n1'],       isActive:true},
-  {id:'c0d', type:'parent-child', pids:['k0','k0w2','r1'],       isActive:true},
-  {id:'m1a', type:'married',      pids:['k1','k1h'],             isActive:true},
-  {id:'m1b', type:'married',      pids:['s1','s1w1'],            isActive:true},
-  {id:'m1c', type:'married',      pids:['s1','s1w2'],            isActive:true},
-  {id:'m1d', type:'married',      pids:['n1','n1w'],             isActive:true},
-  {id:'m1e', type:'married',      pids:['r1','r1w1'],            isActive:true},
-  {id:'m1f', type:'married',      pids:['r1','r1w2'],            isActive:true},
-  {id:'c1a', type:'parent-child', pids:['s1','s1w1','s2a'],      isActive:true},
-  {id:'m2a', type:'married',      pids:['s2a','s2aw'],           isActive:true},
-  {id:'c2a', type:'parent-child', pids:['s2a','s2aw','s3a'],     isActive:true},
-  {id:'m3a', type:'married',      pids:['s3a','s3aw'],           isActive:true},
-  {id:'c3a', type:'parent-child', pids:['s3a','s3aw','s4a'],     isActive:true},
-  {id:'c3b', type:'parent-child', pids:['s3a','s3aw','s4b'],     isActive:true},
-  {id:'c3c', type:'parent-child', pids:['s3a','s3aw','s4c'],     isActive:true},
-  {id:'c1b', type:'parent-child', pids:['n1','n1w','n2a'],       isActive:true},
-  {id:'c1c', type:'parent-child', pids:['n1','n1w','n2b'],       isActive:true},
-  {id:'c1d', type:'parent-child', pids:['n1','n1w','n2c'],       isActive:true},
-  {id:'c1e', type:'parent-child', pids:['n1','n1w','n2d'],       isActive:true},
-  {id:'c1f', type:'parent-child', pids:['n1','n1w','n2e'],       isActive:true},
-  {id:'c1g', type:'parent-child', pids:['n1','n1w','n2f'],       isActive:true},
-  {id:'c1h', type:'parent-child', pids:['n1','n1w','n2g'],       isActive:true},
-  {id:'m2b', type:'married',      pids:['n2a','n2aw'],           isActive:true},
-  {id:'m2c', type:'married',      pids:['n2b','n2bh'],           isActive:true},
-  {id:'m2d', type:'married',      pids:['n2d','n2dw1'],          isActive:false},
-  {id:'m2e', type:'married',      pids:['n2d','n2dw2'],          isActive:true},
-  {id:'m2f', type:'married',      pids:['n2e','n2eh'],           isActive:true},
-  {id:'m2g', type:'married',      pids:['n2f','n2fh'],           isActive:true},
-  {id:'m2h', type:'married',      pids:['n2g','n2gh'],           isActive:true},
-  {id:'c2b', type:'parent-child', pids:['n2a','n2aw','n3a'],     isActive:true},
-  {id:'c2c', type:'parent-child', pids:['n2a','n2aw','n3b'],     isActive:true},
-  {id:'c2d', type:'parent-child', pids:['n2b','n2bh','n3c'],     isActive:true},
-  {id:'c2e', type:'parent-child', pids:['n2b','n2bh','n3d'],     isActive:true},
-  {id:'c2f', type:'parent-child', pids:['n2d','n2dw1','n3e'],    isActive:false},
-  {id:'c2g', type:'parent-child', pids:['n2d','n2dw2','n3e'],    isActive:true},
-  {id:'c2h', type:'parent-child', pids:['n2d','n2dw2','n3f'],    isActive:true},
-  {id:'c2i', type:'parent-child', pids:['n2d','n2dw2','n3g'],    isActive:true},
-  {id:'c2j', type:'parent-child', pids:['n2e','n2eh','n3h'],     isActive:true},
-  {id:'c2k', type:'parent-child', pids:['n2f','n2fh','n3i'],     isActive:true},
-  {id:'c2l', type:'parent-child', pids:['n2g','n2gh','n3j'],     isActive:true},
-  {id:'m3b', type:'married',      pids:['n3c','n3cw'],           isActive:true},
-  {id:'c3d', type:'parent-child', pids:['n3c','n3cw','n4a'],     isActive:true},
-  {id:'c1i', type:'parent-child', pids:['r1','r1w2','r2a'],      isActive:true},
+  { id:'m1', type:'married', pids:['p_ksr','p_ksr_w1'], isActive:true },
+  { id:'m2', type:'married', pids:['p_ksr','p_ksr_w2'], isActive:true },
+  { id:'c1', type:'parent-child', pids:['p_ksr','p_ksr_w1','p_krm_1'], isActive:true },
+  { id:'c2', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sad_1'], isActive:true },
+  { id:'c3', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_pan_1'], isActive:true },
+  { id:'c4', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sur_1'], isActive:true },
+  { id:'m3', type:'married', pids:['p_krm_1','p_krm_1_w1'], isActive:true },
+  { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
+  { id:'m5', type:'married', pids:['p_sad_1','p_sad_1_w2'], isActive:true },
+  { id:'c5', type:'parent-child', pids:['p_sad_1','p_sad_1_w1','p_sad_2'], isActive:true },
+  { id:'m6', type:'married', pids:['p_sad_2','p_sad_2_w1'], isActive:true },
+  { id:'c6', type:'parent-child', pids:['p_sad_2','p_sad_2_w1','p_sad_3'], isActive:true },
+  { id:'m7', type:'married', pids:['p_sad_3','p_sad_3_w1'], isActive:true },
+  { id:'c7', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4a'], isActive:true },
+  { id:'c8', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4b'], isActive:true },
+  { id:'c9', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4c'], isActive:true },
+  { id:'m8', type:'married', pids:['p_pan_1','p_pan_1_w1'], isActive:true },
+  { id:'c10', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2a'], isActive:true },
+  { id:'c11', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2b'], isActive:true },
+  { id:'c12', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2c'], isActive:true },
+  { id:'c13', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2d'], isActive:true },
+  { id:'c14', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2e'], isActive:true },
+  { id:'c15', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2f'], isActive:true },
+  { id:'c16', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2g'], isActive:true },
+  { id:'m9', type:'married', pids:['p_pan_2a','p_pan_2a_w1'], isActive:true },
+  { id:'m10', type:'married', pids:['p_pan_2b','p_pan_2b_w1'], isActive:true },
+  { id:'m11', type:'married', pids:['p_pan_2d','p_pan_2d_w1'], isActive:false },
+  { id:'m12', type:'married', pids:['p_pan_2d','p_pan_2d_w2'], isActive:true },
+  { id:'m13', type:'married', pids:['p_pan_2e','p_pan_2e_w1'], isActive:true },
+  { id:'m14', type:'married', pids:['p_pan_2f','p_pan_2f_w1'], isActive:true },
+  { id:'m15', type:'married', pids:['p_pan_2g','p_pan_2g_w1'], isActive:true },
+  { id:'c17', type:'parent-child', pids:['p_pan_2a','p_pan_2a_w1','p_pan_3a'], isActive:true },
+  { id:'c18', type:'parent-child', pids:['p_pan_2a','p_pan_2a_w1','p_pan_3b'], isActive:true },
+  { id:'c19', type:'parent-child', pids:['p_pan_2b','p_pan_2b_w1','p_pan_3c'], isActive:true },
+  { id:'c20', type:'parent-child', pids:['p_pan_2b','p_pan_2b_w1','p_pan_3d'], isActive:true },
+  { id:'c21', type:'parent-child', pids:['p_pan_2d','p_pan_2d_w1','p_pan_3e'], isActive:false },
+  { id:'c22', type:'parent-child', pids:['p_pan_2d','p_pan_2d_w2','p_pan_3e'], isActive:true },
+  { id:'c23', type:'parent-child', pids:['p_pan_2d','p_pan_2d_w2','p_pan_3f'], isActive:true },
+  { id:'c24', type:'parent-child', pids:['p_pan_2d','p_pan_2d_w2','p_pan_3g'], isActive:true },
+  { id:'c25', type:'parent-child', pids:['p_pan_2e','p_pan_2e_w1','p_pan_3h'], isActive:true },
+  { id:'c26', type:'parent-child', pids:['p_pan_2f','p_pan_2f_w1','p_pan_3i'], isActive:true },
+  { id:'c27', type:'parent-child', pids:['p_pan_2g','p_pan_2g_w1','p_pan_3j'], isActive:true },
+  { id:'m16', type:'married', pids:['p_pan_3c','p_pan_3c_w1'], isActive:true },
+  { id:'c28', type:'parent-child', pids:['p_pan_3c','p_pan_3c_w1','p_pan_4a'], isActive:true },
+  { id:'m17', type:'married', pids:['p_sur_1','p_sur_1_w1'], isActive:true },
+  { id:'m18', type:'married', pids:['p_sur_1','p_sur_1_w2'], isActive:true },
+  { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
 ];
 
 const SPOS={
-  k0: {x:1200, y:0}, k0w1: {x:1050, y:0}, k0w2: {x:1350, y:0},
-  k1: {x:0, y:280}, k1h: {x:150, y:280},
-  s1: {x:500, y:280}, s1w1: {x:650, y:280}, s1w2: {x:800, y:280},
-  n1: {x:1200, y:280}, n1w: {x:1350, y:280},
-  r1: {x:3100, y:280}, r1w1: {x:3250, y:280}, r1w2: {x:3400, y:280},
-  s2a: {x:500, y:560}, s2aw: {x:650, y:560},
-  n2a: {x:850, y:560}, n2aw: {x:1000, y:560},
-  n2b: {x:1200, y:560}, n2bh: {x:1350, y:560},
-  n2c: {x:1550, y:560},
-  n2dw1: {x:1700, y:560}, n2d: {x:1850, y:560}, n2dw2: {x:2000, y:560},
-  n2e: {x:2200, y:560}, n2eh: {x:2350, y:560},
-  n2f: {x:2500, y:560}, n2fh: {x:2650, y:560},
-  n2g: {x:2800, y:560}, n2gh: {x:2950, y:560},
-  r2a: {x:3100, y:560},
-  s3a: {x:500, y:840}, s3aw: {x:650, y:840},
-  n3a: {x:850, y:840}, n3b: {x:1000, y:840},
-  n3c: {x:1200, y:840}, n3cw: {x:1350, y:840}, n3d: {x:1550, y:840},
-  n3e: {x:1700, y:840}, n3f: {x:1850, y:840}, n3g: {x:2000, y:840},
-  n3h: {x:2275, y:840}, n3i: {x:2575, y:840}, n3j: {x:2875, y:840},
-  s4a: {x:450, y:1120}, s4b: {x:600, y:1120}, s4c: {x:750, y:1120},
-  n4a: {x:1275, y:1120}
+  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
+  p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
+  p_sad_1: {x:610, y:200}, p_sad_1_w1: {x:440, y:200}, p_sad_1_w2: {x:780, y:200},
+  p_sad_2: {x:440, y:400}, p_sad_2_w1: {x:610, y:400},
+  p_sad_3: {x:525, y:600}, p_sad_3_w1: {x:695, y:600},
+  p_sad_4a: {x:440, y:800}, p_sad_4b: {x:610, y:800}, p_sad_4c: {x:780, y:800},
+  p_pan_1: {x:1280, y:200}, p_pan_1_w1: {x:1450, y:200},
+  p_pan_2a: {x:900, y:400}, p_pan_2a_w1: {x:1070, y:400},
+  p_pan_2b: {x:1280, y:400}, p_pan_2b_w1: {x:1450, y:400},
+  p_pan_2c: {x:1660, y:400},
+  p_pan_2d: {x:1950, y:400}, p_pan_2d_w1: {x:1780, y:400}, p_pan_2d_w2: {x:2120, y:400},
+  p_pan_2e: {x:2420, y:400}, p_pan_2e_w1: {x:2590, y:400},
+  p_pan_2f: {x:2800, y:400}, p_pan_2f_w1: {x:2970, y:400},
+  p_pan_2g: {x:3180, y:400}, p_pan_2g_w1: {x:3350, y:400},
+  p_pan_3a: {x:900, y:600}, p_pan_3b: {x:1070, y:600},
+  p_pan_3c: {x:1280, y:600}, p_pan_3c_w1: {x:1450, y:600},
+  p_pan_3d: {x:1660, y:600},
+  p_pan_3e: {x:1780, y:600}, p_pan_3f: {x:2035, y:600}, p_pan_3g: {x:2205, y:600},
+  p_pan_3h: {x:2505, y:600}, p_pan_3i: {x:2885, y:600}, p_pan_3j: {x:3265, y:600},
+  p_pan_4a: {x:1365, y:800},
+  p_sur_1: {x:3800, y:200}, p_sur_1_w1: {x:3630, y:200}, p_sur_1_w2: {x:3970, y:200},
+  p_sur_2: {x:3885, y:400}
 };
-
-function makePrefix(name){
-  const clean=name.replace(/[^a-zA-Z]/g,'').toUpperCase();
-  if(clean.length>=5) return clean[0]+clean[2]+clean[4];
-  if(clean.length>=3) return clean[0]+clean[1]+clean[2];
-  return clean.padEnd(3,'X');
-}
-
-function nextBaniId(prefix, people, isBlood){
-  const re=new RegExp(`^${prefix}-(\\d+)(-X)?$`);
-  const nums=people.map(p=>p.baniId||'').filter(id=>re.test(id)).map(id=>parseInt(id.match(re)[1]));
-  const next=(nums.length?Math.max(...nums):0)+1;
-  const num=String(next).padStart(3,'0');
-  return `${prefix}-${num}${isBlood?'':'-X'}`;
-}
-
-function nextBaruId(people){
-  const re=/^BARU-(\d+)$/;
-  const nums=people.map(p=>p.baniId||'').filter(id=>re.test(id)).map(id=>parseInt(id.match(re)[1]));
-  const next=(nums.length?Math.max(...nums):0)+1;
-  return `BARU-${String(next).padStart(3,'0')}`;
-}
-
-function getBaniPrefixFromParents(parentIds, allPeople){
-  for(const pid of parentIds){
-    const p=allPeople.find(x=>x.id===pid);
-    if(!p) continue;
-    if(p.baniId&&!p.baniId.startsWith('BARU')&&!p.baniId.startsWith('KSR')){
-      const m=p.baniId.match(/^([A-Z]+)-/);
-      if(m) return m[1];
-    }
-    if(p.baniId&&p.baniId.match(/^KSR-/)){
-      return 'NEW_BANI_HEAD'; 
-    }
-  }
-  return null;
-}
 
 /* ── APP ── */
 function App(){
@@ -438,7 +372,6 @@ function App(){
   const vpRef=useRef();
 
   const [loading,setLoading]   = useState(true);
-  const [loadErr,setLoadErr]   = useState('');
   const [saveStatus,setSaveStatus] = useState('saved'); 
   const [uploadPct,setUploadPct]   = useState(null); 
   const [uploadTarget,setUploadTarget] = useState(null); 
@@ -454,6 +387,7 @@ function App(){
   const COL_RELATIONSHIPS = ()=>db.collection('relationships');
   const COL_POSITIONS     = ()=>db.collection('positions');
 
+  /* ── 1. FIREBASE LOAD & DELTA SAVE ── */
   useEffect(()=>{
     async function load(){
       try{
@@ -468,7 +402,6 @@ function App(){
           SP.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
           SR.forEach(r=>{lastSyncedRels.current[r.id]=r;});
           Object.entries(SPOS).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
-          localStorage.setItem('silsilah_v10',JSON.stringify({people:SP,rels:SR,pos:SPOS}));
         } else {
           const loadedPeople=mSnap.docs.map(d=>d.data());
           const loadedRels=rSnap.docs.map(d=>d.data());
@@ -477,30 +410,19 @@ function App(){
           loadedPeople.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
           loadedRels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
           Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
-          localStorage.setItem('silsilah_v10',JSON.stringify({people:loadedPeople,rels:loadedRels,pos:loadedPos}));
         }
       }catch(err){
-        try{
-          const saved=JSON.parse(localStorage.getItem('silsilah_v10')||'null');
-          if(saved){
-            const savedIds=new Set((saved.people||[]).map(p=>p.id));
-            const mergedPeople=[...(saved.people||[]),...SP.filter(p=>!savedIds.has(p.id))];
-            const savedRelIds=new Set((saved.rels||[]).map(r=>r.id));
-            const mergedRels=[...(saved.rels||[]),...SR.filter(r=>!savedRelIds.has(r.id))];
-            const mergedPos={...SPOS};
-            Object.entries(saved.pos||{}).forEach(([id,xy])=>{if(xy&&(xy.x!==0||xy.y!==0)) mergedPos[id]=xy;});
-            setPeople(mergedPeople);setRels(mergedRels);setPos(mergedPos);
-          } else {setPeople(SP);setRels(SR);setPos({...SPOS});}
-          setLoadErr('Offline — perubahan hanya tersimpan di perangkat ini.');
-        }catch{setPeople(SP);setRels(SR);setPos({...SPOS});}
-      } finally{setLoading(false);}
+        setPeople(SP);setRels(SR);setPos({...SPOS});
+      } finally{
+        setLoading(false);
+        setTimeout(autoCamera, 100);
+      }
     }
     load();
   },[]);
 
   useEffect(()=>{
     if(!people.length)return;
-    localStorage.setItem('silsilah_v10',JSON.stringify({people,rels,pos}));
     if(isFirstLoad.current){isFirstLoad.current=false;return;}
     setSaveStatus('syncing');
     if(saveTimer.current)clearTimeout(saveTimer.current);
@@ -560,111 +482,34 @@ function App(){
     }catch(err){ setUploadPct(null); return null; }
   }
 
-  useEffect(()=>{
-    if(!people.length||!vpRef.current)return;
-    const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight;
-    const root=people.find(p=>p.baniId==='KSR-000');
-    const rp=root&&pos[root.id];
-    const cx=rp?rp.x+CW/2:1010+CW/2;
-    const cy=rp?rp.y+CH/2:-180+CH/2;
-    setVt({s:0.45,x:vw/2-cx*0.45,y:vh/2-cy*0.45+40});
-  },[people.length]);
-
-  const selP=people.find(p=>p.id===sel)||null;
-  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
-
-  function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
-  function getBioParents(pid){ return rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
-  function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
-  function getActiveChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
-  function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
-  function getActivePartner(pid){
-    const marriages=rels.filter(r=>r.type==='married'&&r.pids.includes(pid));
-    for(const m of marriages){
-      const other=m.pids.find(x=>x!==pid);
-      const op=people.find(p=>p.id===other);
-      if(op&&op.status!=='Cerai') return other;
-    }
-    return marriages[0]?.pids.find(x=>x!==pid)||null;
+  function autoCamera(){
+    if(!vpRef.current)return;
+    const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
+    const isMobile = window.innerWidth < 600;
+    const scale = isMobile ? 0.35 : 0.6;
+    const rootP = pos['p_ksr'] || {x:1200, y:0};
+    setVt({ s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) });
   }
+
+  /* ── 2. PAN & ZOOM CONTROLS (NATIVE TOUCH) ── */
+  const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
   
-  function getSiblings(pid){
-    const sibs=new Set();
-    const myParents=new Set([...getActiveParents(pid),...getBioParents(pid)]);
-    if(myParents.size===0) return [];
-    rels.forEach(r=>{
-      if(r.type==='parent-child'){
-        const parents=r.pids.slice(0,-1), child=r.pids[r.pids.length-1];
-        if(child===pid) return;
-        if(parents.some(p=>myParents.has(p))) sibs.add(child);
-      }
-    });
-    return [...sibs];
-  }
-
-  function getChildrenForDisplay(pid){
-    const inactiveOnly=[...new Set(rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]))];
-    const act=[...new Set(getActiveChildren(pid))];
-    const shown=new Set([...inactiveOnly,...act]);
-    return [...shown].map(cid=>({
-      id:cid,
-      tag:inactiveOnly.includes(cid)&&!act.includes(cid)?'biologis': !inactiveOnly.includes(cid)&&act.includes(cid)&&isAdopted(cid)?'asuh': undefined
-    }));
-  }
-
-  function buildOrthogonalLines(){
-    const lines=[], drawn=new Set();
-    rels.forEach(r=>{
-      if(r.type==='married'){
-        const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
-        if(!visibleIds.has(a)||!visibleIds.has(b)) return;
-        const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
-        const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
-        lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married', active:true});
-      }
-      if(r.type==='parent-child' && r.isActive){
-        const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
-        const pc=pos[cid]; if(!pc) return;
-        if(!visibleIds.has(cid)) return;
-        const valid = pids.filter(x=>pos[x]&&visibleIds.has(x)); if(!valid.length) return;
-        
-        const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
-        const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
-        
-        let spouseOffset = 0;
-        const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.baniId && p.baniId.endsWith('-X'));
-        if (spouseParent) {
-          const m = spouseParent.baniId.match(/-W(\d+)$/);
-          if (m) spouseOffset = parseInt(m[1]);
-          else spouseOffset = 1; 
-        }
-        
-        const dropDepth = 25 + (spouseOffset * 15); 
-        const midY = sy + (CH/2) + dropDepth; 
-        const ex = CX(pc), ey = CY(pc) - (CH/2);
-        
-        lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child', active:r.isActive});
-      }
-    });
-    return lines;
-  }
-  
-  const vpTop = 50; 
+  const vpTop = 52;
   function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
   function vpMove(e){
     if(dragging.current){ e.preventDefault(); setPos(p=>({...p,[dragging.current]:{x:e.clientX/vt.s-dragOff.current.x,y:(e.clientY-vpTop)/vt.s-dragOff.current.y}})); return; }
-    if(!panning.current)return;
-    setVt(t=>({...t,x:e.clientX-panStart.current.x,y:e.clientY-panStart.current.y}));
+    if(panning.current) setVt(t=>({...t,x:e.clientX-panStart.current.x,y:e.clientY-panStart.current.y}));
   }
   function vpUp(){panning.current=false;dragging.current=null;}
-
-  const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
+  
   useEffect(()=>{
-    const el=vpRef.current;if(!el)return;
+    const el=vpRef.current; if(!el)return;
     function onWheel(e){
-      e.preventDefault(); const t=vtRef.current; const f=e.deltaY<0?1.12:0.9; const ns=Math.min(Math.max(t.s*f,0.15),4);
-      const rect=el.getBoundingClientRect(); const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-      setVt({s:ns,x:mx-(mx-t.x)*(ns/t.s),y:my-(my-t.y)*(ns/t.s)});
+      e.preventDefault();
+      const t=vtRef.current, f=e.deltaY<0?1.1:0.9;
+      const ns=Math.min(Math.max(t.s*f,0.15),4);
+      const rect=el.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      setVt({s:ns, x:mx-(mx-t.x)*(ns/t.s), y:my-(my-t.y)*(ns/t.s)});
     }
     el.addEventListener('wheel',onWheel,{passive:false});
     return()=>el.removeEventListener('wheel',onWheel);
@@ -725,10 +570,93 @@ function App(){
     el.addEventListener('touchstart',onTouchStart,{passive:true});
     el.addEventListener('touchmove',onTouchMove,{passive:false});
     el.addEventListener('touchend',onTouchEnd,{passive:true});
-    return()=>{ el.removeEventListener('touchstart',onTouchStart); el.removeEventListener('touchmove',onTouchMove); el.removeEventListener('touchend',onTouchEnd); };
+    return()=>{
+      el.removeEventListener('touchstart',onTouchStart);
+      el.removeEventListener('touchmove',onTouchMove);
+      el.removeEventListener('touchend',onTouchEnd);
+    };
   },[]);
 
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
+
+  /* ── 3. DATA HELPERS & SAUDARA LOGIC ── */
+  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
+  const selP=people.find(p=>p.id===sel)||null;
+  
+  function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function getBioParents(pid){ return rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
+  function getActiveChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+  function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
+  function getActivePartner(pid){
+    const marriages=rels.filter(r=>r.type==='married'&&r.pids.includes(pid));
+    for(const m of marriages){
+      const other=m.pids.find(x=>x!==pid);
+      const op=people.find(p=>p.id===other);
+      if(op&&op.status!=='Cerai') return other;
+    }
+    return marriages[0]?.pids.find(x=>x!==pid)||null;
+  }
+  
+  function getSiblings(pid){
+    const sibs=new Set();
+    const myParents=new Set([...getActiveParents(pid),...getBioParents(pid)]);
+    if(myParents.size===0) return [];
+    rels.forEach(r=>{
+      if(r.type==='parent-child'){
+        const parents=r.pids.slice(0,-1), child=r.pids[r.pids.length-1];
+        if(child===pid) return;
+        if(parents.some(p=>myParents.has(p))) sibs.add(child);
+      }
+    });
+    return [...sibs];
+  }
+
+  function getChildrenForDisplay(pid){
+    const inactiveOnly=[...new Set(rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]))];
+    const act=[...new Set(getActiveChildren(pid))];
+    const shown=new Set([...inactiveOnly,...act]);
+    return [...shown].map(cid=>({
+      id:cid,
+      tag:inactiveOnly.includes(cid)&&!act.includes(cid)?'biologis': !inactiveOnly.includes(cid)&&act.includes(cid)&&isAdopted(cid)?'asuh': undefined
+    }));
+  }
+
+  /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
+  function buildOrthogonalLines(){
+    const lines=[], drawn=new Set();
+    rels.forEach(r=>{
+      if(r.type==='married'){
+        const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
+        if(!visibleIds.has(a)||!visibleIds.has(b)) return;
+        const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
+        const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
+        lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married', active:true});
+      }
+      if(r.type==='parent-child' && r.isActive){
+        const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
+        const pc=pos[cid]; if(!pc) return;
+        if(!visibleIds.has(cid)) return;
+        const valid = pids.filter(x=>pos[x]&&visibleIds.has(x)); if(!valid.length) return;
+        
+        const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
+        const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
+        
+        // Elevasi kedalaman garis berdasarkan urutan pasangan (spouseOrder)
+        let spouseOffset = 0;
+        const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.isBlood===false);
+        if (spouseParent && spouseParent.spouseOrder) spouseOffset = spouseParent.spouseOrder;
+        
+        const dropDepth = 25 + (spouseOffset * 15); 
+        const midY = sy + (CH/2) + dropDepth; 
+        const ex = CX(pc), ey = CY(pc) - (CH/2);
+        
+        lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child', active:r.isActive});
+      }
+    });
+    return lines;
+  }
+  const lines = buildOrthogonalLines();
 
   function onEdgeClick(e,line){
     if(!isAdmin)return;e.stopPropagation();
@@ -738,28 +666,48 @@ function App(){
   function toggleEdgeActive(){setRels(prev=>prev.map(r=>r.id===edgeSel.rid?{...r,isActive:!r.isActive}:r));setEdgeSel(null);}
   function deleteEdge(){setRels(prev=>prev.filter(r=>r.id!==edgeSel.rid));setEdgeSel(null);}
 
-  async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
-  
-  function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
-  
-  async function handlePhotoUpload(e, target){
-    const file=e.target.files?.[0]; if(!file)return; setUploadTarget(target);
-    const personId = target==='edit'?(editF.id||'new'):'new_'+Date.now();
-    const url=await uploadPhoto(file, personId);
-    if(url){ if(target==='edit') setEditF(f=>({...f,photo:url})); else setAddF(f=>({...f,photo:url})); }
-    setUploadTarget(null); if(fileInputRef.current) fileInputRef.current.value='';
-  }
-  function delPerson(){
-    setPeople(prev=>prev.filter(p=>p.id!==sel)); setRels(prev=>prev.filter(r=>!r.pids.includes(sel)));
-    setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
-  }
+  /* ── 5. ADD & RELATION ── */
   function addPerson(){
-    const internalId='p'+Date.now(); const xs=Object.values(pos).map(p=>p.x); const maxX=xs.length?Math.max(...xs):200;
-    const baniId=nextBaruId([...people, {baniId:'BARU-000'}]); 
-    const newPerson={id:internalId,...addF,baniId};
-    setPeople(prev=>[...prev,newPerson]); setPos(prev=>({...prev,[internalId]:{x:maxX+160,y:320}}));
-    setSel(internalId);setSbMode('view');setModal(null);
+    const id = 'p_'+Date.now();
+    const num = String(Date.now()).slice(-4);
+    const xs = Object.values(pos).map(p=>p.x), maxX = xs.length?Math.max(...xs):200;
+    const newPerson = { id, displayId: `BARU-${num}`, bani: 'BARU', isBlood: true, spouseOrder: null, ...addF };
+    setPeople(prev=>[...prev,newPerson]); setPos(prev=>({...prev,[id]:{x:maxX+160,y:200}}));
+    setSel(id); setSbMode('view'); setModal(null);
     setAddF({fullName:'',nickname:'',gender:'M',status:'Hidup',birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:''});
+  }
+
+  function commitMarriage(pid1, pid2){
+    setRels(prev=>[...prev,{id:'r_'+Date.now(),type:'married',pids:[pid1,pid2],isActive:true}]);
+    setPeople(prev=>{
+      const p1=prev.find(p=>p.id===pid1), p2=prev.find(p=>p.id===pid2);
+      if(!p1||!p2) return prev;
+      const isP1New = !p1.bani || p1.bani==='BARU';
+      const newcomer = isP1New ? p1 : p2; const host = isP1New ? p2 : p1;
+      if(!host.bani || host.bani==='BARU') return prev;
+      const spousesCount = prev.filter(p=>p.bani===host.bani && p.isBlood===false).length;
+      const sOrder = spousesCount + 1;
+      return prev.map(p=>{
+        if(p.id===newcomer.id) return {...p, bani:host.bani, isBlood:false, spouseOrder:sOrder, displayId:`${host.displayId}-S${sOrder}`};
+        return p;
+      });
+    });
+  }
+
+  function commitRel(parentIds, childId, isActive){
+    setRels(prev=>[...prev,{id:'r_'+Date.now(),type:'parent-child',pids:[...parentIds,childId],isActive}]);
+    setPeople(prev=>{
+      const child=prev.find(p=>p.id===childId);
+      const bloodParent=parentIds.map(id=>prev.find(p=>p.id===id)).find(p=>p&&p.isBlood===true);
+      if(!child || !bloodParent || !bloodParent.bani) return prev;
+      if(child.bani && child.bani!=='BARU') return prev; // sudah punya bani asli
+      const bloodsInBani = prev.filter(p=>p.bani===bloodParent.bani && p.isBlood===true).length;
+      const childNum = String(bloodsInBani+1).padStart(3,'0');
+      return prev.map(p=>{
+        if(p.id===child.id) return {...p, bani:bloodParent.bani, isBlood:true, displayId:`${bloodParent.bani}-${childNum}`};
+        return p;
+      });
+    });
   }
 
   function prepareAddRel(){
@@ -771,35 +719,114 @@ function App(){
     if(partner&&partner!==childId){ setPendingRel({parentIds:[mainParent,partner],childId,isActive}); setModal('confirm-parents'); } 
     else { commitRel([mainParent],childId,isActive); setRelF({type:'married',pid:'',isActive:true});setModal(null); }
   }
-  function commitRel(parentIds, childId, isActive){
-    setRels(prev=>[...prev,{id:'r'+Date.now(),type:'parent-child',pids:[...parentIds,childId],isActive}]);
-    setPeople(prev=>{
-      const child=prev.find(p=>p.id===childId); if(!child) return prev;
-      const alreadyReal=child.baniId&&!child.baniId.startsWith('BARU'); if(alreadyReal) return prev;
-      let prefixSignal=getBaniPrefixFromParents(parentIds, prev); let finalPrefix;
-      if(prefixSignal==='NEW_BANI_HEAD'){ finalPrefix=makePrefix(child.nickname||child.fullName); } 
-      else if(prefixSignal){ finalPrefix=prefixSignal; } else { return prev; }
-      const isBlood=parentIds.some(pid=>{ const p=prev.find(x=>x.id===pid); return p&&p.baniId&&(p.baniId.match(/^KSR-/)||!p.baniId.endsWith('-X')); });
-      const newId=nextBaniId(finalPrefix, prev, isBlood);
-      return prev.map(p=>p.id===childId?{...p,baniId:newId}:p);
-    });
-  }
-  function commitMarriage(pid1, pid2){
-    setRels(prev=>[...prev,{id:'r'+Date.now(),type:'married',pids:[pid1,pid2],isActive:true}]);
-    setPeople(prev=>{
-      const p1=prev.find(p=>p.id===pid1); const p2=prev.find(p=>p.id===pid2); if(!p1||!p2) return prev;
-      const newcomer=p1.baniId?.startsWith('BARU')?p1:p2.baniId?.startsWith('BARU')?p2:null;
-      const existing=newcomer?.id===pid1?p2:p1; if(!newcomer||!existing) return prev;
-      if(!existing.baniId||existing.baniId.startsWith('BARU')) return prev;
-      const m=existing.baniId.match(/^([A-Z]+)-/); if(!m) return prev;
-      const prefix=m[1]; const newId=nextBaniId(prefix, prev, false); 
-      return prev.map(p=>p.id===newcomer.id?{...p,baniId:newId}:p);
-    });
-  }
+
   function confirmBothParents(){ commitRel(pendingRel.parentIds,pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
   function confirmSingleParent(){ commitRel([pendingRel.parentIds[0]],pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
-  function removeRel(rid){setRels(prev=>prev.filter(r=>r.id!==rid));}
 
+  async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
+  
+  function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
+  
+  function delPerson(){
+    setPeople(prev=>prev.filter(p=>p.id!==sel)); setRels(prev=>prev.filter(r=>!r.pids.includes(sel)));
+    setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
+  }
+
+  /* ── 6. DYNAMIC AUTO-LAYOUT (ANTI-OVERLAP & DARAH-KIRI) ── */
+  function computeAutoLayout(){
+    const GAP_X=40, GAP_Y=160;
+    const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
+    
+    const genMap={}; const queue=[root.id]; genMap[root.id]=0;
+    while(queue.length){
+      const cur=queue.shift(); const g=genMap[cur];
+      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}}));
+      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(cur)).forEach(r=>{
+        const cid=r.pids[r.pids.length-1]; if(!(cid in genMap)){genMap[cid]=g+1;queue.push(cid);}
+      });
+    }
+
+    function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
+    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+
+    function subtreeWidth(pid, visited=new Set()){
+      if(visited.has(pid)) return CW; visited.add(pid);
+      const spouses=getSpouses(pid); const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
+      const children=getBloodChildren(pid); if(!children.length) return selfW;
+      const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
+      return Math.max(selfW, childTotal);
+    }
+
+    const newPos={};
+    function layoutSubtree(pid, centerX, gen, visited=new Set()){
+      if(visited.has(pid)) return; visited.add(pid);
+      const yPos = gen*GAP_Y;
+      const spouses = getSpouses(pid), children = getBloodChildren(pid);
+
+      function placeUnit(selfCX){
+        const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
+        let ux = selfCX - totalUnit/2;
+        
+        if (spouses.length === 0) {
+          // Jomblo / Sendiri
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+        } else if (spouses.length === 1) {
+          // 1 Pasangan: Darah selalu KIRI, Pasangan di KANAN
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+          ux += CW + GAP_X;
+          newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
+        } else {
+          // Poligami (>1): Istri-1 di Kiri, Suami/Darah di Tengah, Istri-2+ di Kanan
+          const s1 = spouses.filter(s=>s.spouseOrder===1);
+          const s2 = spouses.filter(s=>s.spouseOrder>1);
+          s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
+          s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+        }
+      }
+
+      if(!children.length){ placeUnit(centerX); return; }
+      
+      const widths = children.map(cid=>subtreeWidth(cid, new Set([pid])));
+      const totalChildW = widths.reduce((s,w)=>s+w,0) + (children.length-1)*GAP_X;
+      let cx = centerX - totalChildW/2;
+      
+      const childCenters = [];
+      children.forEach((cid,i)=>{
+        const w=widths[i];
+        const childCenter = cx + w/2;
+        childCenters.push(childCenter);
+        layoutSubtree(cid, childCenter, gen+1, new Set([...visited])); 
+        cx+=w+GAP_X;
+      });
+      
+      // Mencegah Pergeseran Kiri (Overlap Bug Fix)
+      // Parent dipaksa tepat di tengah antara center anak pertama dan anak terakhir
+      const selfCX = children.length === 1 ? childCenters[0] : (childCenters[0] + childCenters[childCenters.length-1]) / 2;
+      placeUnit(selfCX);
+    }
+
+    const w = subtreeWidth(root.id);
+    layoutSubtree(root.id, w/2, 0);
+    setPos(newPos); setTimeout(autoCamera, 100); setModal(null);
+  }
+
+  /* ── 7. UI RENDERERS ── */
+  // BANI NAME DINAMIS HANYA DI TOP BAR
+  const baniTitle=useMemo(()=>{
+    if(!people.length) return 'Bani Kasirin';
+    if(!sel) return 'Bani Kasirin';
+    const selPerson=people.find(p=>p.id===sel); if(!selPerson) return 'Bani Kasirin';
+    if(selPerson.bani==='KSR') return 'Bani Kasirin';
+    
+    // Cari leluhur tertinggi di cabang ini
+    let headBani = selPerson.bani;
+    if(BANI_NAMES[headBani]) return `Bani ${BANI_NAMES[headBani]}`;
+    return `Bani ${headBani}`; // Fallback jika tidak ada di dictionary
+  },[sel,people]);
+
+  const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
+  
   function centerPerson(id){
     const p=pos[id];
     if(p&&vpRef.current){
@@ -807,201 +834,10 @@ function App(){
       setVt({s:ns,x:vw/2-CX(p)*ns,y:vh/2-CY(p)*ns});
     }
   }
-  function fullReset(){
-    if(!vpRef.current)return;
-    const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight;
-    const root=people.find(p=>p.baniId==='KSR-000'); const rootPos=root&&pos[root.id];
-    const cx=rootPos?rootPos.x+CW/2:1080+CW/2; const cy=rootPos?rootPos.y+CH/2:80+CH/2;
-    setVt({s:0.55,x:vw/2-cx*0.55,y:vh/2-cy*0.55+60}); setSel(null);setSbMode('view');
+
+  function focusPerson(id){ 
+    setSel(id); setSbMode('view'); centerPerson(id); setSearchQ(''); setShowSR(false); setShowSearch(false); 
   }
-
-  function computeAutoLayout(){
-    const CARD_W=110, GAP_X=40, GAP_Y=160, PAD_BANI=80;
-    const START_Y=0;
-
-    const genMap={};
-    const root=people.find(p=>p.baniId==='KSR-000');
-    if(!root){setModal(null);return;}
-    const queue=[root.id]; genMap[root.id]=0;
-    
-    while(queue.length){
-      const cur=queue.shift(); const g=genMap[cur];
-      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}}));
-      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(cur)).forEach(r=>{
-        const cid=r.pids[r.pids.length-1];
-        if(!(cid in genMap)){genMap[cid]=g+1;queue.push(cid);}
-      });
-    }
-    people.forEach(p=>{if(!(p.id in genMap))genMap[p.id]=99;});
-
-    function getBloodChildren(pid){
-      const childIds=new Set();
-      rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).forEach(r=>childIds.add(r.pids[r.pids.length-1]));
-      return [...childIds];
-    }
-
-    function getSpousesOf(pid){
-      const spouses=[];
-      rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).forEach(r=>{
-        const other=r.pids.find(x=>x!==pid);
-        if(other&&!spouses.includes(other)) spouses.push(other);
-      });
-      return spouses;
-    }
-
-    function subtreeWidth(pid, visited=new Set()){
-      if(visited.has(pid)) return CARD_W; visited.add(pid);
-      const spouses=getSpousesOf(pid);
-      const selfWidth=spouses.length>0 ? CARD_W*(1+spouses.length)+GAP_X*spouses.length : CARD_W;
-      const children=getBloodChildren(pid);
-      if(!children.length) return selfWidth;
-      const childTotal=children.reduce((sum,cid)=>sum+subtreeWidth(cid,new Set([...visited])),0) +(children.length-1)*GAP_X;
-      return Math.max(selfWidth, childTotal);
-    }
-
-    const newPos={};
-    function layoutSubtree(pid, centerX, gen, visited=new Set()){
-      if(visited.has(pid)) return; visited.add(pid);
-      const yPos=START_Y+gen*GAP_Y;
-      const spouses=getSpousesOf(pid);
-      const children=getBloodChildren(pid);
-
-      function placeUnit(selfCX){
-        const totalUnit=CARD_W*(1+spouses.length)+GAP_X*spouses.length;
-        let ux=selfCX-totalUnit/2;
-        
-        if(spouses.length===0){
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
-        } else if(spouses.length===1){
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
-          ux+=CARD_W+GAP_X;
-          newPos[spouses[0]]={x:Math.round(ux), y:Math.round(yPos)};
-        } else {
-          const before=spouses.slice(0,Math.floor(spouses.length/2));
-          const after=spouses.slice(Math.floor(spouses.length/2));
-          before.forEach(sp=>{ if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X; });
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X;
-          after.forEach(sp=>{ if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X; });
-        }
-      }
-
-      if(children.length===0){ placeUnit(centerX); return; }
-
-      const widths=children.map(cid=>subtreeWidth(cid,new Set([pid])));
-      const totalChildW=widths.reduce((s,w)=>s+w,0)+(children.length-1)*GAP_X;
-      let cx=centerX-totalChildW/2;
-      
-      const childCenters = [];
-      children.forEach((cid,i)=>{
-        const w=widths[i];
-        const childCenter = cx + w/2;
-        childCenters.push(childCenter);
-        layoutSubtree(cid, childCenter, gen+1, new Set([...visited]));
-        cx+=w+GAP_X;
-      });
-
-      const selfCX = (childCenters[0] + childCenters[childCenters.length-1]) / 2;
-      placeUnit(selfCX);
-    }
-
-    const baniHeads=people.filter(p=>genMap[p.id]===1&&
-      rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(root.id)&&r.pids[r.pids.length-1]===p.id)
-    );
-
-    baniHeads.sort((a,b)=>{
-      const ra=rels.find(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===a.id);
-      const rb=rels.find(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===b.id);
-      return (ra?.id||'').localeCompare(rb?.id||'');
-    });
-
-    let cursorX=0;
-    baniHeads.forEach((bh,i)=>{
-      const w=subtreeWidth(bh.id, new Set([root.id]));
-      const centerX=cursorX+w/2;
-      layoutSubtree(bh.id, centerX, 1, new Set([root.id]));
-      cursorX+=w+(i<baniHeads.length-1?PAD_BANI:0);
-    });
-
-    const totalW=cursorX;
-    const rootCX=totalW/2;
-    const rootSpouses=getSpousesOf(root.id);
-    
-    if(rootSpouses.length===0){
-      newPos[root.id]={x:Math.round(rootCX-CARD_W/2), y:Math.round(START_Y)};
-    } else if(rootSpouses.length===1){
-      newPos[root.id]={x:Math.round(rootCX-CARD_W-GAP_X/2), y:Math.round(START_Y)};
-      newPos[rootSpouses[0]]={x:Math.round(rootCX+GAP_X/2), y:Math.round(START_Y)};
-    } else {
-      const totalUnit=CARD_W*(1+rootSpouses.length)+GAP_X*rootSpouses.length;
-      let ux=rootCX-totalUnit/2;
-      const before=rootSpouses.slice(0,Math.floor(rootSpouses.length/2));
-      const after=rootSpouses.slice(Math.floor(rootSpouses.length/2));
-      before.forEach(sp=>{ newPos[sp]={x:Math.round(ux), y:Math.round(START_Y)}; ux+=CARD_W+GAP_X; });
-      newPos[root.id]={x:Math.round(ux), y:Math.round(START_Y)}; ux+=CARD_W+GAP_X;
-      after.forEach(sp=>{ newPos[sp]={x:Math.round(ux), y:Math.round(START_Y)}; ux+=CARD_W+GAP_X; });
-    }
-
-    const unconnected=people.filter(p=>!(p.id in newPos));
-    let ux2=0;
-    const maxY=Math.max(...Object.values(newPos).map(p=>p.y),0);
-    unconnected.forEach(p=>{
-      newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
-      ux2+=CARD_W+GAP_X;
-    });
-
-    setPos(newPos);
-    if(vpRef.current){
-      const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight;
-      setVt({s:0.5,x:vw/2-rootCX*0.5,y:vh/2-START_Y*0.5+80});
-    }
-    setModal(null);
-  }
-
-  function getBaniHead(pid, visited=new Set()){
-    if(visited.has(pid)) return null; visited.add(pid);
-    const p=people.find(x=>x.id===pid); if(!p) return null;
-    if(p.baniId==='KSR-000') return p;
-    const parents=getActiveParents(pid);
-    if(!parents.length) return null;
-    const parentPeople=parents.map(id=>people.find(x=>x.id===id)).filter(Boolean);
-    if(parentPeople.some(par=>par.baniId==='KSR-000'||par.baniId?.startsWith('KSR'))) return p; 
-    for(const parentId of parents){
-      const head=getBaniHead(parentId, visited);
-      if(head) return head;
-    }
-    return null;
-  }
-
-  // BANI NAME DINAMIS HANYA DI TOP BAR
-  const baniTitle=useMemo(()=>{
-    if(!people.length) return 'Bani Kasirin';
-    if(!sel) return 'Bani Kasirin';
-    const selPerson=people.find(p=>p.id===sel); if(!selPerson) return 'Bani Kasirin';
-    if(selPerson.baniId==='KSR-000'||selPerson.baniId==='KSR-W1'||selPerson.baniId?.match(/^KSR-W\d+$/)) return 'Bani Kasirin';
-    let head=getBaniHead(sel);
-    if(!head){
-      const partnerIds=getPartners(sel);
-      for(const pid of partnerIds){ head=getBaniHead(pid); if(head) break; }
-    }
-    if(!head) return 'Bani Kasirin';
-    if(head.baniId==='KSR-000') return 'Bani Kasirin';
-    
-    // Menerjemahkan KRM menjadi Karmilah khusus untuk variabel baniTitle
-    const prefixMatch = head.baniId?.match(/^([A-Z]+)-/);
-    if (prefixMatch && BANI_NAMES[prefixMatch[1]]) {
-        return `Bani ${BANI_NAMES[prefixMatch[1]]}`;
-    }
-    return `Bani ${nn(head)}`;
-  },[sel,people,rels]);
-
-  const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
-  function focusPerson(id){ setSel(id);setSbMode('view'); centerPerson(id); setSearchQ('');setShowSR(false);setShowSearch(false); }
-
-  const lines = buildOrthogonalLines();
-  const activeParents = sel ? getActiveParents(sel) : [];
-  const partners = sel ? getPartners(sel) : [];
-  const siblings = sel ? getSiblings(sel) : [];
-  const childrenDisplay = sel ? getChildrenForDisplay(sel) : [];
 
   function PChip({id,tag,onRm}){
     const pp=people.find(x=>x.id===id);if(!pp)return null;
@@ -1015,6 +851,7 @@ function App(){
     );
   }
 
+  /* ── STATS CALCULATION ── */
   const totalOrang = people.length;
   const totalWafat = people.filter(p=>p.status==='Wafat').length;
   const totalPasangan = rels.filter(r=>r.type==='married').length;
@@ -1022,8 +859,7 @@ function App(){
   return <>
     <input ref={fileInputRef} type="file" accept="image/*" style={{display:'none'}} onChange={e=>handlePhotoUpload(e, uploadTarget)}/>
     
-    {loading&&( <div className="loading-screen"> <div className="loading-spinner"/> <div className="loading-title">Memuat Silsilah…</div> <div className="loading-sub">Mengambil data dari cloud</div> </div> )}
-    {!loading&&loadErr&&( <div style={{position:'fixed',top:58,left:'50%',transform:'translateX(-50%)',zIndex:195,background:'#fff8f0',border:'1px solid #e0c090',borderRadius:10,padding:'7px 14px',fontSize:11,color:'#8a5020',maxWidth:320,textAlign:'center'}}> ⚠️ {loadErr} </div> )}
+    {loading && <div className="loading-screen"><div className="loading-spinner"/><h3>Memuat Silsilah...</h3></div>}
 
     <div className="topbar">
       <div style={{flexShrink:0}}>
@@ -1031,52 +867,57 @@ function App(){
         <div className="brand-sub">Silsilah Keluarga</div>
       </div>
       <div className="sep"/>
-      <div className="search-wrap">
-        <input placeholder="Cari nama…" value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
+      <div className="search-wrap hide-mob">
+        <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       </div>
       <button className="search-icon-btn" onClick={()=>{setShowSearch(true);setSearchQ('');setShowSR(false);}}>🔍</button>
       <div className="spacer"/>
-      {isAdmin&&<button className="btn accent" style={{fontSize:11}} onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
+      
+      <div className="save-status hide-mob">
+        <div className={`save-dot ${saveStatus}`}/>
+        {saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal':'Tersimpan'}
+      </div>
+
+      {isAdmin&&<button className="btn accent hide-mob" onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
-      {isAdmin&&<button className="btn" style={{fontSize:11}} onClick={()=>setModal('registry')}>🪪 ID</button>}
-      <button className={`btn${isAdmin?' adm':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin ✓':'Login Admin'}</button>
-      <button className="btn btn-home-top" onClick={()=>{fullReset();}}>Home</button>
+      <button className="btn hide-mob" onClick={()=>setModal('registry')}>🪪 ID</button>
+      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin Aktif':'Login'}</button>
     </div>
 
     <div className={`search-expand${showSearch?' open':''}`}>
-      <input placeholder="Cari nama…" value={searchQ} autoFocus={showSearch} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
+      <input placeholder="Cari nama..." value={searchQ} autoFocus={showSearch} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       <button className="se-close" onClick={()=>{setShowSearch(false);setSearchQ('');setShowSR(false);}}>✕</button>
     </div>
 
     {showSR&&searchRes.length>0&&<>
-      <div className="sresults" style={{top:50}}>
+      <div className="sresults" style={{left:160}}>
         {searchRes.map(p=>(
           <div key={p.id} className="sitem" onClick={()=>focusPerson(p.id)}>
-            <div style={{width:8,height:8,borderRadius:'50%',background:MC(p.gender),flexShrink:0}}/>
-            <div><span style={{fontWeight:700}}>{nn(p)}</span>{p.fullName!==nn(p)&&<span style={{color:'#9a9080',fontSize:10.5,marginLeft:5}}>{p.fullName}</span>}</div>
-            {p.status==='Wafat'&&<span style={{marginLeft:'auto',fontSize:9.5,color:'#a05030',fontWeight:700}}>Wafat</span>}
+            <div className="pi-dot" style={{background:MC(p.gender)}}/>
+            <div><span style={{fontWeight:700}}>{nn(p)}</span><div style={{color:'#8a8278',fontSize:10}}>{p.displayId}</div></div>
           </div>
         ))}
       </div>
       <div style={{position:'fixed',inset:0,zIndex:185}} onClick={()=>setShowSR(false)}/>
     </>}
 
-    <div id="vp" ref={vpRef} style={{top:vpTop}} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={()=>{panning.current=false;dragging.current=null;}} onClick={e=>{if(e.target===vpRef.current){setSel(null);setSbMode('view');setEdgeSel(null);}}}>
+    <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp} onClick={e=>{if(e.target===vpRef.current){setSel(null);setEdgeSel(null);}}}>
       <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
         <svg id="csvg">
-          {lines.map(l=>(
-            <g key={l.rid}>
-              <path d={l.d} stroke={l.stroke} strokeWidth={l.w} strokeDasharray={l.dash||undefined} strokeLinecap="round" strokeLinejoin="round" fill="none" style={{pointerEvents:'none'}}/>
+          {lines.map((l,i)=>(
+            <g key={i}>
+              <path d={l.d} stroke={l.stroke} strokeWidth={l.w} strokeDasharray={l.dash} fill="none" strokeLinecap="round" strokeLinejoin="round" style={{pointerEvents:'none'}}/>
               {isAdmin&&<path d={l.d} stroke="transparent" strokeWidth={18} fill="none" style={{cursor:'pointer'}} onClick={e=>onEdgeClick(e,l)}/>}
             </g>
           ))}
         </svg>
+
         {people.map(p=>{
-          const pp=pos[p.id]||{x:0,y:0};
-          return(
-            <div key={p.id} className="node" style={{left:pp.x,top:pp.y,width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{ e.stopPropagation(); setSel(p.id);setSbMode('view');setEdgeSel(null); }}>
-              <div className={`card${p.status==='Wafat'?' wafat':''}${sel===p.id?' sel':''}`} style={{cursor:isAdmin?'move':'pointer'}}>
+          const pp=pos[p.id]; if(!pp) return null;
+          return (
+            <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{e.stopPropagation();setSel(p.id);setSbMode('view');setEdgeSel(null);}}>
+              <div className={`card ${p.status==='Wafat'?'wafat':''} ${sel===p.id?'sel':''}`}>
                 <div className="gaccent" style={{background:MC(p.gender)}}/>
                 <div className="avatar" style={{background:MB(p.gender)}}>
                   {p.photo?<img src={p.photo} alt=""/>:<span style={{color:MC(p.gender)}}>{ini(p.fullName)}</span>}
@@ -1089,8 +930,9 @@ function App(){
           );
         })}
       </div>
+
       {edgeSel&&isAdmin&&(
-        <div className="edge-popup" style={{left:Math.min(edgeSel.sx,window.innerWidth-230),top:Math.min(edgeSel.sy,window.innerHeight-160)}} onClick={e=>e.stopPropagation()}>
+        <div className="edge-popup" style={{left:Math.min(edgeSel.mx*vt.s+vt.x, window.innerWidth-250), top:Math.min(edgeSel.my*vt.s+vt.y+vpTop, window.innerHeight-150)}} onClick={e=>e.stopPropagation()}>
           <h4>Edit Relasi</h4>
           <div className="edge-info">Jenis: <strong>{edgeSel.label}</strong>{edgeSel.type==='parent-child'&&<><br/>Status: <strong>{edgeSel.active?'Pengasuh aktif':'Biologis / historis'}</strong></>}</div>
           <div className="edge-actions">
@@ -1102,80 +944,72 @@ function App(){
       )}
     </div>
 
-    {/* ── SIDEBAR PROFIL ── */}
-    <div className={`sidebar${sel?' open':''}`} style={{top:vpTop}}>
+    {/* SIDEBAR DENGAN PROFIL & SAUDARA */}
+    <div className={`sidebar ${sel?'open':''}`}>
       {selP&&sbMode==='view'&&<>
         <div className="sb-head">
           <div style={{flex:1}}>
             <h2 style={{marginBottom:0}}>Profil</h2>
-            {isAdmin&&selP.baniId&&<div style={{fontSize:10,color:'#4a7a9b',fontWeight:700,letterSpacing:'.04em',marginTop:2}}>{selP.baniId}</div>}
+            {isAdmin&&selP.bani&&<div style={{fontSize:10,color:'#4a7a9b',fontWeight:700,letterSpacing:'.04em',marginTop:2}}>Bani {selP.bani}</div>}
           </div>
           {isAdmin&&<>
-            <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
-            <button className="btn danger" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setModal('delconfirm')}>Hapus</button>
+            <button className="btn" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
+            <button className="btn danger" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>setModal('delconfirm')}>Hapus</button>
           </>}
-          <button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSel(null)}>✕</button>
+          <button className="btn" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>setSel(null)}>✕</button>
         </div>
         <div className="sb-body">
           <div className="profile-hero">
             <div className="profile-avatar" style={{background:MB(selP.gender)}}>
               {selP.photo?<img src={selP.photo} alt=""/>:<span style={{color:MC(selP.gender)}}>{ini(selP.fullName)}</span>}
             </div>
-            <div className="profile-nick">{nn(selP)}</div>
-            {selP.fullName!==nn(selP)&&<div className="profile-fullname">{selP.fullName}</div>}
+            <div className="profile-nick" style={{fontSize:16}}>{nn(selP)}</div>
+            <div className="profile-fullname" style={{fontSize:11}}>{selP.fullName}</div>
             <div className="profile-gender" style={{background:MB(selP.gender),color:MC(selP.gender)}}>
               {selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Unknown'}
               {selP.status!=='Hidup'&&<span style={{marginLeft:6,opacity:.7}}>· {selP.status}</span>}
             </div>
           </div>
-
+          
           <div className="sec">
             <div className="sec-title">Info</div>
-            {fmtBirth(selP.birthPlace,selP.birthDate)?<div className="info-row"><span className="info-label">Lahir</span><span className="info-val">{fmtBirth(selP.birthPlace,selP.birthDate)}</span></div>:null}
-            {selP.deathDate?<div className="info-row"><span className="info-label">Wafat</span><span className="info-val">{fmtDate(selP.deathDate)}</span></div>:null}
-            {selP.domicile?<div className="info-row"><span className="info-label">Domisili</span><span className="info-val">{selP.domicile}</span></div>:null}
-            {!fmtBirth(selP.birthPlace,selP.birthDate)&&!selP.domicile&&!selP.deathDate&&<div className="info-empty">Belum ada info detail.</div>}
+            {fmtBirth(selP.birthPlace,selP.birthDate)&&<div className="info-row"><span className="info-label">Lahir</span><span className="info-val">{fmtBirth(selP.birthPlace,selP.birthDate)}</span></div>}
+            {selP.deathDate&&<div className="info-row"><span className="info-label">Wafat</span><span className="info-val">{fmtDate(selP.deathDate)}</span></div>}
+            {selP.domicile&&<div className="info-row"><span className="info-label">Domisili</span><span className="info-val">{selP.domicile}</span></div>}
+            {!fmtBirth(selP.birthPlace,selP.birthDate)&&!selP.deathDate&&!selP.domicile&&<div className="info-empty">Belum ada info detail.</div>}
           </div>
 
-          <div className="sec">
-            <div className="sec-title">Orang Tua</div>
-            {activeParents.length>0?<div className="chips">{activeParents.map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty">Belum diisi.</div>}
-            {selP.bioNote?<div className="bio-note">{selP.bioNote}</div>:null}
-          </div>
-
-          <div className="sec">
-            <div className="sec-title">Pasangan</div>
-            {partners.length>0
-              ?<div className="chips">{partners.map(id=>{
+          <div className="sec"><div className="sec-title">Keluarga</div>
+            <div className="info-row"><span className="info-label">Orang Tua</span><span className="info-val">
+              {getActiveParents(selP.id).length>0?<div className="chips">{getActiveParents(selP.id).map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
+            {selP.bioNote&&<div className="bio-note">{selP.bioNote}</div>}
+            
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Pasangan</span><span className="info-val">
+              {getPartners(selP.id).length>0?<div className="chips">{getPartners(selP.id).map(id=>{
                 const pp=people.find(x=>x.id===id);
                 const r=rels.find(r=>r.type==='married'&&r.pids.includes(id)&&r.pids.includes(sel));
-                return<PChip key={id} id={id} tag={pp?.status==='Cerai'?'cerai':undefined} onRm={r?()=>removeRel(r.id):undefined}/>;
-              })}</div>
-              :<div className="info-empty">Belum ada data pasangan.</div>}
+                return<PChip key={id} id={id} tag={pp?.status==='Cerai'?'cerai':undefined} onRm={r?()=>deleteEdge(r.id):undefined}/>;
+              })}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
+
+            {/* SEKSI SAUDARA */}
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Saudara</span><span className="info-val">
+              {siblings.length>0?<div className="chips">{[...new Set(siblings)].map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Tidak ada / belum terdata.</div>}
+            </span></div>
+            
+            <div className="info-row" style={{marginTop:8}}><span className="info-label">Anak</span><span className="info-val">
+              {childrenDisplay.length>0?<div className="chips">{childrenDisplay.map(({id,tag})=><PChip key={id} id={id} tag={tag}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
+            </span></div>
           </div>
-
-          <div className="sec">
-            <div className="sec-title">Saudara</div>
-            {siblings.length>0?<div className="chips">{[...new Set(siblings)].map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty">Tidak ada / belum terdata.</div>}
-          </div>
-
-          <div className="sec">
-            <div className="sec-title">Anak</div>
-            {childrenDisplay.length>0?<div className="chips">{childrenDisplay.map(({id,tag})=><PChip key={id} id={id} tag={tag}/>)}</div>:<div className="info-empty">Belum ada data anak.</div>}
-          </div>
-
-          {selP.notes&&<div className="sec">
-            <div className="sec-title">Catatan</div>
-            <div className="info-val" style={{fontSize:11.5,lineHeight:1.6,color:'#4a4038'}}>{selP.notes}</div>
-          </div>}
-
-          {isAdmin&&<div style={{marginTop:16}}><button className="btn" style={{width:'100%'}} onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Tambah Relasi</button></div>}
+          
+          {selP.notes&&<div className="sec"><div className="sec-title">Catatan</div><div className="info-val" style={{fontSize:11.5,lineHeight:1.6,color:'#4a4038'}}>{selP.notes}</div></div>}
         </div>
       </>}
 
       {selP&&sbMode==='edit'&&<>
         <div className="sb-head"><h2 style={{fontSize:13}}>Edit Profil</h2><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSbMode('view')}>Batal</button></div>
-        <div className="sb-body" style={{paddingTop:14}}>
+        <div className="sb-body" style={{paddingTop:20}}>
           {[['fullName','Nama Lengkap','text'],['nickname','Nama Panggilan','text'],['birthPlace','Tempat Lahir','text'],['birthDate','Tanggal Lahir','date'],['deathDate','Tanggal Wafat','date'],['domicile','Domisili','text']].map(([k,lbl,t])=>(
             <div className="fg" key={k}><label>{lbl}</label>
               <input type={t} value={editF[k]||''} onChange={e=>setEditF(f=>({...f,[k]:e.target.value}))} placeholder={k==='nickname'?(editF.fullName?.split(' ')[0]||''):k==='birthPlace'?'contoh: Blitar':k==='domicile'?'contoh: Malang, Jawa Timur':''}/>
@@ -1217,23 +1051,11 @@ function App(){
         <h3>Tambah Relasi</h3><p className="modal-sub">Untuk: <strong>{selP?.fullName}</strong></p>
         <div className="fg"><label>Jenis Relasi</label><select value={relF.type} onChange={e=>setRelF(f=>({...f,type:e.target.value}))}><option value="married">Pasangan / Menikah</option><option value="parent-of">Orang tua dari (Pilih Anak)</option><option value="child-of">Anak dari (Pilih Ortu)</option></select></div>
         {relF.type!=='married'&&<div className="fg"><label>Status Pengasuh</label><select value={relF.isActive?'1':'0'} onChange={e=>setRelF(f=>({...f,isActive:e.target.value==='1'}))}><option value="1">Aktif (pengasuh saat ini)</option><option value="0">Tidak aktif (biologis / historis)</option></select></div>}
-        <div className="fg">
-          <label>Pilih Orang {relF.pid&&<span style={{color:'#4a7a9b',fontWeight:700}}>✓ {nn(people.find(p=>p.id===relF.pid)||{fullName:''})}</span>}</label>
-          <div className="ppicker">
-            <div className="ppicker-search"><span className="pps-ico">🔍</span><input autoFocus placeholder="Ketik nama untuk cari…" value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/>{relSearchQ&&<span style={{cursor:'pointer',color:'#b0a898',fontSize:13}} onClick={()=>setRelSearchQ('')}>✕</span>}</div>
-            <div className="ppicker-list">
-              {(()=>{
-                const q=relSearchQ.trim().toLowerCase();
-                const filtered=people.filter(p=>p.id!==sel).filter(p=>!q||p.fullName.toLowerCase().includes(q)||(p.nickname&&p.nickname.toLowerCase().includes(q))).sort((a,b)=>{if(a.id===relF.pid)return -1;if(b.id===relF.pid)return 1;return nn(a).localeCompare(nn(b),'id');});
-                if(!filtered.length)return <div className="ppicker-empty">Tidak ada hasil untuk "{relSearchQ}"</div>;
-                return filtered.map(p=>(
-                  <div key={p.id} className={`ppicker-item${relF.pid===p.id?' selected':''}`} onClick={()=>setRelF(f=>({...f,pid:p.id}))}><div className="pi-dot" style={{background:MC(p.gender)}}/><span className="pi-nick">{nn(p)}</span>{p.fullName!==nn(p)&&<span className="pi-full">{p.fullName}</span>}{p.status!=='Hidup'&&<span style={{marginLeft:'auto',fontSize:9,fontWeight:700,color:p.status==='Wafat'?'#a05030':'#705090'}}>{p.status}</span>}</div>
-                ));
-              })()}
-            </div>
-          </div>
-        </div>
-        <div className="frow"><button className="btn primary" onClick={()=>{prepareAddRel();setRelSearchQ('');}} disabled={!relF.pid}>Tambah</button><button className="btn" onClick={()=>{setModal(null);setRelSearchQ('');}}>Batal</button></div>
+        <div className="fg"><label>Cari Orang</label><input autoFocus placeholder="Ketik nama..." value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/></div>
+        <div className="ppicker-list">{people.filter(p=>p.id!==sel && p.fullName.toLowerCase().includes(relSearchQ.toLowerCase())).slice(0,5).map(p=>(
+          <div key={p.id} className={`ppicker-item ${relF.pid===p.id?'selected':''}`} onClick={()=>setRelF(f=>({...f,pid:p.id}))}><div className="pi-dot" style={{background:MC(p.gender)}}/>{nn(p)} - <span style={{fontSize:10,color:'#8a8278'}}>{p.displayId}</span></div>
+        ))}</div>
+        <div className="frow"><button className="btn primary" onClick={prepareAddRel} disabled={!relF.pid}>Konfirmasi</button></div>
       </div>
     </div>}
 
@@ -1244,7 +1066,7 @@ function App(){
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <h3>Konfirmasi Orang Tua</h3>
             <p className="modal-sub">Ditemukan pasangan aktif dari <strong>{p1?nn(p1):''}</strong>:</p>
-            <div className="confirm-box"><strong>{p2?nn(p2):''}</strong> terdeteksi sebagai pasangan aktif {p1?nn(p1):''}.<br/>Apakah <strong>{ch?nn(ch):''}</strong> adalah anak dari <strong>keduanya</strong>?</div>
+            <div className="confirm-box" style={{background:'#f8f5f0',border:'1px solid #e8e0d8',padding:'10px 12px',borderRadius:10,fontSize:12,marginBottom:14}}><strong>{p2?nn(p2):''}</strong> terdeteksi sebagai pasangan aktif {p1?nn(p1):''}.<br/>Apakah <strong>{ch?nn(ch):''}</strong> adalah anak dari <strong>keduanya</strong>?</div>
             <div className="frow" style={{flexDirection:'column',gap:6}}><button className="btn primary" onClick={confirmBothParents}>Ya, anak dari {p1?nn(p1):''} &amp; {p2?nn(p2):''}</button><button className="btn" onClick={confirmSingleParent}>Tidak, anak dari {p1?nn(p1):''} saja</button><button className="btn" onClick={()=>{setPendingRel(null);setModal('addrel');}}>Batal</button></div>
           </div>
         </div>
@@ -1253,71 +1075,77 @@ function App(){
 
     {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <h3>Tambah Anggota Baru</h3>
-        <div style={{background:'#f0f7ee',border:'1px solid #c8e0c8',borderRadius:8,padding:'7px 11px',fontSize:11,color:'#3a6030',marginBottom:12}}>🪪 ID otomatis terbuat saat relasi ditetapkan</div>
-        <div className="fg"><label>Nama Lengkap *</label><input value={addF.fullName} autoFocus onChange={e=>setAddF(f=>({...f,fullName:e.target.value}))}/></div>
-        <div className="fg"><label>Nama Panggilan</label><input value={addF.nickname} placeholder={addF.fullName.split(' ')[0]||'opsional'} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
-        <div className="fg"><label>Jenis Kelamin</label><select value={addF.gender} onChange={e=>setAddF(f=>({...f,gender:e.target.value}))}><option value="M">Laki-laki</option><option value="F">Perempuan</option><option value="?">Unknown (belum diketahui)</option></select></div>
-        <div className="fg"><label>Status</label><select value={addF.status} onChange={e=>setAddF(f=>({...f,status:e.target.value}))}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
-        <div className="fg"><label>Tempat Lahir</label><input value={addF.birthPlace} placeholder="contoh: Blitar" onChange={e=>setAddF(f=>({...f,birthPlace:e.target.value}))}/></div>
-        <div className="fg"><label>Tanggal Lahir</label><input type="date" value={addF.birthDate} onChange={e=>setAddF(f=>({...f,birthDate:e.target.value}))}/></div>
-        <div className="fg"><label>Domisili</label><input value={addF.domicile} placeholder="contoh: Malang, Jawa Timur" onChange={e=>setAddF(f=>({...f,domicile:e.target.value}))}/></div>
-        <div className="fg">
-          <label>Foto <span style={{fontWeight:400,color:'#b0a898'}}>(opsional)</span></label>
-          <div className="photo-upload-wrap"><input type="text" value={addF.photo} placeholder="Paste URL atau klik Upload →" onChange={e=>setAddF(f=>({...f,photo:e.target.value}))}/><button className="upload-btn" disabled={uploadTarget==='add'} onClick={()=>{setUploadTarget('add');fileInputRef.current?.click();}}>{uploadTarget==='add'?'Uploading…':'📷 Upload'}</button></div>
-          {uploadTarget==='add'&&uploadPct!==null&&(<div className="upload-progress"><span>{uploadPct}%</span><div className="upload-bar-wrap"><div className="upload-bar" style={{width:uploadPct+'%'}}/></div></div>)}
-        </div>
-        <div className="fg"><label>Catatan</label><textarea value={addF.notes} onChange={e=>setAddF(f=>({...f,notes:e.target.value}))}/></div>
-        <div className="fg"><label>Catatan Orang Tua <span style={{fontWeight:400,color:'#b0a898'}}>(opsional)</span></label><textarea value={addF.bioNote} placeholder="contoh: Orang tua kandung: ..." onChange={e=>setAddF(f=>({...f,bioNote:e.target.value}))}/></div>
-        <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName.trim()}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <h3>Tambah Anggota Baru</h3><p className="modal-sub">ID otomatis terbuat saat relasi ditentukan.</p>
+        <div className="fg"><label>Nama Lengkap</label><input value={addF.fullName} autoFocus onChange={e=>setAddF({...addF,fullName:e.target.value})}/></div>
+        <div className="fg"><label>Panggilan</label><input value={addF.nickname} onChange={e=>setAddF({...addF,nickname:e.target.value})}/></div>
+        <div className="fg"><label>Gender</label><select value={addF.gender} onChange={e=>setAddF({...addF,gender:e.target.value})}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
+        <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
     {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
-        <h3>⊞ Rapikan Otomatis</h3>
-        <p className="modal-sub">Semua posisi kartu akan dihitung ulang. Posisi yang diatur manual akan terganti.</p>
-        <div style={{background:'#f0f7ff',border:'1px solid #c0d8f0',borderRadius:8,padding:'8px 12px',fontSize:11,color:'#3060a0',marginBottom:14,lineHeight:1.6}}>ℹ️ Setelah dirapikan, kamu tetap bisa menggeser kartu secara manual.</div>
-        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
+        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
     {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}>
-      <div className="modal" style={{maxWidth:420}} onClick={e=>e.stopPropagation()}>
-        <div style={{display:'flex',alignItems:'center',marginBottom:14}}><h3 style={{flex:1,marginBottom:0}}>ID Registry</h3><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>{setModal(null);setRegistryFilter(null);}}>✕ Tutup</button></div>
+      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><h3>🪪 ID Registry</h3><button className="btn" onClick={()=>setModal(null)}>✕ Tutup</button></div>
         {(()=>{
-          const groups={}; people.forEach(p=>{
-            if(!p.baniId){groups['?']=groups['?']||[];groups['?'].push(p);return;}
-            const m=p.baniId.match(/^([A-Z]+)-/); const prefix=m?m[1]:'?'; groups[prefix]=groups[prefix]||[]; groups[prefix].push(p);
-          });
-          const sortedMembers=arr=>arr.sort((a,b)=>{const na=parseInt((a.baniId||'').replace(/\D/g,''))||999; const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999; return na-nb;});
-          const baniPrefixes=Object.keys(groups).filter(k=>k!=='KSR'&&k!=='BARU'&&k!=='?').sort();
-
-          function MemberTable({members, color}){
-            return( <table style={{width:'100%',borderCollapse:'collapse'}}><tbody>
-                  {sortedMembers([...members]).map(p=>( <tr key={p.id} style={{borderBottom:'1px solid #f5f2ee'}}> <td style={{fontFamily:'monospace',fontSize:11,fontWeight:700,color, padding:'5px 10px 5px 0',whiteSpace:'nowrap',width:1}}>{p.baniId||'—'}</td> <td style={{fontSize:12,color:'#2a2018',padding:'5px 0'}}>{nn(p)}</td> </tr> ))}
-                </tbody></table> );
-          }
-
+          const groups={}; people.forEach(p=>{const b=p.bani||'BARU'; groups[b]=groups[b]||[]; groups[b].push(p);});
+          const baniPrefixes=Object.keys(groups).filter(k=>k!=='BARU').sort();
           return <>
-            {groups['KSR']&&( <div style={{marginBottom:16}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#6a5020',borderBottom:'2px solid #e8d8a0',paddingBottom:4,marginBottom:6}}>🌳 Leluhur Utama (Kasirin)<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['KSR'].length} orang</span></div><MemberTable members={groups['KSR']} color="#8a6020"/></div> )}
-            {groups['BARU']&&( <div style={{marginBottom:16}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#a05030',borderBottom:'2px solid #f0d8c8',paddingBottom:4,marginBottom:6}}>⏳ Belum ada relasi orang tua<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['BARU'].length} orang</span></div><MemberTable members={groups['BARU']} color="#a05030"/></div> )}
-            {baniPrefixes.length>0&&(
-              <div style={{marginBottom:registryFilter?12:0}}>
-                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase', color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:10}}>Pilih Bani</div>
-                <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-                  {baniPrefixes.map(prefix=>( <button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} style={{padding:'5px 12px',borderRadius:20,fontSize:11,fontWeight:700,border:`1.5px solid ${registryFilter===prefix?'#4a7a9b':'#d0cbc2'}`,background:registryFilter===prefix?'#4a7a9b':'#fff',color:registryFilter===prefix?'#fff':'#4a7a9b',cursor:'pointer',fontFamily:'inherit'}}>Bani {prefix}<span style={{fontWeight:400,fontSize:10,marginLeft:4,opacity:.7}}>{groups[prefix]?.length||0}</span></button> ))}
-                </div>
-              </div>
-            )}
-            {registryFilter&&groups[registryFilter]&&( <div style={{marginTop:12}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:6}}>Bani {registryFilter}<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups[registryFilter].length} orang</span></div><MemberTable members={groups[registryFilter]} color="#4a7a9b"/></div> )}
+            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:20}}>
+              {baniPrefixes.map(prefix=><button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} className={`btn ${registryFilter===prefix?'primary':''}`}>Bani {prefix} ({groups[prefix].length})</button>)}
+              {groups['BARU']&&<button className="btn danger" onClick={()=>setRegistryFilter('BARU')}>Baru/Unlinked ({groups['BARU'].length})</button>}
+            </div>
+            {(registryFilter||baniPrefixes[0])&&(()=>{
+              const activeGrp = registryFilter||baniPrefixes[0];
+              const members = groups[activeGrp].sort((a,b)=>{
+                if(a.isBlood!==b.isBlood) return a.isBlood?-1:1;
+                if(!a.isBlood) return (a.spouseOrder||99)-(b.spouseOrder||99);
+                return a.displayId.localeCompare(b.displayId);
+              });
+              return <table className="reg-table">
+                <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
+                <tbody>{members.map(p=><tr key={p.id}>
+                  <td style={{fontWeight:800,fontFamily:'monospace',color:'#4a7a9b'}}>{p.displayId}</td>
+                  <td><div style={{fontWeight:700}}>{nn(p)}</div><div style={{fontSize:10,color:'#8a8278'}}>{p.fullName}</div></td>
+                  <td>{p.isBlood?<span className="tag-blood">Keturunan Asli</span>:<span className="tag-spouse">Pasangan (Ke-{p.spouseOrder||1})</span>}</td>
+                </tr>)}</tbody>
+              </table>
+            })()}
           </>;
         })()}
       </div>
     </div>}
+
+    {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
+    <div className={`legend ${sel?'sb-open':''}`}>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#6ea8d4'}}/> Laki-laki</div>
+      <div className="li"><div className="pi-dot" style={{background:'#d47ea8'}}/> Perempuan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#c8a830'}}/> Unknown</div>
+    </div>
+
+    <div className={`statpill ${sel?'sb-open':''}`}>
+      <div><span className="stat-val">{totalOrang}</span> Individu</div>
+      <div className="stat-sep"></div>
+      <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
+      <div className="stat-sep hide-mob"></div>
+      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
+    </div>
+
+    <div className={`ctrl ${sel?'sb-open':''}`}>
+      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
+      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
+      <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
+    </div>
   </>;
 }
-
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
