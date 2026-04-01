@@ -25,6 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
+   SILSILAH-MASTER-V1.1
    CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -109,12 +110,16 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .info-empty{font-size:10.5px;color:#c0b8ae;font-style:italic}
 .bio-note{font-size:10px;color:#9a9080;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ede8e0;}
 
+/* V1.1 FIX: Global pi-dot so it works in Legend and Ppicker */
+.pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#f5f2ed;border-radius:20px;font-size:10px;font-weight:600;color:#4a4038;cursor:pointer;border:1px solid #e8e3da;transition:background .1s;}
-.chip:hover{background:#ede8e0}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#f5f2ed;border-radius:20px;font-size:10.5px;font-weight:600;color:#3a352f;cursor:pointer;border:1px solid #e8e3da;transition:all .15s;}
+.chip:hover{background:#ede8e0;transform:translateY(-1px)}
 .chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .chip-tag{font-size:8px;color:#9a9080;margin-left:2px;font-weight:500;background:#ede8e0;padding:1px 5px;border-radius:8px;}
 .chip-rm{font-size:10px;color:#c07070;margin-left:3px;cursor:pointer;}
+.chip-rm:hover{color:#903030}
 
 /* Forms */
 .fg{margin-bottom:12px}
@@ -136,15 +141,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .ctrl{position:fixed;bottom:20px;right:20px;z-index:180;display:flex;flex-direction:column;gap:6px;transition:opacity .2s;}
 .cbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;font-size:18px;cursor:pointer;color:#3a3028;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.08);}
 
-/* Responsif Mobile (Solusi Tumpang Tindih Portrait) */
+/* Responsif Mobile (Solusi V1.1 Tumpang Tindih Portrait) */
 @media(max-width:768px) and (orientation: portrait){ 
   .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; pointer-events:none;}
-  .statpill { bottom: 14px; width: calc(100% - 28px); padding: 8px 12px; font-size: 10px; gap: 4px; justify-content: space-evenly; border-radius: 14px; }
+  .statpill { bottom: 14px; width: calc(100% - 24px); padding: 8px 6px; font-size: 10px; gap: 4px; justify-content: space-evenly; border-radius: 14px; }
   .stat-val { font-size: 11.5px; margin-right: 2px; }
   .stat-sep { display: none; } /* Hilangkan titik pemisah di HP agar hemat ruang */
-  .legend { bottom: 62px; left: 14px; padding: 10px 12px; }
+  .legend { bottom: 62px; left: 12px; padding: 10px 12px; }
   .legend .li { font-size: 9.5px; margin-bottom: 5px; }
-  .ctrl { bottom: 62px; right: 14px; }
+  .ctrl { bottom: 62px; right: 12px; }
   .cbtn { width: 36px; height: 36px; font-size: 16px;}
 }
 @media(max-width:768px) and (orientation: landscape){
@@ -180,6 +185,22 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .photo-upload-wrap{display:flex;gap:8px;align-items:flex-start;}
 .photo-upload-wrap input[type=text]{flex:1}
 .upload-btn{flex-shrink:0;padding:8px 12px;border-radius:10px;border:1px solid #d0cbc2;background:#f8f5f0;font-size:11px;font-weight:600;cursor:pointer;color:#5a4e3c;}
+
+/* PPICKER */
+.ppicker-list{max-height:160px;overflow-y:auto;border:1px solid #dfdbd5;border-radius:12px;margin-top:6px}
+.ppicker-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #f5f2ee;}
+.ppicker-item:hover{background:#f8f5f1;}
+.ppicker-item.selected{background:#f0f7ee;font-weight:700;}
+
+/* EDGE POPUP */
+.edge-popup{position:fixed;z-index:250;background:#fff;border:1px solid #dbd6cf;border-radius:12px;padding:12px 14px;min-width:210px;box-shadow:0 8px 28px rgba(0,0,0,.13);}
+.edge-popup h4{font-size:12px;font-weight:700;margin-bottom:8px;color:#2a2018}
+.edge-info{font-size:11px;color:#7a7060;margin-bottom:10px;line-height:1.6}
+
+/* Loading */
+.loading-screen{position:fixed;inset:0;z-index:1000;background:#f0ede8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.loading-spinner{width:36px;height:36px;border:3px solid #dbd6cf;border-top-color:#7a6a58;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -195,7 +216,7 @@ const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 const nn=p=>p.nickname||p.fullName.split(' ')[0];
 const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; 
 
-// Kamus Data untuk Translasi Nama Bani di Top Bar
+// Kamus Data untuk Translasi Nama Bani (Hanya di Top Bar)
 const BANI_NAMES = { 'KRM': 'Karmilah', 'SAD': 'Said', 'PAN': 'Panidjan', 'SUR': 'Surahman', 'KSR': 'Kasirin' };
 
 async function checkPin(val){
@@ -570,24 +591,31 @@ function App(){
     el.addEventListener('touchstart',onTouchStart,{passive:true});
     el.addEventListener('touchmove',onTouchMove,{passive:false});
     el.addEventListener('touchend',onTouchEnd,{passive:true});
-    return()=>{
-      el.removeEventListener('touchstart',onTouchStart);
-      el.removeEventListener('touchmove',onTouchMove);
-      el.removeEventListener('touchend',onTouchEnd);
-    };
+    return()=>{ el.removeEventListener('touchstart',onTouchStart); el.removeEventListener('touchmove',onTouchMove); el.removeEventListener('touchend',onTouchEnd); };
   },[]);
 
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
 
-  /* ── 3. DATA HELPERS & SAUDARA LOGIC ── */
+  /* ── 3. DATA HELPERS (V1.1 FIX: BULETPROOF REDUCE INSTEAD OF FLATMAP) ── */
   const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
   const selP=people.find(p=>p.id===sel)||null;
   
-  function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
-  function getBioParents(pid){ return rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function getActiveParents(pid){ 
+    const rs = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
+    return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
+  }
+  function getBioParents(pid){ 
+    const rs = rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid);
+    return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
+  }
   function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
   function getActiveChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
-  function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
+  
+  function getPartners(pid){ 
+    const rs = rels.filter(r=>r.type==='married'&&r.pids.includes(pid));
+    return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.filter(x=>x!==pid)), []))];
+  }
+  
   function getActivePartner(pid){
     const marriages=rels.filter(r=>r.type==='married'&&r.pids.includes(pid));
     for(const m of marriages){
@@ -642,7 +670,7 @@ function App(){
         const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
         const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
         
-        // Elevasi kedalaman garis berdasarkan urutan pasangan (spouseOrder)
+        // Elevasi kedalaman garis berdasarkan urutan pasangan
         let spouseOffset = 0;
         const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.isBlood===false);
         if (spouseParent && spouseParent.spouseOrder) spouseOffset = spouseParent.spouseOrder;
@@ -665,6 +693,9 @@ function App(){
   }
   function toggleEdgeActive(){setRels(prev=>prev.map(r=>r.id===edgeSel.rid?{...r,isActive:!r.isActive}:r));setEdgeSel(null);}
   function deleteEdge(){setRels(prev=>prev.filter(r=>r.id!==edgeSel.rid));setEdgeSel(null);}
+  
+  // V1.1 FIX: Helper function to remove relations specifically for PChip
+  function removeRel(rid){ setRels(prev=>prev.filter(r=>r.id!==rid)); }
 
   /* ── 5. ADD & RELATION ── */
   function addPerson(){
@@ -768,15 +799,14 @@ function App(){
         let ux = selfCX - totalUnit/2;
         
         if (spouses.length === 0) {
-          // Jomblo / Sendiri
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
         } else if (spouses.length === 1) {
-          // 1 Pasangan: Darah selalu KIRI, Pasangan di KANAN
+          // Darah Kiri, Pasangan Kanan
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
           ux += CW + GAP_X;
           newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
         } else {
-          // Poligami (>1): Istri-1 di Kiri, Suami/Darah di Tengah, Istri-2+ di Kanan
+          // Poligami: Istri 1, Darah Tengah, Istri 2+
           const s1 = spouses.filter(s=>s.spouseOrder===1);
           const s2 = spouses.filter(s=>s.spouseOrder>1);
           s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
@@ -800,8 +830,7 @@ function App(){
         cx+=w+GAP_X;
       });
       
-      // Mencegah Pergeseran Kiri (Overlap Bug Fix)
-      // Parent dipaksa tepat di tengah antara center anak pertama dan anak terakhir
+      // Center orang tua agar pas di tengah semua anak (menghindari overlap)
       const selfCX = children.length === 1 ? childCenters[0] : (childCenters[0] + childCenters[childCenters.length-1]) / 2;
       placeUnit(selfCX);
     }
@@ -812,17 +841,18 @@ function App(){
   }
 
   /* ── 7. UI RENDERERS ── */
-  // BANI NAME DINAMIS HANYA DI TOP BAR
+  
+  // V1.1 FIX: BANI NAME DINAMIS HANYA DI TOP BAR
   const baniTitle=useMemo(()=>{
     if(!people.length) return 'Bani Kasirin';
     if(!sel) return 'Bani Kasirin';
     const selPerson=people.find(p=>p.id===sel); if(!selPerson) return 'Bani Kasirin';
     if(selPerson.bani==='KSR') return 'Bani Kasirin';
     
-    // Cari leluhur tertinggi di cabang ini
     let headBani = selPerson.bani;
+    if(!headBani || headBani === 'BARU') return 'Bani Kasirin';
     if(BANI_NAMES[headBani]) return `Bani ${BANI_NAMES[headBani]}`;
-    return `Bani ${headBani}`; // Fallback jika tidak ada di dictionary
+    return `Bani ${headBani}`;
   },[sel,people]);
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
@@ -908,7 +938,7 @@ function App(){
           {lines.map((l,i)=>(
             <g key={i}>
               <path d={l.d} stroke={l.stroke} strokeWidth={l.w} strokeDasharray={l.dash} fill="none" strokeLinecap="round" strokeLinejoin="round" style={{pointerEvents:'none'}}/>
-              {isAdmin&&<path d={l.d} stroke="transparent" strokeWidth={18} fill="none" style={{cursor:'pointer'}} onClick={e=>onEdgeClick(e,l)}/>}
+              {isAdmin&&<path d={l.d} stroke="transparent" strokeWidth={18} fill="none" style={{cursor:'pointer'}} onClick={e=>{e.stopPropagation();onEdgeClick(e,l);}}/>}
             </g>
           ))}
         </svg>
@@ -989,11 +1019,10 @@ function App(){
               {getPartners(selP.id).length>0?<div className="chips">{getPartners(selP.id).map(id=>{
                 const pp=people.find(x=>x.id===id);
                 const r=rels.find(r=>r.type==='married'&&r.pids.includes(id)&&r.pids.includes(sel));
-                return<PChip key={id} id={id} tag={pp?.status==='Cerai'?'cerai':undefined} onRm={r?()=>deleteEdge(r.id):undefined}/>;
+                return<PChip key={id} id={id} tag={pp?.status==='Cerai'?'cerai':undefined} onRm={r?()=>removeRel(r.id):undefined}/>;
               })}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
             </span></div>
 
-            {/* SEKSI SAUDARA */}
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Saudara</span><span className="info-val">
               {siblings.length>0?<div className="chips">{[...new Set(siblings)].map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Tidak ada / belum terdata.</div>}
             </span></div>
@@ -1004,27 +1033,22 @@ function App(){
           </div>
           
           {selP.notes&&<div className="sec"><div className="sec-title">Catatan</div><div className="info-val" style={{fontSize:11.5,lineHeight:1.6,color:'#4a4038'}}>{selP.notes}</div></div>}
+          {isAdmin&&<div style={{marginTop:16}}><button className="btn" style={{width:'100%'}} onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Tambah Relasi</button></div>}
         </div>
       </>}
 
       {selP&&sbMode==='edit'&&<>
         <div className="sb-head"><h2 style={{fontSize:13}}>Edit Profil</h2><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSbMode('view')}>Batal</button></div>
         <div className="sb-body" style={{paddingTop:20}}>
-          {[['fullName','Nama Lengkap','text'],['nickname','Nama Panggilan','text'],['birthPlace','Tempat Lahir','text'],['birthDate','Tanggal Lahir','date'],['deathDate','Tanggal Wafat','date'],['domicile','Domisili','text']].map(([k,lbl,t])=>(
-            <div className="fg" key={k}><label>{lbl}</label>
-              <input type={t} value={editF[k]||''} onChange={e=>setEditF(f=>({...f,[k]:e.target.value}))} placeholder={k==='nickname'?(editF.fullName?.split(' ')[0]||''):k==='birthPlace'?'contoh: Blitar':k==='domicile'?'contoh: Malang, Jawa Timur':''}/>
-            </div>
-          ))}
-          <div className="fg">
-            <label>Foto</label>
-            {editF.photo&&<div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}><img src={editF.photo} alt="" style={{width:42,height:42,borderRadius:'50%',objectFit:'cover',border:'1.5px solid #dbd6cf'}}/><span style={{fontSize:10.5,color:'#9a9080',flex:1,wordBreak:'break-all',lineClamp:2}}>{editF.photo.includes('firebasestorage')&&'📸 Sudah di-upload'}</span><button className="upload-btn" style={{fontSize:10,padding:'4px 8px',color:'#a03030'}} onClick={()=>setEditF(f=>({...f,photo:''}))}>Hapus</button></div>}
-            <div className="photo-upload-wrap"><input type="text" value={editF.photo||''} placeholder="Paste URL foto atau klik Upload →" onChange={e=>setEditF(f=>({...f,photo:e.target.value}))}/><button className="upload-btn" disabled={uploadTarget==='edit'} onClick={()=>{setUploadTarget('edit');fileInputRef.current?.click();}}>{uploadTarget==='edit'?'Uploading…':'📷 Upload'}</button></div>
-            {uploadTarget==='edit'&&uploadPct!==null&&(<div className="upload-progress"><span>{uploadPct}%</span><div className="upload-bar-wrap"><div className="upload-bar" style={{width:uploadPct+'%'}}/></div></div>)}
-          </div>
-          <div className="fg"><label>Jenis Kelamin</label><select value={editF.gender||'M'} onChange={e=>setEditF(f=>({...f,gender:e.target.value}))}><option value="M">Laki-laki</option><option value="F">Perempuan</option><option value="?">Unknown (belum diketahui)</option></select></div>
-          <div className="fg"><label>Status</label><select value={editF.status||'Hidup'} onChange={e=>setEditF(f=>({...f,status:e.target.value}))}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
-          <div className="fg"><label>Catatan</label><textarea value={editF.notes||''} onChange={e=>setEditF(f=>({...f,notes:e.target.value}))}/></div>
-          <div className="fg"><label>Catatan Orang Tua <span style={{fontWeight:400,color:'#b0a898'}}>(keterangan asuh/kandung)</span></label><textarea value={editF.bioNote||''} onChange={e=>setEditF(f=>({...f,bioNote:e.target.value}))}/></div>
+          <div className="fg"><label>Nama Lengkap</label><input value={editF.fullName||''} onChange={e=>setEditF({...editF,fullName:e.target.value})}/></div>
+          <div className="fg"><label>Nama Panggilan</label><input value={editF.nickname||''} onChange={e=>setEditF({...editF,nickname:e.target.value})}/></div>
+          <div className="fg"><label>Tempat Lahir</label><input value={editF.birthPlace||''} placeholder="contoh: Blitar" onChange={e=>setEditF({...editF,birthPlace:e.target.value})}/></div>
+          <div className="fg"><label>Tanggal Lahir</label><input type="date" value={editF.birthDate||''} onChange={e=>setEditF({...editF,birthDate:e.target.value})}/></div>
+          <div className="fg"><label>Tanggal Wafat</label><input type="date" value={editF.deathDate||''} onChange={e=>setEditF({...editF,deathDate:e.target.value})}/></div>
+          <div className="fg"><label>Domisili</label><input value={editF.domicile||''} placeholder="contoh: Malang, Jawa Timur" onChange={e=>setEditF({...editF,domicile:e.target.value})}/></div>
+          <div className="fg"><label>Status</label><select value={editF.status||'Hidup'} onChange={e=>setEditF({...editF,status:e.target.value})}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
+          <div className="fg"><label>Catatan</label><textarea value={editF.notes||''} onChange={e=>setEditF({...editF,notes:e.target.value})}/></div>
+          <div className="fg"><label>Catatan Orang Tua <span style={{fontWeight:400,color:'#b0a898'}}>(keterangan asuh/kandung)</span></label><textarea value={editF.bioNote||''} onChange={e=>setEditF({...editF,bioNote:e.target.value})}/></div>
           <div className="frow"><button className="btn primary" onClick={saveEdit}>Simpan</button></div>
         </div>
       </>}
