@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.2
+   SILSILAH-MASTER-V1.3
    CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -597,7 +597,7 @@ function App(){
 
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
 
-  /* ── 3. DATA HELPERS (V1.2 FIX: BULETPROOF REDUCE INSTEAD OF FLATMAP) ── */
+  /* ── 3. DATA HELPERS (V1.2 FIX: REDUCE) ── */
   const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
   const selP=people.find(p=>p.id===sel)||null;
   
@@ -694,7 +694,6 @@ function App(){
   function toggleEdgeActive(){setRels(prev=>prev.map(r=>r.id===edgeSel.rid?{...r,isActive:!r.isActive}:r));setEdgeSel(null);}
   function deleteEdge(){setRels(prev=>prev.filter(r=>r.id!==edgeSel.rid));setEdgeSel(null);}
   
-  // V1.2 FIX: Helper function to remove relations specifically for PChip
   function removeRel(rid){ setRels(prev=>prev.filter(r=>r.id!==rid)); }
 
   /* ── 5. ADD & RELATION ── */
@@ -763,7 +762,7 @@ function App(){
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT (ANTI-OVERLAP & DARAH-KIRI) ── */
+  /* ── 6. DYNAMIC AUTO-LAYOUT ── */
   function computeAutoLayout(){
     const GAP_X=40, GAP_Y=160;
     const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
@@ -799,15 +798,12 @@ function App(){
         let ux = selfCX - totalUnit/2;
         
         if (spouses.length === 0) {
-          // Jomblo / Sendiri
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
         } else if (spouses.length === 1) {
-          // 1 Pasangan: Darah selalu KIRI, Pasangan di KANAN
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
           ux += CW + GAP_X;
           newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
         } else {
-          // Poligami (>1): Istri-1 di Kiri, Suami/Darah di Tengah, Istri-2+ di Kanan
           const s1 = spouses.filter(s=>s.spouseOrder===1);
           const s2 = spouses.filter(s=>s.spouseOrder>1);
           s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
@@ -831,7 +827,6 @@ function App(){
         cx+=w+GAP_X;
       });
       
-      // Center orang tua agar pas di tengah semua anak (menghindari overlap)
       const selfCX = children.length === 1 ? childCenters[0] : (childCenters[0] + childCenters[childCenters.length-1]) / 2;
       placeUnit(selfCX);
     }
@@ -842,7 +837,7 @@ function App(){
   }
 
   /* ── 7. UI RENDERERS ── */
-  // V1.2 FIX: Variables declared before rendering to prevent ReferenceError
+  // VARIABEL AKTIF UNTUK PROFIL SIDEBAR
   const activeParents = sel ? getActiveParents(sel) : [];
   const partners = sel ? getPartners(sel) : [];
   const siblings = sel ? getSiblings(sel) : [];
@@ -852,7 +847,6 @@ function App(){
   const totalWafat = people.filter(p=>p.status==='Wafat').length;
   const totalPasangan = rels.filter(r=>r.type==='married').length;
 
-  // BANI NAME DINAMIS HANYA DI TOP BAR
   const baniTitle=useMemo(()=>{
     if(!people.length) return 'Bani Kasirin';
     if(!sel) return 'Bani Kasirin';
@@ -979,13 +973,12 @@ function App(){
       )}
     </div>
 
-    {/* SIDEBAR DENGAN PROFIL & SAUDARA */}
+    {/* SIDEBAR PROFIL */}
     <div className={`sidebar ${sel?'open':''}`}>
       {selP&&sbMode==='view'&&<>
         <div className="sb-head">
           <div style={{flex:1}}>
             <h2 style={{marginBottom:0}}>Profil</h2>
-            {isAdmin&&selP.bani&&<div style={{fontSize:10,color:'#4a7a9b',fontWeight:700,letterSpacing:'.04em',marginTop:2}}>Bani {selP.bani}</div>}
           </div>
           {isAdmin&&<>
             <button className="btn" style={{fontSize:11,padding:'4px 10px'}} onClick={()=>{setEditF({...selP});setSbMode('edit');}}>Edit</button>
@@ -998,7 +991,17 @@ function App(){
             <div className="profile-avatar" style={{background:MB(selP.gender)}}>
               {selP.photo?<img src={selP.photo} alt=""/>:<span style={{color:MC(selP.gender)}}>{ini(selP.fullName)}</span>}
             </div>
-            <div className="profile-nick" style={{fontSize:16}}>{nn(selP)}</div>
+            
+            {/* V1.3 PATCH: ID REGISTRY DINAMIS DI SEBELAH NICKNAME KHUSUS ADMIN */}
+            <div className="profile-nick" style={{fontSize:16, display:'flex', alignItems:'center', justifyContent:'center', gap:'6px'}}>
+              {nn(selP)}
+              {isAdmin && selP.displayId && (
+                <span style={{fontSize:9, fontFamily:'monospace', color:'#4a7a9b', background:'#e8f2fa', padding:'2px 6px', borderRadius:'6px', letterSpacing:'0.05em', fontWeight:700}}>
+                  {selP.displayId}
+                </span>
+              )}
+            </div>
+            
             <div className="profile-fullname" style={{fontSize:11}}>{selP.fullName}</div>
             <div className="profile-gender" style={{background:MB(selP.gender),color:MC(selP.gender)}}>
               {selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Unknown'}
@@ -1028,7 +1031,6 @@ function App(){
               })}</div>:<div className="info-empty" style={{marginTop:4}}>Belum ada data.</div>}
             </span></div>
 
-            {/* SEKSI SAUDARA */}
             <div className="info-row" style={{marginTop:8}}><span className="info-label">Saudara</span><span className="info-val">
               {siblings.length>0?<div className="chips">{[...new Set(siblings)].map(id=><PChip key={id} id={id}/>)}</div>:<div className="info-empty" style={{marginTop:4}}>Tidak ada / belum terdata.</div>}
             </span></div>
@@ -1039,7 +1041,6 @@ function App(){
           </div>
           
           {selP.notes&&<div className="sec"><div className="sec-title">Catatan</div><div className="info-val" style={{fontSize:11.5,lineHeight:1.6,color:'#4a4038'}}>{selP.notes}</div></div>}
-          {isAdmin&&<div style={{marginTop:16}}><button className="btn" style={{width:'100%'}} onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Tambah Relasi</button></div>}
         </div>
       </>}
 
@@ -1165,8 +1166,8 @@ function App(){
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
       <div className="stat-sep"></div>
       <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div className="stat-sep"></div>
-      <div><span className="stat-val">{totalWafat}</span> Wafat</div>
+      <div className="stat-sep hide-mob"></div>
+      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
     </div>
 
     <div className={`ctrl ${sel?'sb-open':''}`}>
