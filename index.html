@@ -170,17 +170,18 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 
 @media(max-width:520px){ .legend.sb-open,.ctrl.sb-open,.statpill.sb-open{opacity:0;visibility:hidden;pointer-events:none;} }
 
-/* REVISI BUG OVERLAP MOBILE: Stat Pill Memanjang & Mencegah Tumpang Tindih */
 @media(max-width:768px) and (orientation: portrait){ 
-  .statpill { bottom: 12px; width: calc(100% - 24px); justify-content: space-evenly; padding: 7px 4px; font-size: 9.5px; gap: 2px; border-radius: 12px;}
+  .statpill { bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); justify-content: space-evenly; padding: 7px 4px; font-size: 9.5px; gap: 2px; border-radius: 12px; }
   .stat-val { font-size: 11px; margin-right: 2px; }
-  .stat-sep { display: none; } /* Hide dots on mobile to save space */
+  .stat-sep { display: none; } 
   
   .legend { bottom: 58px; left: 12px; padding: 8px 10px; }
   .legend .li { font-size: 9.5px; margin-bottom: 4px; }
+  
   .ctrl { bottom: 58px; right: 12px; gap: 4px; }
   .cbtn { width: 34px; height: 34px; font-size: 14px; }
 }
+
 @media(max-width:768px) and (orientation: landscape){
   .statpill { bottom: 12px; padding: 6px 14px; font-size: 10.5px; gap: 10px; }
   .legend { bottom: 12px; left: 12px; padding: 8px 12px; }
@@ -214,6 +215,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
 .reg-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
 .reg-table td{padding:8px 0;border-bottom:1px solid #f4f2ef;font-size:12px;color:#2c2825}
+.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
+.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
 </style>
 </head>
 <body>
@@ -229,9 +232,7 @@ const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 const nn=p=>p.nickname||p.fullName.split(' ')[0];
 const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; 
 
-// KAMUS NAMA BANI (Untuk merubah Prefix jadi Nama Lengkap di UI)
 const BANI_NAMES = { 'KRM': 'Karmilah', 'SAD': 'Said', 'PAN': 'Panidjan', 'SUR': 'Surahman', 'KSR': 'Kasirin' };
-const getBaniName = (prefix) => BANI_NAMES[prefix] || prefix;
 
 async function checkPin(val){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
@@ -296,7 +297,7 @@ const SP=[
   {id:'s4a',  fullName:'Cucu Said 1',              nickname:'Cucu Said 1',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-004'},
   {id:'s4b',  fullName:'Cucu Said 2',              nickname:'Cucu Said 2',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-005'},
   {id:'s4c',  fullName:'Cucu Said 3',              nickname:'Cucu Said 3',    gender:'?',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'SAD-006'},
-  {id:'n4a',  fullName:'Ishita Hirya Mahesani',    nickname:'Hirya',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-019'},
+  {id:'n4a',  fullName:'Ishita Hirya Mahesani',    nickname:'Hirya',          gender:'F',status:'Hidup', birthPlace:'',birthDate:'',deathDate:'',domicile:'',photo:'',notes:'',bioNote:'',baniId:'PAN-019'}
 ];
 
 const SR=[
@@ -370,7 +371,7 @@ const SPOS={
   n3e: {x:1700, y:840}, n3f: {x:1850, y:840}, n3g: {x:2000, y:840},
   n3h: {x:2275, y:840}, n3i: {x:2575, y:840}, n3j: {x:2875, y:840},
   s4a: {x:450, y:1120}, s4b: {x:600, y:1120}, s4c: {x:750, y:1120},
-  n4a: {x:1275, y:1120},
+  n4a: {x:1275, y:1120}
 };
 
 function makePrefix(name){
@@ -611,7 +612,6 @@ function App(){
     }));
   }
 
-  /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
@@ -636,7 +636,7 @@ function App(){
         if (spouseParent) {
           const m = spouseParent.baniId.match(/-W(\d+)$/);
           if (m) spouseOffset = parseInt(m[1]);
-          else spouseOffset = 1; // Default -X offset
+          else spouseOffset = 1; 
         }
         
         const dropDepth = 25 + (spouseOffset * 15); 
@@ -648,8 +648,7 @@ function App(){
     });
     return lines;
   }
-  const lines = buildOrthogonalLines();
-
+  
   const vpTop = 50; 
   function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
   function vpMove(e){
@@ -671,7 +670,6 @@ function App(){
     return()=>el.removeEventListener('wheel',onWheel);
   },[]);
 
-  // ── TOUCH PAN / PINCH-ZOOM ──
   const lastTouch=useRef(null); const lastPinch=useRef(null); const touchStartPos=useRef(null); const TAP_SLOP=8; 
   function onTouchStart(e){
     const tag=e.target.tagName;
@@ -741,7 +739,9 @@ function App(){
   function deleteEdge(){setRels(prev=>prev.filter(r=>r.id!==edgeSel.rid));setEdgeSel(null);}
 
   async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
-  async function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
+  
+  function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
+  
   async function handlePhotoUpload(e, target){
     const file=e.target.files?.[0]; if(!file)return; setUploadTarget(target);
     const personId = target==='edit'?(editF.id||'new'):'new_'+Date.now();
@@ -815,9 +815,6 @@ function App(){
     setVt({s:0.55,x:vw/2-cx*0.55,y:vh/2-cy*0.55+60}); setSel(null);setSbMode('view');
   }
 
-  /* ══════════════════════════════════════════════════════
-     AUTO LAYOUT (BUG FIX: OVERLAP & DRIFT)
-  ══════════════════════════════════════════════════════ */
   function computeAutoLayout(){
     const CARD_W=110, GAP_X=40, GAP_Y=160, PAD_BANI=80;
     const START_Y=0;
@@ -876,12 +873,10 @@ function App(){
         if(spouses.length===0){
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
         } else if(spouses.length===1){
-          // 1 Pasangan: DARAH KIRI, PASANGAN KANAN
           newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
           ux+=CARD_W+GAP_X;
           newPos[spouses[0]]={x:Math.round(ux), y:Math.round(yPos)};
         } else {
-          // Poligami (>1): Istri 1 Kiri, Darah (pid) Tengah, Istri 2+ Kanan
           const before=spouses.slice(0,Math.floor(spouses.length/2));
           const after=spouses.slice(Math.floor(spouses.length/2));
           before.forEach(sp=>{ if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X; });
@@ -896,14 +891,17 @@ function App(){
       const totalChildW=widths.reduce((s,w)=>s+w,0)+(children.length-1)*GAP_X;
       let cx=centerX-totalChildW/2;
       
+      const childCenters = [];
       children.forEach((cid,i)=>{
         const w=widths[i];
-        layoutSubtree(cid, cx+w/2, gen+1, new Set([...visited]));
+        const childCenter = cx + w/2;
+        childCenters.push(childCenter);
+        layoutSubtree(cid, childCenter, gen+1, new Set([...visited]));
         cx+=w+GAP_X;
       });
 
-      // BUG FIX: Parent selalu diposisikan tepat di centerX alokasinya agar tidak bergeser tumpang tindih
-      placeUnit(centerX);
+      const selfCX = (childCenters[0] + childCenters[childCenters.length-1]) / 2;
+      placeUnit(selfCX);
     }
 
     const baniHeads=people.filter(p=>genMap[p.id]===1&&
@@ -959,22 +957,51 @@ function App(){
     setModal(null);
   }
 
-  /* ── BANI LABEL ── */
-  const baniLabel=useMemo(()=>{
-    if(!selP || !selP.baniId) return 'Bani Kasirin';
-    const m = selP.baniId.match(/^([A-Z]+)-/);
-    if(m && BANI_NAMES[m[1]]) return `Bani ${BANI_NAMES[m[1]]}`;
-    return 'Bani Kasirin';
-  },[selP]);
+  function getBaniHead(pid, visited=new Set()){
+    if(visited.has(pid)) return null; visited.add(pid);
+    const p=people.find(x=>x.id===pid); if(!p) return null;
+    if(p.baniId==='KSR-000') return p;
+    const parents=getActiveParents(pid);
+    if(!parents.length) return null;
+    const parentPeople=parents.map(id=>people.find(x=>x.id===id)).filter(Boolean);
+    if(parentPeople.some(par=>par.baniId==='KSR-000'||par.baniId?.startsWith('KSR'))) return p; 
+    for(const parentId of parents){
+      const head=getBaniHead(parentId, visited);
+      if(head) return head;
+    }
+    return null;
+  }
+
+  // BANI NAME DINAMIS HANYA DI TOP BAR
+  const baniTitle=useMemo(()=>{
+    if(!people.length) return 'Bani Kasirin';
+    if(!sel) return 'Bani Kasirin';
+    const selPerson=people.find(p=>p.id===sel); if(!selPerson) return 'Bani Kasirin';
+    if(selPerson.baniId==='KSR-000'||selPerson.baniId==='KSR-W1'||selPerson.baniId?.match(/^KSR-W\d+$/)) return 'Bani Kasirin';
+    let head=getBaniHead(sel);
+    if(!head){
+      const partnerIds=getPartners(sel);
+      for(const pid of partnerIds){ head=getBaniHead(pid); if(head) break; }
+    }
+    if(!head) return 'Bani Kasirin';
+    if(head.baniId==='KSR-000') return 'Bani Kasirin';
+    
+    // Menerjemahkan KRM menjadi Karmilah khusus untuk variabel baniTitle
+    const prefixMatch = head.baniId?.match(/^([A-Z]+)-/);
+    if (prefixMatch && BANI_NAMES[prefixMatch[1]]) {
+        return `Bani ${BANI_NAMES[prefixMatch[1]]}`;
+    }
+    return `Bani ${nn(head)}`;
+  },[sel,people,rels]);
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
   function focusPerson(id){ setSel(id);setSbMode('view'); centerPerson(id); setSearchQ('');setShowSR(false);setShowSearch(false); }
 
-  const lines=buildOrthogonalLines();
-  const activeParents=sel?getActiveParents(sel):[];
-  const partners=sel?getPartners(sel):[];
-  const siblings=sel?getSiblings(sel):[];
-  const childrenDisplay=sel?getChildrenForDisplay(sel):[];
+  const lines = buildOrthogonalLines();
+  const activeParents = sel ? getActiveParents(sel) : [];
+  const partners = sel ? getPartners(sel) : [];
+  const siblings = sel ? getSiblings(sel) : [];
+  const childrenDisplay = sel ? getChildrenForDisplay(sel) : [];
 
   function PChip({id,tag,onRm}){
     const pp=people.find(x=>x.id===id);if(!pp)return null;
@@ -988,7 +1015,6 @@ function App(){
     );
   }
 
-  /* ── STATS CALCULATION ── */
   const totalOrang = people.length;
   const totalWafat = people.filter(p=>p.status==='Wafat').length;
   const totalPasangan = rels.filter(r=>r.type==='married').length;
@@ -1001,7 +1027,7 @@ function App(){
 
     <div className="topbar">
       <div style={{flexShrink:0}}>
-        <div className="brand-name">{baniLabel}</div>
+        <div className="brand-name">{baniTitle}</div>
         <div className="brand-sub">Silsilah Keluarga</div>
       </div>
       <div className="sep"/>
@@ -1015,6 +1041,7 @@ function App(){
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
       {isAdmin&&<button className="btn" style={{fontSize:11}} onClick={()=>setModal('registry')}>🪪 ID</button>}
       <button className={`btn${isAdmin?' adm':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin ✓':'Login Admin'}</button>
+      <button className="btn btn-home-top" onClick={()=>{fullReset();}}>Home</button>
     </div>
 
     <div className={`search-expand${showSearch?' open':''}`}>
@@ -1190,11 +1217,23 @@ function App(){
         <h3>Tambah Relasi</h3><p className="modal-sub">Untuk: <strong>{selP?.fullName}</strong></p>
         <div className="fg"><label>Jenis Relasi</label><select value={relF.type} onChange={e=>setRelF(f=>({...f,type:e.target.value}))}><option value="married">Pasangan / Menikah</option><option value="parent-of">Orang tua dari (Pilih Anak)</option><option value="child-of">Anak dari (Pilih Ortu)</option></select></div>
         {relF.type!=='married'&&<div className="fg"><label>Status Pengasuh</label><select value={relF.isActive?'1':'0'} onChange={e=>setRelF(f=>({...f,isActive:e.target.value==='1'}))}><option value="1">Aktif (pengasuh saat ini)</option><option value="0">Tidak aktif (biologis / historis)</option></select></div>}
-        <div className="fg"><label>Cari Orang</label><input autoFocus placeholder="Ketik nama..." value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/></div>
-        <div className="ppicker-list">{people.filter(p=>p.id!==sel && p.fullName.toLowerCase().includes(relSearchQ.toLowerCase())).slice(0,5).map(p=>(
-          <div key={p.id} className={`ppicker-item ${relF.pid===p.id?'selected':''}`} onClick={()=>setRelF(f=>({...f,pid:p.id}))}><div className="pi-dot" style={{background:MC(p.gender)}}/>{nn(p)} - <span style={{fontSize:10,color:'#8a8278'}}>{p.displayId}</span></div>
-        ))}</div>
-        <div className="frow"><button className="btn primary" onClick={prepareAddRel} disabled={!relF.pid}>Konfirmasi</button></div>
+        <div className="fg">
+          <label>Pilih Orang {relF.pid&&<span style={{color:'#4a7a9b',fontWeight:700}}>✓ {nn(people.find(p=>p.id===relF.pid)||{fullName:''})}</span>}</label>
+          <div className="ppicker">
+            <div className="ppicker-search"><span className="pps-ico">🔍</span><input autoFocus placeholder="Ketik nama untuk cari…" value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/>{relSearchQ&&<span style={{cursor:'pointer',color:'#b0a898',fontSize:13}} onClick={()=>setRelSearchQ('')}>✕</span>}</div>
+            <div className="ppicker-list">
+              {(()=>{
+                const q=relSearchQ.trim().toLowerCase();
+                const filtered=people.filter(p=>p.id!==sel).filter(p=>!q||p.fullName.toLowerCase().includes(q)||(p.nickname&&p.nickname.toLowerCase().includes(q))).sort((a,b)=>{if(a.id===relF.pid)return -1;if(b.id===relF.pid)return 1;return nn(a).localeCompare(nn(b),'id');});
+                if(!filtered.length)return <div className="ppicker-empty">Tidak ada hasil untuk "{relSearchQ}"</div>;
+                return filtered.map(p=>(
+                  <div key={p.id} className={`ppicker-item${relF.pid===p.id?' selected':''}`} onClick={()=>setRelF(f=>({...f,pid:p.id}))}><div className="pi-dot" style={{background:MC(p.gender)}}/><span className="pi-nick">{nn(p)}</span>{p.fullName!==nn(p)&&<span className="pi-full">{p.fullName}</span>}{p.status!=='Hidup'&&<span style={{marginLeft:'auto',fontSize:9,fontWeight:700,color:p.status==='Wafat'?'#a05030':'#705090'}}>{p.status}</span>}</div>
+                ));
+              })()}
+            </div>
+          </div>
+        </div>
+        <div className="frow"><button className="btn primary" onClick={()=>{prepareAddRel();setRelSearchQ('');}} disabled={!relF.pid}>Tambah</button><button className="btn" onClick={()=>{setModal(null);setRelSearchQ('');}}>Batal</button></div>
       </div>
     </div>}
 
@@ -1214,73 +1253,71 @@ function App(){
 
     {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <h3>Tambah Anggota Baru</h3><p className="modal-sub">ID akan terbuat otomatis saat relasi ditentukan.</p>
-        <div className="fg"><label>Nama Lengkap</label><input value={addF.fullName} autoFocus onChange={e=>setAddF(f=>({...f,fullName:e.target.value}))}/></div>
-        <div className="fg"><label>Panggilan</label><input value={addF.nickname} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
-        <div className="fg"><label>Gender</label><select value={addF.gender} onChange={e=>setAddF(f=>({...f,gender:e.target.value}))}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
-        <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <h3>Tambah Anggota Baru</h3>
+        <div style={{background:'#f0f7ee',border:'1px solid #c8e0c8',borderRadius:8,padding:'7px 11px',fontSize:11,color:'#3a6030',marginBottom:12}}>🪪 ID otomatis terbuat saat relasi ditetapkan</div>
+        <div className="fg"><label>Nama Lengkap *</label><input value={addF.fullName} autoFocus onChange={e=>setAddF(f=>({...f,fullName:e.target.value}))}/></div>
+        <div className="fg"><label>Nama Panggilan</label><input value={addF.nickname} placeholder={addF.fullName.split(' ')[0]||'opsional'} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
+        <div className="fg"><label>Jenis Kelamin</label><select value={addF.gender} onChange={e=>setAddF(f=>({...f,gender:e.target.value}))}><option value="M">Laki-laki</option><option value="F">Perempuan</option><option value="?">Unknown (belum diketahui)</option></select></div>
+        <div className="fg"><label>Status</label><select value={addF.status} onChange={e=>setAddF(f=>({...f,status:e.target.value}))}><option>Hidup</option><option>Wafat</option><option>Cerai</option></select></div>
+        <div className="fg"><label>Tempat Lahir</label><input value={addF.birthPlace} placeholder="contoh: Blitar" onChange={e=>setAddF(f=>({...f,birthPlace:e.target.value}))}/></div>
+        <div className="fg"><label>Tanggal Lahir</label><input type="date" value={addF.birthDate} onChange={e=>setAddF(f=>({...f,birthDate:e.target.value}))}/></div>
+        <div className="fg"><label>Domisili</label><input value={addF.domicile} placeholder="contoh: Malang, Jawa Timur" onChange={e=>setAddF(f=>({...f,domicile:e.target.value}))}/></div>
+        <div className="fg">
+          <label>Foto <span style={{fontWeight:400,color:'#b0a898'}}>(opsional)</span></label>
+          <div className="photo-upload-wrap"><input type="text" value={addF.photo} placeholder="Paste URL atau klik Upload →" onChange={e=>setAddF(f=>({...f,photo:e.target.value}))}/><button className="upload-btn" disabled={uploadTarget==='add'} onClick={()=>{setUploadTarget('add');fileInputRef.current?.click();}}>{uploadTarget==='add'?'Uploading…':'📷 Upload'}</button></div>
+          {uploadTarget==='add'&&uploadPct!==null&&(<div className="upload-progress"><span>{uploadPct}%</span><div className="upload-bar-wrap"><div className="upload-bar" style={{width:uploadPct+'%'}}/></div></div>)}
+        </div>
+        <div className="fg"><label>Catatan</label><textarea value={addF.notes} onChange={e=>setAddF(f=>({...f,notes:e.target.value}))}/></div>
+        <div className="fg"><label>Catatan Orang Tua <span style={{fontWeight:400,color:'#b0a898'}}>(opsional)</span></label><textarea value={addF.bioNote} placeholder="contoh: Orang tua kandung: ..." onChange={e=>setAddF(f=>({...f,bioNote:e.target.value}))}/></div>
+        <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName.trim()}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
     {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
-        <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
-        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <h3>⊞ Rapikan Otomatis</h3>
+        <p className="modal-sub">Semua posisi kartu akan dihitung ulang. Posisi yang diatur manual akan terganti.</p>
+        <div style={{background:'#f0f7ff',border:'1px solid #c0d8f0',borderRadius:8,padding:'8px 12px',fontSize:11,color:'#3060a0',marginBottom:14,lineHeight:1.6}}>ℹ️ Setelah dirapikan, kamu tetap bisa menggeser kartu secara manual.</div>
+        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
     {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}>
-      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><h3>🪪 ID Registry</h3><button className="btn" onClick={()=>setModal(null)}>✕ Tutup</button></div>
+      <div className="modal" style={{maxWidth:420}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'center',marginBottom:14}}><h3 style={{flex:1,marginBottom:0}}>ID Registry</h3><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>{setModal(null);setRegistryFilter(null);}}>✕ Tutup</button></div>
         {(()=>{
-          const groups={}; people.forEach(p=>{const b=p.baniId||'BARU'; const m=b.match(/^([A-Z]+)-/); const prefix=m?m[1]:'BARU'; groups[prefix]=groups[prefix]||[]; groups[prefix].push(p);});
-          const baniPrefixes=Object.keys(groups).filter(k=>k!=='KSR'&&k!=='BARU').sort();
+          const groups={}; people.forEach(p=>{
+            if(!p.baniId){groups['?']=groups['?']||[];groups['?'].push(p);return;}
+            const m=p.baniId.match(/^([A-Z]+)-/); const prefix=m?m[1]:'?'; groups[prefix]=groups[prefix]||[]; groups[prefix].push(p);
+          });
+          const sortedMembers=arr=>arr.sort((a,b)=>{const na=parseInt((a.baniId||'').replace(/\D/g,''))||999; const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999; return na-nb;});
+          const baniPrefixes=Object.keys(groups).filter(k=>k!=='KSR'&&k!=='BARU'&&k!=='?').sort();
+
+          function MemberTable({members, color}){
+            return( <table style={{width:'100%',borderCollapse:'collapse'}}><tbody>
+                  {sortedMembers([...members]).map(p=>( <tr key={p.id} style={{borderBottom:'1px solid #f5f2ee'}}> <td style={{fontFamily:'monospace',fontSize:11,fontWeight:700,color, padding:'5px 10px 5px 0',whiteSpace:'nowrap',width:1}}>{p.baniId||'—'}</td> <td style={{fontSize:12,color:'#2a2018',padding:'5px 0'}}>{nn(p)}</td> </tr> ))}
+                </tbody></table> );
+          }
+
           return <>
-            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:20}}>
-              {baniPrefixes.map(prefix=><button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} className={`btn ${registryFilter===prefix?'primary':''}`}>Bani {getBaniName(prefix)} ({groups[prefix].length})</button>)}
-              {groups['BARU']&&<button className="btn danger" onClick={()=>setRegistryFilter('BARU')}>Baru/Unlinked ({groups['BARU'].length})</button>}
-            </div>
-            {(registryFilter||baniPrefixes[0])&&(()=>{
-              const activeGrp = registryFilter||baniPrefixes[0];
-              const members = groups[activeGrp].sort((a,b)=>{ const na=parseInt((a.baniId||'').replace(/\D/g,''))||999; const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999; return na-nb; });
-              return <table className="reg-table">
-                <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
-                <tbody>{members.map(p=><tr key={p.id}>
-                  <td style={{fontWeight:800,fontFamily:'monospace',color:'#4a7a9b'}}>{p.baniId||'—'}</td>
-                  <td><div style={{fontWeight:700}}>{nn(p)}</div><div style={{fontSize:10,color:'#8a8278'}}>{p.fullName}</div></td>
-                  <td>{p.baniId?.endsWith('-X')||p.baniId?.match(/-W\d+/) ? <span className="tag-spouse">Pasangan</span> : <span className="tag-blood">Keturunan Asli</span>}</td>
-                </tr>)}</tbody>
-              </table>
-            })()}
+            {groups['KSR']&&( <div style={{marginBottom:16}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#6a5020',borderBottom:'2px solid #e8d8a0',paddingBottom:4,marginBottom:6}}>🌳 Leluhur Utama (Kasirin)<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['KSR'].length} orang</span></div><MemberTable members={groups['KSR']} color="#8a6020"/></div> )}
+            {groups['BARU']&&( <div style={{marginBottom:16}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#a05030',borderBottom:'2px solid #f0d8c8',paddingBottom:4,marginBottom:6}}>⏳ Belum ada relasi orang tua<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups['BARU'].length} orang</span></div><MemberTable members={groups['BARU']} color="#a05030"/></div> )}
+            {baniPrefixes.length>0&&(
+              <div style={{marginBottom:registryFilter?12:0}}>
+                <div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase', color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:10}}>Pilih Bani</div>
+                <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                  {baniPrefixes.map(prefix=>( <button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} style={{padding:'5px 12px',borderRadius:20,fontSize:11,fontWeight:700,border:`1.5px solid ${registryFilter===prefix?'#4a7a9b':'#d0cbc2'}`,background:registryFilter===prefix?'#4a7a9b':'#fff',color:registryFilter===prefix?'#fff':'#4a7a9b',cursor:'pointer',fontFamily:'inherit'}}>Bani {prefix}<span style={{fontWeight:400,fontSize:10,marginLeft:4,opacity:.7}}>{groups[prefix]?.length||0}</span></button> ))}
+                </div>
+              </div>
+            )}
+            {registryFilter&&groups[registryFilter]&&( <div style={{marginTop:12}}><div style={{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#4a7a9b',borderBottom:'2px solid #d0e4f0',paddingBottom:4,marginBottom:6}}>Bani {registryFilter}<span style={{fontWeight:400,color:'#b0a898',marginLeft:6}}>{groups[registryFilter].length} orang</span></div><MemberTable members={groups[registryFilter]} color="#4a7a9b"/></div> )}
           </>;
         })()}
       </div>
     </div>}
-
-    {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
-    <div className={`legend ${sel?'sb-open':''}`}>
-      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
-      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
-      <div className="li"><div className="pi-dot" style={{background:'#6ea8d4'}}/> Laki-laki</div>
-      <div className="li"><div className="pi-dot" style={{background:'#d47ea8'}}/> Perempuan</div>
-      <div className="li"><div className="pi-dot" style={{background:'#c8a830'}}/> Unknown</div>
-    </div>
-
-    <div className={`statpill ${sel?'sb-open':''}`}>
-      <div><span className="stat-val">{totalOrang}</span> Individu</div>
-      <div className="stat-sep"></div>
-      <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div className="stat-sep"></div>
-      <div><span className="stat-val">{totalWafat}</span> Wafat</div>
-    </div>
-
-    <div className={`ctrl ${sel?'sb-open':''}`}>
-      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
-      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
-      <button className="cbtn" onClick={fullReset} style={{fontSize:22}}>⌂</button>
-    </div>
   </>;
 }
+
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
