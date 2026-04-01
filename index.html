@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.4
+   SILSILAH-MASTER-V1.5
    CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -110,7 +110,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .info-empty{font-size:10.5px;color:#c0b8ae;font-style:italic}
 .bio-note{font-size:10px;color:#9a9080;font-style:italic;margin-top:5px;padding-top:5px;border-top:1px dashed #ede8e0;}
 
-/* V1.1 FIX: Global pi-dot */
+/* Global pi-dot */
 .pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
@@ -994,24 +994,22 @@ function App(){
             <div className="profile-nick" style={{fontSize:16}}>{nn(selP)}</div>
             <div className="profile-fullname" style={{fontSize:11}}>{selP.fullName}</div>
             
-            {/* V1.4 PATCH: ID REGISTRY DIPINDAH KE SEBELAH INFO GENDER KHUSUS ADMIN */}
             <div className="profile-gender" style={{background:MB(selP.gender),color:MC(selP.gender)}}>
               {selP.gender==='M'?'Laki-laki':selP.gender==='F'?'Perempuan':'Unknown'}
               {selP.status!=='Hidup'&&<span style={{marginLeft:6,opacity:.7}}>· {selP.status}</span>}
-              {isAdmin && selP.displayId && (
-                <span style={{fontSize:9, fontFamily:'monospace', color:'#4a7a9b', background:'#e8f2fa', padding:'1px 5px', borderRadius:'6px', letterSpacing:'0.05em', fontWeight:700, marginLeft:4}}>
-                  {selP.displayId}
-                </span>
-              )}
             </div>
           </div>
           
+          {/* V1.5 PATCH: ID REGISTRY DINAMIS DI DALAM INFO KHUSUS ADMIN */}
           <div className="sec">
             <div className="sec-title">Info</div>
+            {isAdmin && selP.displayId && (
+              <div className="info-row"><span className="info-label">ID Sistem</span><span className="info-val" style={{fontWeight: 700}}>{selP.displayId}</span></div>
+            )}
             {fmtBirth(selP.birthPlace,selP.birthDate)&&<div className="info-row"><span className="info-label">Lahir</span><span className="info-val">{fmtBirth(selP.birthPlace,selP.birthDate)}</span></div>}
             {selP.deathDate&&<div className="info-row"><span className="info-label">Wafat</span><span className="info-val">{fmtDate(selP.deathDate)}</span></div>}
             {selP.domicile&&<div className="info-row"><span className="info-label">Domisili</span><span className="info-val">{selP.domicile}</span></div>}
-            {!fmtBirth(selP.birthPlace,selP.birthDate)&&!selP.deathDate&&!selP.domicile&&<div className="info-empty">Belum ada info detail.</div>}
+            {!fmtBirth(selP.birthPlace,selP.birthDate)&&!selP.deathDate&&!selP.domicile&&!(isAdmin && selP.displayId)&&<div className="info-empty">Belum ada info detail.</div>}
           </div>
 
           <div className="sec"><div className="sec-title">Keluarga</div>
