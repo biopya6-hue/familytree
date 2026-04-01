@@ -30,13 +30,11 @@ const storage = firebase.storage();
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw}
 
-/* TOPBAR */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:50px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(240,237,232,0.96);backdrop-filter:blur(10px);border-bottom:1px solid #dbd6cf;}
 .brand-name{font-size:14px;font-weight:700;letter-spacing:-.03em}
 .brand-sub{font-size:10px;color:#9a9080;margin-top:1px}
 .sep{width:1px;height:20px;background:#dbd6cf;flex-shrink:0}
 
-/* SEARCH */
 .search-wrap{flex:1;max-width:220px;position:relative;}
 .search-wrap input{width:100%;padding:6px 11px;border-radius:20px;border:1px solid #d0cbc2;background:#fff;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s;}
 .search-wrap input:focus{border-color:#8a7a6a}
@@ -48,7 +46,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .search-expand .se-close{width:32px;height:32px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#7a7060;flex-shrink:0;}
 @media(max-width:600px){ .search-wrap{display:none;} .search-icon-btn{display:flex;} }
 
-/* BUTTONS */
 .spacer{flex:1}
 .btn{padding:6px 13px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid #cdc8c0;background:#fff;cursor:pointer;color:#3a3028;transition:all .12s;white-space:nowrap;font-family:inherit;flex-shrink:0;}
 .btn:hover{background:#e8e3dc;border-color:#b0a898}
@@ -63,14 +60,14 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .btn:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:420px){ .btn-home-top{display:none;} }
 
-/* VIEWPORT & CANVAS */
 #vp{position:fixed;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;}
 #vp.pan{cursor:grabbing}
 #world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
-/* NODE CARDS */
+/* NODE */
 .node{position:absolute;z-index:10;transition:opacity .2s}
+.node.hidden{opacity:0;pointer-events:none}
 .card{width:110px;background:#fff;border:1.5px solid #dbd6cf;border-radius:14px;text-align:center;padding:10px 8px 8px;cursor:pointer;transition:box-shadow .18s,border-color .18s,transform .12s;position:relative;}
 .card:hover{border-color:#9a8e7e;box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-1px)}
 .card.sel{border-color:#6a5a48;box-shadow:0 0 0 3px rgba(106,90,72,.15),0 6px 20px rgba(0,0,0,.1)}
@@ -121,7 +118,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .chip-rm{font-size:10px;color:#c07070;margin-left:3px;cursor:pointer;}
 .chip-rm:hover{color:#903030}
 
-/* MODALS & FORMS */
 .fg{margin-bottom:11px}
 .fg label{display:block;font-size:10.5px;font-weight:700;color:#7a7060;margin-bottom:4px;}
 .fg input,.fg select,.fg textarea{width:100%;padding:7px 11px;border-radius:10px;border:1px solid #d0cbc2;font-size:12px;background:#fff;outline:none;color:#1a1a1a;font-family:inherit;transition:border-color .15s;}
@@ -144,12 +140,13 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#d0cbc2;border-radius:4px}
 
-/* LOADING & SAVE STATUS */
 .loading-screen{position:fixed;inset:0;z-index:1000;background:#f0ede8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
 .loading-spinner{width:36px;height:36px;border:3px solid #dbd6cf;border-top-color:#7a6a58;border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-title{font-size:16px;font-weight:700;color:#2a2018;letter-spacing:-.02em}
 .loading-sub{font-size:12px;color:#9a9080}
+.loading-error{background:#fdf0f0;border:1px solid #d0a0a0;border-radius:12px;padding:14px 18px;max-width:320px;text-align:center;}
+.loading-error p{font-size:12px;color:#a03030;line-height:1.6;margin-bottom:10px;}
 
 .save-status{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:190;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:20px;padding:5px 14px;font-size:10.5px;box-shadow:0 2px 8px rgba(0,0,0,.07);transition:opacity .3s,visibility .3s;white-space:nowrap;}
 .save-status.hidden{opacity:0;visibility:hidden}
@@ -159,43 +156,37 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .save-dot.error{background:#d06060}
 @keyframes savepulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── UI MELAYANG & AUTO-SCALE MOBILE (REVISI) ── */
 .legend{position:fixed;bottom:16px;left:16px;z-index:180;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:12px;padding:9px 13px;box-shadow:0 2px 8px rgba(0,0,0,.07);transition:opacity .2s,visibility .2s;}
 .li{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#7a7060;margin-bottom:4px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
 .statpill{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.95);border:1px solid #d0cbc2;border-radius:20px;padding:6px 18px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 2px 8px rgba(0,0,0,.07);white-space:nowrap;transition:opacity .2s,visibility .2s;}
 .stat-val{color:#2a2218;font-weight:800;font-size:13px;margin-right:3px}
+.stat-sep{width:4px;height:4px;border-radius:50%;background:#dfdbd5;}
 
 .ctrl{position:fixed;bottom:16px;right:16px;z-index:180;display:flex;flex-direction:column;gap:5px;transition:opacity .2s,visibility .2s;}
 .cbtn{width:36px;height:36px;border-radius:12px;background:#fff;border:1px solid #d0cbc2;font-size:15px;cursor:pointer;color:#3a3028;display:flex;align-items:center;justify-content:center;transition:background .12s;box-shadow:0 2px 8px rgba(0,0,0,.07);}
 .cbtn:hover{background:#f0ebe4}
 
-/* Auto-Hide when Sidebar Open on Mobile */
-@media(max-width:520px){
-  .legend.sb-open,.ctrl.sb-open,.statpill.sb-open{opacity:0;visibility:hidden;pointer-events:none;}
-}
+@media(max-width:520px){ .legend.sb-open,.ctrl.sb-open,.statpill.sb-open{opacity:0;visibility:hidden;pointer-events:none;} }
 
-/* Resolusi Tumpah Tindih Layar HP Portrait */
+/* REVISI BUG OVERLAP MOBILE: Stat Pill Memanjang & Mencegah Tumpang Tindih */
 @media(max-width:768px) and (orientation: portrait){ 
-  /* Statpill memanjang horizontal, gap dan font dikecilkan agar 'Wafat' muat */
-  .statpill { bottom: 12px; width: calc(100% - 24px); justify-content: center; padding: 8px 10px; gap: 6px; font-size: 9.5px; border-radius: 12px;}
-  .stat-val { font-size: 11px; margin-right: 2px;}
+  .statpill { bottom: 12px; width: calc(100% - 24px); justify-content: space-evenly; padding: 7px 4px; font-size: 9.5px; gap: 2px; border-radius: 12px;}
+  .stat-val { font-size: 11px; margin-right: 2px; }
+  .stat-sep { display: none; } /* Hide dots on mobile to save space */
   
-  .legend { bottom: 54px; left: 12px; padding: 8px 10px; }
-  .legend .li { font-size: 9px; margin-bottom: 4px; }
-  
-  .ctrl { bottom: 54px; right: 12px; gap: 4px; }
+  .legend { bottom: 58px; left: 12px; padding: 8px 10px; }
+  .legend .li { font-size: 9.5px; margin-bottom: 4px; }
+  .ctrl { bottom: 58px; right: 12px; gap: 4px; }
   .cbtn { width: 34px; height: 34px; font-size: 14px; }
 }
-
 @media(max-width:768px) and (orientation: landscape){
   .statpill { bottom: 12px; padding: 6px 14px; font-size: 10.5px; gap: 10px; }
   .legend { bottom: 12px; left: 12px; padding: 8px 12px; }
   .ctrl { bottom: 12px; right: 12px; }
 }
 
-/* PHOTO UPLOAD */
 .photo-upload-wrap{display:flex;gap:8px;align-items:flex-start;}
 .photo-upload-wrap input[type=text]{flex:1}
 .upload-btn{flex-shrink:0;padding:7px 11px;border-radius:10px;border:1px solid #d0cbc2;background:#f8f5f0;font-size:11px;font-weight:600;cursor:pointer;color:#5a4e3c;transition:background .12s;white-space:nowrap;font-family:inherit;}
@@ -205,7 +196,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .upload-bar-wrap{flex:1;height:4px;background:#e8e3dc;border-radius:4px;overflow:hidden;}
 .upload-bar{height:100%;background:#6ab87a;border-radius:4px;transition:width .2s;}
 
-/* PERSON PICKER */
 .ppicker{border:1px solid #d0cbc2;border-radius:10px;overflow:hidden;background:#fff;}
 .ppicker-search{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid #ede8e0;}
 .ppicker-search input{flex:1;border:none;outline:none;font-size:12px;font-family:inherit;color:#1a1a1a;background:transparent;}
@@ -221,12 +211,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .ppicker-item .pi-gen{font-size:9.5px;color:#b0a898;margin-left:auto;font-weight:500;}
 .ppicker-empty{padding:14px;font-size:11.5px;color:#b0a898;text-align:center;font-style:italic;}
 
-/* REGISTRY TABLE */
 .reg-table{width:100%;border-collapse:collapse;margin-top:8px}
 .reg-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a8278;padding:8px 0;border-bottom:2px solid #e8e5e0}
 .reg-table td{padding:8px 0;border-bottom:1px solid #f4f2ef;font-size:12px;color:#2c2825}
-.tag-blood{background:#edf4f9;color:#3a6582;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
-.tag-spouse{background:#fcf8ec;color:#8a6a3a;padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700}
 </style>
 </head>
 <body>
@@ -241,6 +228,10 @@ const MB=g=>g==='M'?'#e8f2fa':g==='F'?'#fae8f2':'#fdf8e8';
 const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 const nn=p=>p.nickname||p.fullName.split(' ')[0];
 const PIN_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; 
+
+// KAMUS NAMA BANI (Untuk merubah Prefix jadi Nama Lengkap di UI)
+const BANI_NAMES = { 'KRM': 'Karmilah', 'SAD': 'Said', 'PAN': 'Panidjan', 'SUR': 'Surahman', 'KSR': 'Kasirin' };
+const getBaniName = (prefix) => BANI_NAMES[prefix] || prefix;
 
 async function checkPin(val){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
@@ -581,16 +572,9 @@ function App(){
   const selP=people.find(p=>p.id===sel)||null;
   const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
 
-  function getActiveParents(pid){
-    const rs=rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
-    return [...new Set(rs.flatMap(r=>r.pids.slice(0,-1)))];
-  }
-  function getBioParents(pid){
-    const rs=rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid);
-    return [...new Set(rs.flatMap(r=>r.pids.slice(0,-1)))];
-  }
+  function getActiveParents(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
+  function getBioParents(pid){ return rels.filter(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid).flatMap(r=>r.pids.slice(0,-1)); }
   function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
-  function getBioChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
   function getActiveChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
   function getPartners(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).flatMap(r=>r.pids.filter(x=>x!==pid)); }
   function getActivePartner(pid){
@@ -603,15 +587,14 @@ function App(){
     return marriages[0]?.pids.find(x=>x!==pid)||null;
   }
   
-  // ── FIX BUG 2: LOGIKA SAUDARA ──
   function getSiblings(pid){
     const sibs=new Set();
     const myParents=new Set([...getActiveParents(pid),...getBioParents(pid)]);
-    if(myParents.size===0) return []; 
+    if(myParents.size===0) return [];
     rels.forEach(r=>{
       if(r.type==='parent-child'){
         const parents=r.pids.slice(0,-1), child=r.pids[r.pids.length-1];
-        if(child===pid) return; 
+        if(child===pid) return;
         if(parents.some(p=>myParents.has(p))) sibs.add(child);
       }
     });
@@ -628,44 +611,44 @@ function App(){
     }));
   }
 
-  /* ── KONEKTOR ORTHOGONAL / SIKU ── */
-  function buildLines(){
-    const lines=[],drawn=new Set();
+  /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
+  function buildOrthogonalLines(){
+    const lines=[], drawn=new Set();
     rels.forEach(r=>{
       if(r.type==='married'){
-        const[a,b]=r.pids; const pa=pos[a],pb=pos[b];if(!pa||!pb)return;
-        if(!visibleIds.has(a)||!visibleIds.has(b))return;
-        const key=[a,b].sort().join('-'); if(drawn.has(key))return;drawn.add(key);
-        const x1=CX(pa),y1=CY(pa),x2=CX(pb),y2=CY(pb);
-        // Garis Lurus Horizontal untuk Pasangan
-        lines.push({rid:r.id,d:`M${x1},${y1} L${x2},${y2}`,stroke:'#c8a870',dash:'6 4',w:2.5,mx:(x1+x2)/2,my:(y1+y2)/2,label:'Pasangan',type:'married',active:true});
+        const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
+        if(!visibleIds.has(a)||!visibleIds.has(b)) return;
+        const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
+        const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
+        lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married', active:true});
       }
-      if(r.type==='parent-child'&&r.isActive){
-        const pids=r.pids.slice(0,-1),cid=r.pids[r.pids.length-1];
-        const pc=pos[cid];if(!pc)return;
-        if(!visibleIds.has(cid))return;
-        const valid=pids.filter(x=>pos[x]&&visibleIds.has(x));if(!valid.length)return;
+      if(r.type==='parent-child' && r.isActive){
+        const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
+        const pc=pos[cid]; if(!pc) return;
+        if(!visibleIds.has(cid)) return;
+        const valid = pids.filter(x=>pos[x]&&visibleIds.has(x)); if(!valid.length) return;
         
-        const sx=valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
-        const sy=valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
+        const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
+        const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
         
-        // BUG FIX: Elevasi kedalaman garis untuk poligami
         let spouseOffset = 0;
-        // Cari urutan istri dari salah satu parent
         const spouseParent = pids.map(id=>people.find(p=>p.id===id)).find(p=>p && p.baniId && p.baniId.endsWith('-X'));
-        if (spouseParent && spouseParent.baniId) {
-            const m = spouseParent.baniId.match(/-W(\d+)$/);
-            if (m) spouseOffset = parseInt(m[1]);
+        if (spouseParent) {
+          const m = spouseParent.baniId.match(/-W(\d+)$/);
+          if (m) spouseOffset = parseInt(m[1]);
+          else spouseOffset = 1; // Default -X offset
         }
+        
         const dropDepth = 25 + (spouseOffset * 15); 
         const midY = sy + (CH/2) + dropDepth; 
         const ex = CX(pc), ey = CY(pc) - (CH/2);
-
-        lines.push({rid:r.id,d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`,stroke:'#90a8b8',dash:undefined,w:2,mx:ex,my:midY,label:'Orang tua → Anak',type:'parent-child',active:r.isActive});
+        
+        lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child', active:r.isActive});
       }
     });
     return lines;
   }
+  const lines = buildOrthogonalLines();
 
   const vpTop = 50; 
   function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
@@ -691,34 +674,52 @@ function App(){
   // ── TOUCH PAN / PINCH-ZOOM ──
   const lastTouch=useRef(null); const lastPinch=useRef(null); const touchStartPos=useRef(null); const TAP_SLOP=8; 
   function onTouchStart(e){
-    const tag=e.target.tagName; if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
+    const tag=e.target.tagName;
+    if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
     if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup'))return;
 
     if(e.touches.length===1){
-      const t=e.touches[0]; touchStartPos.current={x:t.clientX,y:t.clientY}; lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y}; lastPinch.current=null;
+      const t=e.touches[0];
+      touchStartPos.current={x:t.clientX,y:t.clientY};
+      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastPinch.current=null;
     } else if(e.touches.length>=2){
-      e.preventDefault(); const t0=e.touches[0],t1=e.touches[1]; const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
-      lastPinch.current={ dist:Math.hypot(dx,dy), s:vtRef.current.s, x:vtRef.current.x, y:vtRef.current.y, mx:(t0.clientX+t1.clientX)/2, my:(t0.clientY+t1.clientY)/2, }; lastTouch.current=null; touchStartPos.current=null;
+      e.preventDefault(); 
+      const t0=e.touches[0],t1=e.touches[1];
+      const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+      lastPinch.current={
+        dist:Math.hypot(dx,dy), s:vtRef.current.s, x:vtRef.current.x, y:vtRef.current.y,
+        mx:(t0.clientX+t1.clientX)/2, my:(t0.clientY+t1.clientY)/2,
+      };
+      lastTouch.current=null; touchStartPos.current=null;
     }
   }
   function onTouchMove(e){
     if(e.touches.length===1&&lastTouch.current){
-      const t=e.touches[0]; const sp=touchStartPos.current; const moved=sp?Math.hypot(t.clientX-sp.x,t.clientY-sp.y):TAP_SLOP+1;
-      if(moved<TAP_SLOP)return; e.preventDefault(); 
+      const t=e.touches[0]; const sp=touchStartPos.current;
+      const moved=sp?Math.hypot(t.clientX-sp.x,t.clientY-sp.y):TAP_SLOP+1;
+      if(moved<TAP_SLOP)return;
+      e.preventDefault();
       const nx=t.clientX-lastTouch.current.x; const ny=t.clientY-lastTouch.current.y;
       if(isFinite(nx)&&isFinite(ny)) setVt(prev=>({...prev,x:nx,y:ny}));
     } else if(e.touches.length>=2&&lastPinch.current){
-      e.preventDefault(); const t0=e.touches[0],t1=e.touches[1]; const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
-      const dist=Math.hypot(dx,dy); if(!dist)return; const ratio=dist/lastPinch.current.dist;
+      e.preventDefault();
+      const t0=e.touches[0],t1=e.touches[1];
+      const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+      const dist=Math.hypot(dx,dy); if(!dist)return;
+      const ratio=dist/lastPinch.current.dist;
       const ns=Math.min(Math.max(lastPinch.current.s*ratio,0.15),4);
-      const {mx,my,x:ox,y:oy,s:os}=lastPinch.current; const nx=mx-(mx-ox)*(ns/os); const ny=my-(my-oy)*(ns/os);
+      const {mx,my,x:ox,y:oy,s:os}=lastPinch.current;
+      const nx=mx-(mx-ox)*(ns/os); const ny=my-(my-oy)*(ns/os);
       if(isFinite(ns)&&isFinite(nx)&&isFinite(ny)) setVt({s:ns,x:nx,y:ny});
     }
   }
   function onTouchEnd(e){
     if(e.touches.length===0){ lastTouch.current=null;lastPinch.current=null;touchStartPos.current=null; } 
     else if(e.touches.length===1){
-      const t=e.touches[0]; lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y}; lastPinch.current=null; touchStartPos.current={x:t.clientX,y:t.clientY};
+      const t=e.touches[0];
+      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastPinch.current=null; touchStartPos.current={x:t.clientX,y:t.clientY};
     }
   }
   useEffect(()=>{
@@ -815,7 +816,7 @@ function App(){
   }
 
   /* ══════════════════════════════════════════════════════
-     FIX BUG 1: AUTO LAYOUT TUMPANG TINDIH
+     AUTO LAYOUT (BUG FIX: OVERLAP & DRIFT)
   ══════════════════════════════════════════════════════ */
   function computeAutoLayout(){
     const CARD_W=110, GAP_X=40, GAP_Y=160, PAD_BANI=80;
@@ -828,9 +829,7 @@ function App(){
     
     while(queue.length){
       const cur=queue.shift(); const g=genMap[cur];
-      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>{
-        r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}});
-      });
+      rels.filter(r=>r.type==='married'&&r.pids.includes(cur)).forEach(r=>r.pids.forEach(pid=>{if(!(pid in genMap)){genMap[pid]=g;queue.push(pid);}}));
       rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(cur)).forEach(r=>{
         const cid=r.pids[r.pids.length-1];
         if(!(cid in genMap)){genMap[cid]=g+1;queue.push(cid);}
@@ -864,7 +863,7 @@ function App(){
     }
 
     const newPos={};
-    function layoutSubtree(pid, centerX, gen, newPos, visited=new Set()){
+    function layoutSubtree(pid, centerX, gen, visited=new Set()){
       if(visited.has(pid)) return; visited.add(pid);
       const yPos=START_Y+gen*GAP_Y;
       const spouses=getSpousesOf(pid);
@@ -882,19 +881,12 @@ function App(){
           ux+=CARD_W+GAP_X;
           newPos[spouses[0]]={x:Math.round(ux), y:Math.round(yPos)};
         } else {
-          // Poligami (>1): Istri1 — Darah — Istri2+
+          // Poligami (>1): Istri 1 Kiri, Darah (pid) Tengah, Istri 2+ Kanan
           const before=spouses.slice(0,Math.floor(spouses.length/2));
           const after=spouses.slice(Math.floor(spouses.length/2));
-          before.forEach(sp=>{
-            if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)};
-            ux+=CARD_W+GAP_X;
-          });
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
-          ux+=CARD_W+GAP_X;
-          after.forEach(sp=>{
-            if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)};
-            ux+=CARD_W+GAP_X;
-          });
+          before.forEach(sp=>{ if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X; });
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X;
+          after.forEach(sp=>{ if(!newPos[sp]) newPos[sp]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CARD_W+GAP_X; });
         }
       }
 
@@ -906,12 +898,11 @@ function App(){
       
       children.forEach((cid,i)=>{
         const w=widths[i];
-        layoutSubtree(cid, cx+w/2, gen+1, newPos, new Set([...visited]));
+        layoutSubtree(cid, cx+w/2, gen+1, new Set([...visited]));
         cx+=w+GAP_X;
       });
 
-      // FIX BUG 1: Posisi orang tua harus dikunci pada `centerX` mutlak!
-      // Mencegah node tertarik ke kiri karena ketidakseimbangan width anak
+      // BUG FIX: Parent selalu diposisikan tepat di centerX alokasinya agar tidak bergeser tumpang tindih
       placeUnit(centerX);
     }
 
@@ -929,7 +920,7 @@ function App(){
     baniHeads.forEach((bh,i)=>{
       const w=subtreeWidth(bh.id, new Set([root.id]));
       const centerX=cursorX+w/2;
-      layoutSubtree(bh.id, centerX, 1, newPos, new Set([root.id]));
+      layoutSubtree(bh.id, centerX, 1, new Set([root.id]));
       cursorX+=w+(i<baniHeads.length-1?PAD_BANI:0);
     });
 
@@ -968,50 +959,18 @@ function App(){
     setModal(null);
   }
 
-  function getBaniHead(pid, visited=new Set()){
-    if(visited.has(pid)) return null; visited.add(pid);
-    const p=people.find(x=>x.id===pid); if(!p) return null;
-    if(p.baniId==='KSR-000') return p;
-    const parents=getActiveParents(pid);
-    if(!parents.length) return null;
-    const parentPeople=parents.map(id=>people.find(x=>x.id===id)).filter(Boolean);
-    if(parentPeople.some(par=>par.baniId==='KSR-000'||par.baniId?.startsWith('KSR'))) return p; 
-    for(const parentId of parents){
-      const head=getBaniHead(parentId, visited);
-      if(head) return head;
-    }
-    return null;
-  }
-
   /* ── BANI LABEL ── */
   const baniLabel=useMemo(()=>{
-    if(!people.length) return 'Bani Kasirin';
-    if(!sel) return 'Bani Kasirin';
-    const selPerson=people.find(p=>p.id===sel); if(!selPerson) return 'Bani Kasirin';
-    if(selPerson.baniId==='KSR-000'||selPerson.baniId==='KSR-W1'||selPerson.baniId?.match(/^KSR-W\d+$/)) return 'Bani Kasirin';
-    let head=getBaniHead(sel);
-    if(!head){
-      const partnerIds=getPartners(sel);
-      for(const pid of partnerIds){ head=getBaniHead(pid); if(head) break; }
-    }
-    if(!head) return 'Bani Kasirin';
-    if(head.baniId==='KSR-000') return 'Bani Kasirin';
-    // FIX BUG 3: Akan merender nama nickname langsung (misal: Bani Panidjan)
-    return `Bani ${nn(head)}`;
-  },[sel,people,rels]);
-
-  /* ── GET BANI NAME HELPER (Untuk Registry Modal) ── */
-  function getBaniName(prefix) {
-    if(prefix === 'KSR') return 'Kasirin';
-    if(prefix === 'BARU' || prefix === '?') return prefix;
-    const head = people.find(p => p.baniId === `${prefix}-001`);
-    return head ? nn(head) : prefix;
-  }
+    if(!selP || !selP.baniId) return 'Bani Kasirin';
+    const m = selP.baniId.match(/^([A-Z]+)-/);
+    if(m && BANI_NAMES[m[1]]) return `Bani ${BANI_NAMES[m[1]]}`;
+    return 'Bani Kasirin';
+  },[selP]);
 
   const searchRes=searchQ.length>1?people.filter(p=>p.fullName.toLowerCase().includes(searchQ.toLowerCase())||(p.nickname&&p.nickname.toLowerCase().includes(searchQ.toLowerCase()))).slice(0,8):[];
   function focusPerson(id){ setSel(id);setSbMode('view'); centerPerson(id); setSearchQ('');setShowSR(false);setShowSearch(false); }
 
-  const lines=buildLines();
+  const lines=buildOrthogonalLines();
   const activeParents=sel?getActiveParents(sel):[];
   const partners=sel?getPartners(sel):[];
   const siblings=sel?getSiblings(sel):[];
@@ -1056,7 +1015,6 @@ function App(){
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
       {isAdmin&&<button className="btn" style={{fontSize:11}} onClick={()=>setModal('registry')}>🪪 ID</button>}
       <button className={`btn${isAdmin?' adm':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin ✓':'Login Admin'}</button>
-      <button className="btn btn-home-top" onClick={()=>{fullReset();}}>Home</button>
     </div>
 
     <div className={`search-expand${showSearch?' open':''}`}>
@@ -1189,7 +1147,7 @@ function App(){
       </>}
 
       {selP&&sbMode==='edit'&&<>
-        <div className="sb-head"><h2>Edit Profil</h2><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSbMode('view')}>Batal</button></div>
+        <div className="sb-head"><h2 style={{fontSize:13}}>Edit Profil</h2><button className="btn" style={{padding:'4px 10px',fontSize:11}} onClick={()=>setSbMode('view')}>Batal</button></div>
         <div className="sb-body" style={{paddingTop:14}}>
           {[['fullName','Nama Lengkap','text'],['nickname','Nama Panggilan','text'],['birthPlace','Tempat Lahir','text'],['birthDate','Tanggal Lahir','date'],['deathDate','Tanggal Wafat','date'],['domicile','Domisili','text']].map(([k,lbl,t])=>(
             <div className="fg" key={k}><label>{lbl}</label>
@@ -1212,85 +1170,102 @@ function App(){
     </div>
 
     {/* MODALS */}
-    {modal==='pin'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
-      <h3>Login Admin</h3><p className="modal-sub">Masukkan PIN untuk mengedit.</p>
-      <div className="fg"><input type="password" value={pinVal} autoFocus onChange={e=>setPinVal(e.target.value)} onKeyDown={e=>e.key==='Enter'&&tryPin()}/>{pinErr&&<div style={{color:'red',fontSize:11}}>{pinErr}</div>}</div>
-      <div className="frow"><button className="btn primary" onClick={tryPin}>Masuk</button></div>
-    </div></div>}
+    {modal==='pin'&&<div className="overlay" onClick={()=>{setModal(null);setPinVal('');setPinErr('');}}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h3>Login Admin</h3><p className="modal-sub">Masukkan PIN untuk mengedit.</p>
+        <div className="fg"><input type="password" value={pinVal} autoFocus onChange={e=>setPinVal(e.target.value)} onKeyDown={e=>e.key==='Enter'&&tryPin()}/>{pinErr&&<div style={{color:'red',fontSize:11,marginTop:4}}>{pinErr}</div>}</div>
+        <div className="frow"><button className="btn primary" onClick={tryPin}>Masuk</button><button className="btn" onClick={()=>{setModal(null);setPinVal('');setPinErr('');}}>Batal</button></div>
+      </div>
+    </div>}
 
-    {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
-      <h3>Tambah Anggota Baru</h3><p className="modal-sub">ID otomatis terbuat saat relasi ditentukan.</p>
-      <div className="fg"><label>Nama Lengkap</label><input value={addF.fullName} autoFocus onChange={e=>setAddF({...addF,fullName:e.target.value})}/></div>
-      <div className="fg"><label>Panggilan</label><input value={addF.nickname} onChange={e=>setAddF({...addF,nickname:e.target.value})}/></div>
-      <div className="fg"><label>Gender</label><select value={addF.gender} onChange={e=>setAddF({...addF,gender:e.target.value})}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
-      <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
-    </div></div>}
+    {modal==='delconfirm'&&<div className="overlay">
+      <div className="modal">
+        <h3>Hapus Anggota?</h3><p className="modal-sub">Hapus <strong>{selP?.fullName}</strong>? Semua relasi terkait juga dihapus dan tidak bisa dibatalkan.</p>
+        <div className="frow"><button className="btn danger" onClick={delPerson}>Ya, Hapus</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+      </div>
+    </div>}
 
-    {modal==='addrel'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
-      <h3>Tambah Relasi</h3><p className="modal-sub">Untuk: {nn(selP)}</p>
-      <div className="fg"><label>Jenis Relasi</label><select value={relF.type} onChange={e=>setRelF({...relF,type:e.target.value})}><option value="married">Pasangan / Menikah</option><option value="parent-of">Orang tua dari (Pilih Anak)</option><option value="child-of">Anak dari (Pilih Ortu)</option></select></div>
-      <div className="fg"><label>Cari Orang</label><input autoFocus placeholder="Ketik nama..." value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/></div>
-      <div className="ppicker-list">{people.filter(p=>p.id!==sel && p.fullName.toLowerCase().includes(relSearchQ.toLowerCase())).slice(0,5).map(p=>(
-        <div key={p.id} className={`ppicker-item ${relF.pid===p.id?'selected':''}`} onClick={()=>setRelF({...relF,pid:p.id})}><div className="pi-dot" style={{background:MC(p.gender)}}/>{nn(p)} - <span style={{fontSize:10,color:'#8a8278'}}>{p.displayId}</span></div>
-      ))}</div>
-      <div className="frow"><button className="btn primary" onClick={prepareAddRel} disabled={!relF.pid}>Konfirmasi</button></div>
-    </div></div>}
+    {modal==='addrel'&&<div className="overlay" onClick={()=>{setModal(null);setRelSearchQ('');}}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h3>Tambah Relasi</h3><p className="modal-sub">Untuk: <strong>{selP?.fullName}</strong></p>
+        <div className="fg"><label>Jenis Relasi</label><select value={relF.type} onChange={e=>setRelF(f=>({...f,type:e.target.value}))}><option value="married">Pasangan / Menikah</option><option value="parent-of">Orang tua dari (Pilih Anak)</option><option value="child-of">Anak dari (Pilih Ortu)</option></select></div>
+        {relF.type!=='married'&&<div className="fg"><label>Status Pengasuh</label><select value={relF.isActive?'1':'0'} onChange={e=>setRelF(f=>({...f,isActive:e.target.value==='1'}))}><option value="1">Aktif (pengasuh saat ini)</option><option value="0">Tidak aktif (biologis / historis)</option></select></div>}
+        <div className="fg"><label>Cari Orang</label><input autoFocus placeholder="Ketik nama..." value={relSearchQ} onChange={e=>setRelSearchQ(e.target.value)}/></div>
+        <div className="ppicker-list">{people.filter(p=>p.id!==sel && p.fullName.toLowerCase().includes(relSearchQ.toLowerCase())).slice(0,5).map(p=>(
+          <div key={p.id} className={`ppicker-item ${relF.pid===p.id?'selected':''}`} onClick={()=>setRelF(f=>({...f,pid:p.id}))}><div className="pi-dot" style={{background:MC(p.gender)}}/>{nn(p)} - <span style={{fontSize:10,color:'#8a8278'}}>{p.displayId}</span></div>
+        ))}</div>
+        <div className="frow"><button className="btn primary" onClick={prepareAddRel} disabled={!relF.pid}>Konfirmasi</button></div>
+      </div>
+    </div>}
 
-    {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
-      <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
-      <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
-    </div></div>}
-
-    {modal==='delconfirm'&&<div className="overlay" onClick={()=>setModal(null)}><div className="modal" onClick={e=>e.stopPropagation()}>
-      <h3>Hapus Anggota?</h3><p className="modal-sub">Hapus {nn(selP)} secara permanen?</p>
-      <div className="frow"><button className="btn danger" onClick={delPerson}>Ya, Hapus</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
-    </div></div>}
-
-    {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}><div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><h3>🪪 ID Registry</h3><button className="btn" onClick={()=>setModal(null)}>✕ Tutup</button></div>
-      {(()=>{
-        const groups={}; people.forEach(p=>{
-          if(!p.baniId){groups['?']=groups['?']||[];groups['?'].push(p);return;}
-          const m=p.baniId.match(/^([A-Z]+)-/); const prefix=m?m[1]:'?'; groups[prefix]=groups[prefix]||[]; groups[prefix].push(p);
-        });
-        const baniPrefixes=Object.keys(groups).filter(k=>k!=='KSR'&&k!=='BARU'&&k!=='?').sort();
-        
-        return <>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:20}}>
-            {baniPrefixes.map(prefix=><button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} className={`btn ${registryFilter===prefix?'primary':''}`}>
-              {/* FIX BUG 3: NAMA DINAMIS */}
-              Bani {getBaniName(prefix)} ({groups[prefix].length})
-            </button>)}
-            {groups['BARU']&&<button className="btn danger" onClick={()=>setRegistryFilter('BARU')}>Baru/Unlinked ({groups['BARU'].length})</button>}
+    {modal==='confirm-parents'&&pendingRel&&(()=>{
+      const p1=people.find(x=>x.id===pendingRel.parentIds[0]); const p2=people.find(x=>x.id===pendingRel.parentIds[1]); const ch=people.find(x=>x.id===pendingRel.childId);
+      return(
+        <div className="overlay">
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <h3>Konfirmasi Orang Tua</h3>
+            <p className="modal-sub">Ditemukan pasangan aktif dari <strong>{p1?nn(p1):''}</strong>:</p>
+            <div className="confirm-box"><strong>{p2?nn(p2):''}</strong> terdeteksi sebagai pasangan aktif {p1?nn(p1):''}.<br/>Apakah <strong>{ch?nn(ch):''}</strong> adalah anak dari <strong>keduanya</strong>?</div>
+            <div className="frow" style={{flexDirection:'column',gap:6}}><button className="btn primary" onClick={confirmBothParents}>Ya, anak dari {p1?nn(p1):''} &amp; {p2?nn(p2):''}</button><button className="btn" onClick={confirmSingleParent}>Tidak, anak dari {p1?nn(p1):''} saja</button><button className="btn" onClick={()=>{setPendingRel(null);setModal('addrel');}}>Batal</button></div>
           </div>
-          {(registryFilter||baniPrefixes[0])&&(()=>{
-            const activeGrp = registryFilter||baniPrefixes[0];
-            const members = groups[activeGrp].sort((a,b)=>{
-              const na=parseInt((a.baniId||'').replace(/\D/g,''))||999; const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999; return na-nb;
-            });
-            return <table className="reg-table">
-              <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
-              <tbody>{members.map(p=><tr key={p.id}>
-                <td style={{fontWeight:800,fontFamily:'monospace',color:'#4a7a9b'}}>{p.baniId}</td>
-                <td><div style={{fontWeight:700}}>{nn(p)}</div><div style={{fontSize:10,color:'#8a8278'}}>{p.fullName}</div></td>
-                <td>{p.baniId&&p.baniId.endsWith('-X')?<span className="tag-spouse">Pasangan</span>:<span className="tag-blood">Keturunan Asli</span>}</td>
-              </tr>)}</tbody>
-            </table>
-          })()}
-        </>;
-      })()}
-    </div></div>}
+        </div>
+      );
+    })()}
+
+    {modal==='addperson'&&<div className="overlay" onClick={()=>setModal(null)}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h3>Tambah Anggota Baru</h3><p className="modal-sub">ID akan terbuat otomatis saat relasi ditentukan.</p>
+        <div className="fg"><label>Nama Lengkap</label><input value={addF.fullName} autoFocus onChange={e=>setAddF(f=>({...f,fullName:e.target.value}))}/></div>
+        <div className="fg"><label>Panggilan</label><input value={addF.nickname} onChange={e=>setAddF(f=>({...f,nickname:e.target.value}))}/></div>
+        <div className="fg"><label>Gender</label><select value={addF.gender} onChange={e=>setAddF(f=>({...f,gender:e.target.value}))}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
+        <div className="frow"><button className="btn primary" onClick={addPerson} disabled={!addF.fullName}>Tambah</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+      </div>
+    </div>}
+
+    {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
+        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+      </div>
+    </div>}
+
+    {modal==='registry'&&<div className="overlay" onClick={()=>{setModal(null);setRegistryFilter(null);}}>
+      <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><h3>🪪 ID Registry</h3><button className="btn" onClick={()=>setModal(null)}>✕ Tutup</button></div>
+        {(()=>{
+          const groups={}; people.forEach(p=>{const b=p.baniId||'BARU'; const m=b.match(/^([A-Z]+)-/); const prefix=m?m[1]:'BARU'; groups[prefix]=groups[prefix]||[]; groups[prefix].push(p);});
+          const baniPrefixes=Object.keys(groups).filter(k=>k!=='KSR'&&k!=='BARU').sort();
+          return <>
+            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:20}}>
+              {baniPrefixes.map(prefix=><button key={prefix} onClick={()=>setRegistryFilter(registryFilter===prefix?null:prefix)} className={`btn ${registryFilter===prefix?'primary':''}`}>Bani {getBaniName(prefix)} ({groups[prefix].length})</button>)}
+              {groups['BARU']&&<button className="btn danger" onClick={()=>setRegistryFilter('BARU')}>Baru/Unlinked ({groups['BARU'].length})</button>}
+            </div>
+            {(registryFilter||baniPrefixes[0])&&(()=>{
+              const activeGrp = registryFilter||baniPrefixes[0];
+              const members = groups[activeGrp].sort((a,b)=>{ const na=parseInt((a.baniId||'').replace(/\D/g,''))||999; const nb=parseInt((b.baniId||'').replace(/\D/g,''))||999; return na-nb; });
+              return <table className="reg-table">
+                <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
+                <tbody>{members.map(p=><tr key={p.id}>
+                  <td style={{fontWeight:800,fontFamily:'monospace',color:'#4a7a9b'}}>{p.baniId||'—'}</td>
+                  <td><div style={{fontWeight:700}}>{nn(p)}</div><div style={{fontSize:10,color:'#8a8278'}}>{p.fullName}</div></td>
+                  <td>{p.baniId?.endsWith('-X')||p.baniId?.match(/-W\d+/) ? <span className="tag-spouse">Pasangan</span> : <span className="tag-blood">Keturunan Asli</span>}</td>
+                </tr>)}</tbody>
+              </table>
+            })()}
+          </>;
+        })()}
+      </div>
+    </div>}
 
     {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
     <div className={`legend ${sel?'sb-open':''}`}>
-      <div className="li"><svg width="22" height="10"><path d="M2,8 C2,4 20,4 20,8" stroke="#90a8b8" strokeWidth="2.5" fill="none" strokeLinecap="round"/></svg>Orang tua — Anak</div>
-      <div className="li"><svg width="22" height="10"><path d="M2,5 C8,2 14,8 20,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 3" fill="none" strokeLinecap="round"/></svg>Pasangan</div>
-      <div className="li"><div style={{width:8,height:8,borderRadius:'50%',background:'#6ea8d4'}}/> Laki-laki</div>
-      <div className="li"><div style={{width:8,height:8,borderRadius:'50%',background:'#d47ea8'}}/> Perempuan</div>
-      <div className="li"><div style={{width:8,height:8,borderRadius:'50%',background:'#c8a830'}}/> Unknown</div>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
+      <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#6ea8d4'}}/> Laki-laki</div>
+      <div className="li"><div className="pi-dot" style={{background:'#d47ea8'}}/> Perempuan</div>
+      <div className="li"><div className="pi-dot" style={{background:'#c8a830'}}/> Unknown</div>
     </div>
 
-    {/* FIX BUG 2: STAT PILL TAMPIL SEMUA DI HP */}
     <div className={`statpill ${sel?'sb-open':''}`}>
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
       <div className="stat-sep"></div>
