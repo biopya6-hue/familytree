@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.6
+   SILSILAH-MASTER-V1.7
    CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -236,7 +236,7 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.6 (INJEKSI DATA BANI KARMILAH)
+   FASE 2: STRUKTUR DATA ATRIBUT LACI (Bebas Regex)
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
@@ -414,7 +414,6 @@ const SPOS={
   p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
   p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
   
-  // DUMMY KOORDINAT UNTUK KELUARGA KARMILAH AGAR TIDAK MENUMPUK DI 0,0 SEBELUM DIRAPIKAN
   p_krm_2: {x:0, y:400}, p_krm_2_w1: {x:150, y:400},
   p_krm_3: {x:300, y:400}, p_krm_3_w1: {x:450, y:400},
   p_krm_4: {x:600, y:400}, p_krm_4_w1: {x:750, y:400},
@@ -493,7 +492,7 @@ function App(){
   const COL_RELATIONSHIPS = ()=>db.collection('relationships');
   const COL_POSITIONS     = ()=>db.collection('positions');
 
-  /* ── 1. FIREBASE LOAD & DELTA SAVE ── */
+  /* ── 1. FIREBASE LOAD & INTELLIGENT AUTO-MERGE (PATCH 7) ── */
   useEffect(()=>{
     async function load(){
       try{
@@ -512,10 +511,29 @@ function App(){
           const loadedPeople=mSnap.docs.map(d=>d.data());
           const loadedRels=rSnap.docs.map(d=>d.data());
           const loadedPos={}; pSnap.docs.forEach(d=>{loadedPos[d.id]=d.data();});
-          setPeople(loadedPeople); setRels(loadedRels); setPos(loadedPos);
+          
+          // Set reference to strict Firebase data
           loadedPeople.forEach(p=>{lastSyncedPeople.current[p.id]=p;});
           loadedRels.forEach(r=>{lastSyncedRels.current[r.id]=r;});
           Object.entries(loadedPos).forEach(([id,xy])=>{lastSyncedPos.current[id]=xy;});
+
+          // Intelligent Auto-Merge: Find items in HTML (SP/SR/SPOS) that are NOT in Firebase yet
+          const existingPIds = new Set(loadedPeople.map(p=>p.id));
+          const newP = SP.filter(p=>!existingPIds.has(p.id));
+          const mergedPeople = [...loadedPeople, ...newP];
+
+          const existingRIds = new Set(loadedRels.map(r=>r.id));
+          const newR = SR.filter(r=>!existingRIds.has(r.id));
+          const mergedRels = [...loadedRels, ...newR];
+
+          const mergedPos = { ...loadedPos };
+          Object.entries(SPOS).forEach(([id,xy])=>{
+            if(!mergedPos[id]) mergedPos[id] = xy;
+          });
+
+          setPeople(mergedPeople); 
+          setRels(mergedRels); 
+          setPos(mergedPos);
         }
       }catch(err){
         setPeople(SP);setRels(SR);setPos({...SPOS});
@@ -1084,6 +1102,7 @@ function App(){
             </div>
           </div>
           
+          {/* V1.5 PATCH: ID REGISTRY DINAMIS DI DALAM INFO KHUSUS ADMIN */}
           <div className="sec">
             <div className="sec-title">Info</div>
             {isAdmin && selP.displayId && (
