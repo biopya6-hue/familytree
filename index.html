@@ -25,10 +25,10 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.9-C (COMPACT GRID LAYOUT)
+   SILSILAH-MASTER-V1.10 (PATCH 10 - GPU PANNING & PROGRESSIVE UI)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
 
 .topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:52px;display:flex;align-items:center;gap:10px;padding:0 16px;background:rgba(240,237,232,0.96);backdrop-filter:blur(10px);border-bottom:1px solid #dbd6cf;}
 .brand-name{font-size:15px;font-weight:700;letter-spacing:-.03em;color:#1e1a16}
@@ -65,10 +65,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .btn:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:650px){ .hide-mob{display:none;} }
 
-/* Viewport & Nodes */
-#vp{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;z-index:10;}
+/* Viewport & Nodes - V1.10 GPU ACCELERATED */
+#vp{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;z-index:10;touch-action:none;}
 #vp.pan{cursor:grabbing}
-#world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform; transition: transform 0.4s ease-out;}
+#world{position:absolute;top:0;left:0;transform-origin:0 0; will-change:transform;} 
+/* Transisi dihapus dari #world untuk pergerakan jari yang realtime 0-delay */
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
 .node{position:absolute;z-index:10;transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);}
@@ -84,6 +85,70 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .card-badge{display:inline-block;font-size:8px;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:3px;letter-spacing:.04em;}
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
+
+/* V1.10: DRILL-DOWN / FOCUS BUTTON (NEW DESIGN) */
+.drill-btn{
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2e2820;
+  color: #fff;
+  border: 1px solid #1e1810;
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 15;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+.drill-btn:hover{
+  background: #4a7a9b;
+  border-color: #3a6a8b;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* V1.10: FLOATING BANNER FOR RESET */
+.focus-banner {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2e2820;
+  color: #fff;
+  padding: 6px 12px 6px 16px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  z-index: 190;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: dropDown 0.3s ease-out forwards;
+}
+@keyframes dropDown {
+  from { top: 40px; opacity: 0; }
+  to { top: 64px; opacity: 1; }
+}
+.focus-banner-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: background 0.15s;
+}
+.focus-banner-close:hover { background: rgba(255,255,255,0.3); }
 
 /* Sidebar Profil */
 .sidebar{position:fixed;right:0;bottom:0;top:52px;width:310px;z-index:150;background:#fff;border-left:1px solid #dbd6cf;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease-out;box-shadow:-4px 0 24px rgba(0,0,0,.05);}
@@ -132,7 +197,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7060;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-.statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;white-space:nowrap;}
+/* V1.10 FIX: STAT PILL MOBILE WAFAT */
+.statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;flex-wrap:wrap;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;white-space:nowrap;}
 .stat-val{color:#2a2218;font-weight:800;font-size:13.5px;margin-right:4px}
 .stat-sep{width:4px;height:4px;border-radius:50%;background:#d0cbc2;}
 
@@ -231,18 +297,15 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER 
+   DATA MASTER (1.8 INJECTION KEPT INTACT)
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
   { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   
-  // GENERASI 1: KARMILAH
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
-  
-  // GENERASI 2: ANAK KARMILAH 
   { id:'p_krm_2', displayId:'KRM-002', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Naris', nickname:'Naris', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_2_w1', displayId:'KRM-002-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Yuti', nickname:'Yuti', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_3', displayId:'KRM-003', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Lasemi', nickname:'Lasemi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -253,7 +316,6 @@ const SP=[
   { id:'p_krm_5_w1', displayId:'KRM-005-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami ke-1 Sri', nickname:'Suami 1 Sri', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_5_w2', displayId:'KRM-005-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Ehsan', nickname:'Ehsan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3: CUCU KARMILAH DARI JALUR NARIS
   { id:'p_krm_6', displayId:'KRM-006', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Natik', nickname:'Natik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_6_w1', displayId:'KRM-006-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Rob', nickname:'Rob', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_7', displayId:'KRM-007', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Sulami', nickname:'Sulami', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -271,7 +333,6 @@ const SP=[
   { id:'p_krm_13', displayId:'KRM-013', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Eni', nickname:'Eni', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_13_w1', displayId:'KRM-013-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Eni', nickname:'Suami Eni', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3: CUCU KARMILAH DARI JALUR LASEMI
   { id:'p_krm_14', displayId:'KRM-014', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Win', nickname:'Win', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_14_w1', displayId:'KRM-014-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami 1 Win', nickname:'Suami 1 Win', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_14_w2', displayId:'KRM-014-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Eko', nickname:'Eko', gender:'M', status:'Wafat', notes:'', bioNote:'' },
@@ -284,7 +345,6 @@ const SP=[
   { id:'p_krm_19', displayId:'KRM-019', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Dartik', nickname:'Dartik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_19_w1', displayId:'KRM-019-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Joko', nickname:'Joko', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3: CUCU KARMILAH DARI JALUR MARTAM
   { id:'p_krm_20', displayId:'KRM-020', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Yun', nickname:'Yun', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_20_w1', displayId:'KRM-020-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Budi', nickname:'Budi', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_21', displayId:'KRM-021', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Rini', nickname:'Rini', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -292,13 +352,11 @@ const SP=[
   { id:'p_krm_21_w2', displayId:'KRM-021-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Suami 2 Rini', nickname:'Suami 2 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_21_w3', displayId:'KRM-021-S3', bani:'KRM', isBlood:false, spouseOrder:3, fullName:'Suami 3 Rini', nickname:'Suami 3 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3: CUCU KARMILAH DARI JALUR SRI
   { id:'p_krm_22', displayId:'KRM-022', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Tin', nickname:'Tin', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_22_w1', displayId:'KRM-022-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Lani', nickname:'Lani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // BANI SAID (TETAP UTUH)
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -310,7 +368,6 @@ const SP=[
   { id:'p_sad_4b', displayId:'SAD-005', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 2', nickname:'Cucu 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_4c', displayId:'SAD-006', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 3', nickname:'Cucu 3', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   
-  // BANI PANIDJAN (TETAP UTUH)
   { id:'p_pan_1', displayId:'PAN-001', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Panidjan', nickname:'Panidjan', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_pan_1_w1', displayId:'PAN-001-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_pan_2a', displayId:'PAN-002', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Mukayani', nickname:'Mukayani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
@@ -340,7 +397,6 @@ const SP=[
   { id:'p_pan_3j', displayId:'PAN-018', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Hafiz', nickname:'Hafiz', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_pan_4a', displayId:'PAN-019', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Ishita Hirya Mahesani', nickname:'Hirya', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   
-  // BANI SURAHMAN
   { id:'p_sur_1', displayId:'SUR-001', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Surahman', nickname:'Surahman', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sur_1_w1', displayId:'SUR-001-S1', bani:'SUR', isBlood:false, spouseOrder:1, fullName:'Menik', nickname:'Menik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sur_1_w2', displayId:'SUR-001-S2', bani:'SUR', isBlood:false, spouseOrder:2, fullName:'Istri ke-2 Surahman', nickname:'Istri 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -356,8 +412,6 @@ const SR=[
   { id:'c4', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sur_1'], isActive:true },
   
   { id:'m3', type:'married', pids:['p_krm_1','p_krm_1_w1'], isActive:true },
-  
-  // RELASI GENERASI 2 KARMILAH 
   { id:'c_krm_1', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_2'], isActive:true }, 
   { id:'c_krm_2', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_3'], isActive:true }, 
   { id:'c_krm_3', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_4'], isActive:true }, 
@@ -367,8 +421,6 @@ const SR=[
   { id:'m_krm_4', type:'married', pids:['p_krm_4','p_krm_4_w1'], isActive:true }, 
   { id:'m_krm_5', type:'married', pids:['p_krm_5','p_krm_5_w1'], isActive:true }, 
   { id:'m_krm_5b', type:'married', pids:['p_krm_5','p_krm_5_w2'], isActive:true }, 
-
-  // RELASI GENERASI 3 DARI JALUR NARIS
   { id:'c_krm_5', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_6'], isActive:true }, 
   { id:'c_krm_6', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_7'], isActive:true }, 
   { id:'c_krm_7', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_8'], isActive:true }, 
@@ -385,8 +437,6 @@ const SR=[
   { id:'m_krm_11', type:'married', pids:['p_krm_11','p_krm_11_w1'], isActive:true },
   { id:'m_krm_12', type:'married', pids:['p_krm_12','p_krm_12_w1'], isActive:true },
   { id:'m_krm_13', type:'married', pids:['p_krm_13','p_krm_13_w1'], isActive:true },
-
-  // RELASI GENERASI 3 DARI JALUR LASEMI
   { id:'c_krm_13', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_14'], isActive:true }, 
   { id:'c_krm_14', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_15'], isActive:true }, 
   { id:'c_krm_15', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_16'], isActive:true }, 
@@ -398,22 +448,17 @@ const SR=[
   { id:'m_krm_15', type:'married', pids:['p_krm_15','p_krm_15_w1'], isActive:true }, 
   { id:'m_krm_17', type:'married', pids:['p_krm_17','p_krm_17_w1'], isActive:true }, 
   { id:'m_krm_19', type:'married', pids:['p_krm_19','p_krm_19_w1'], isActive:true }, 
-
-  // RELASI GENERASI 3 DARI JALUR MARTAM 
   { id:'c_krm_19', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_20'], isActive:true }, 
   { id:'c_krm_20', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_21'], isActive:true }, 
   { id:'m_krm_20', type:'married', pids:['p_krm_20','p_krm_20_w1'], isActive:true }, 
   { id:'m_krm_21a', type:'married', pids:['p_krm_21','p_krm_21_w1'], isActive:true }, 
   { id:'m_krm_21b', type:'married', pids:['p_krm_21','p_krm_21_w2'], isActive:true }, 
   { id:'m_krm_21c', type:'married', pids:['p_krm_21','p_krm_21_w3'], isActive:true }, 
-
-  // RELASI GENERASI 3 DARI JALUR SRI
   { id:'c_krm_21', type:'parent-child', pids:['p_krm_5','p_krm_5_w1','p_krm_22'], isActive:true }, 
   { id:'m_krm_22', type:'married', pids:['p_krm_22','p_krm_22_w1'], isActive:true }, 
   { id:'c_krm_22', type:'parent-child', pids:['p_krm_5','p_krm_5_w2','p_krm_23'], isActive:true }, 
   { id:'m_krm_23', type:'married', pids:['p_krm_23','p_krm_23_w1'], isActive:true }, 
 
-  // RELASI SAID CS
   { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
   { id:'m5', type:'married', pids:['p_sad_1','p_sad_1_w2'], isActive:true },
   { id:'c5', type:'parent-child', pids:['p_sad_1','p_sad_1_w1','p_sad_2'], isActive:true },
@@ -424,7 +469,6 @@ const SR=[
   { id:'c8', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4b'], isActive:true },
   { id:'c9', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4c'], isActive:true },
   
-  // RELASI PANIDJAN CS
   { id:'m8', type:'married', pids:['p_pan_1','p_pan_1_w1'], isActive:true },
   { id:'c10', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2a'], isActive:true },
   { id:'c11', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2b'], isActive:true },
@@ -454,7 +498,6 @@ const SR=[
   { id:'m16', type:'married', pids:['p_pan_3c','p_pan_3c_w1'], isActive:true },
   { id:'c28', type:'parent-child', pids:['p_pan_3c','p_pan_3c_w1','p_pan_4a'], isActive:true },
   
-  // RELASI SURAHMAN
   { id:'m17', type:'married', pids:['p_sur_1','p_sur_1_w1'], isActive:true },
   { id:'m18', type:'married', pids:['p_sur_1','p_sur_1_w2'], isActive:true },
   { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
@@ -482,7 +525,12 @@ function App(){
   const [relF,setRelF]       = useState({type:'married',pid:'',isActive:true});
   const [relSearchQ,setRelSearchQ]=useState('');
   const [pendingRel,setPendingRel] = useState(null); 
-  const [vt,setVt]           = useState({x:0,y:0,s:0.55});
+  
+  // V1.10: STATE FOKUS ROOT & WORLD REF (UNTUK GPU PANNING)
+  const [focusRoot, setFocusRoot] = useState('p_ksr');
+  const worldRef = useRef(null);
+  const vt = useRef({x:0, y:0, s:0.55}); // Disimpan di Ref agar tidak re-render saat digeser
+
   const [edgeSel,setEdgeSel] = useState(null);
   const [showSearch,setShowSearch]   = useState(false);
   const [registryFilter,setRegistryFilter] = useState(null); 
@@ -493,8 +541,6 @@ function App(){
 
   const [loading,setLoading]   = useState(true);
   const [saveStatus,setSaveStatus] = useState('saved'); 
-  const [uploadPct,setUploadPct]   = useState(null); 
-  const [uploadTarget,setUploadTarget] = useState(null); 
   const fileInputRef = useRef();
   const saveTimer = useRef(null);
   const isFirstLoad = useRef(true);
@@ -507,7 +553,7 @@ function App(){
   const COL_RELATIONSHIPS = ()=>db.collection('relationships');
   const COL_POSITIONS     = ()=>db.collection('positions');
 
-  /* ── 1. FIREBASE LOAD & INTELLIGENT AUTO-MERGE ── */
+  /* ── 1. FIREBASE LOAD ── */
   useEffect(()=>{
     async function load(){
       try{
@@ -552,7 +598,7 @@ function App(){
         setPeople(SP);setRels(SR);setPos({...SPOS});
       } finally{
         setLoading(false);
-        setTimeout(() => computeAutoLayout(), 100);
+        setTimeout(() => computeAutoLayout('p_ksr', true), 100);
       }
     }
     load();
@@ -606,35 +652,59 @@ function App(){
 
   async function uploadPhoto(file, personId){
     if(!file)return null;
-    setUploadPct(0);
     try{
       const ext=file.name.split('.').pop().toLowerCase();
       const ref=storage.ref(`photos/${personId}_${Date.now()}.${ext}`);
-      const task=ref.put(file);
-      await new Promise((res,rej)=>{
-        task.on('state_changed', snap=>setUploadPct(Math.round(snap.bytesTransferred/snap.totalBytes*100)), rej, res);
-      });
-      const url=await ref.getDownloadURL();
-      setUploadPct(null); return url;
-    }catch(err){ setUploadPct(null); return null; }
+      await ref.put(file);
+      return await ref.getDownloadURL();
+    }catch(err){ return null; }
   }
 
-  function autoCamera(){
+  /* ── 2. V1.10 DIRECT DOM CAMERA CONTROLS (NO LAG) ── */
+  function updateWorldTransform() {
+    if (worldRef.current) {
+      worldRef.current.style.transform = `translate(${vt.current.x}px, ${vt.current.y}px) scale(${vt.current.s})`;
+    }
+  }
+
+  function autoCamera(rootId = focusRoot){
     if(!vpRef.current)return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
     const isMobile = window.innerWidth < 600;
     const scale = isMobile ? 0.35 : 0.6;
-    const rootP = pos['p_ksr'] || {x:1200, y:0};
-    setVt({ s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) });
+    const rootP = pos[rootId] || {x:1200, y:0};
+    vt.current = { s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) };
+    updateWorldTransform();
   }
 
-  /* ── 2. PAN & ZOOM CONTROLS ── */
-  const vtRef=useRef(vt); useEffect(()=>{vtRef.current=vt;},[vt]);
+  function setZoom(factor) {
+    let newS = vt.current.s * factor;
+    newS = Math.min(Math.max(newS, 0.15), 4);
+    
+    // Zoom ke tengah viewport
+    if(!vpRef.current) return;
+    const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
+    const mx = vw/2, my = vh/2;
+    
+    vt.current.x = mx - (mx - vt.current.x) * (newS / vt.current.s);
+    vt.current.y = my - (my - vt.current.y) * (newS / vt.current.s);
+    vt.current.s = newS;
+    updateWorldTransform();
+  }
+
   const vpTop = 52;
-  function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.x,y:e.clientY-vt.y};}
+  function vpDown(e){if(e.target!==vpRef.current)return;panning.current=true;panStart.current={x:e.clientX-vt.current.x,y:e.clientY-vt.current.y};}
   function vpMove(e){
-    if(dragging.current){ e.preventDefault(); setPos(p=>({...p,[dragging.current]:{x:e.clientX/vt.s-dragOff.current.x,y:(e.clientY-vpTop)/vt.s-dragOff.current.y}})); return; }
-    if(panning.current) setVt(t=>({...t,x:e.clientX-panStart.current.x,y:e.clientY-panStart.current.y}));
+    if(dragging.current){ 
+      e.preventDefault(); 
+      setPos(p=>({...p,[dragging.current]:{x:e.clientX/vt.current.s-dragOff.current.x,y:(e.clientY-vpTop)/vt.current.s-dragOff.current.y}})); 
+      return; 
+    }
+    if(panning.current) {
+      vt.current.x = e.clientX - panStart.current.x;
+      vt.current.y = e.clientY - panStart.current.y;
+      updateWorldTransform(); // Gerakan seketika via DOM
+    }
   }
   function vpUp(){panning.current=false;dragging.current=null;}
   
@@ -642,10 +712,15 @@ function App(){
     const el=vpRef.current; if(!el)return;
     function onWheel(e){
       e.preventDefault();
-      const t=vtRef.current, f=e.deltaY<0?1.1:0.9;
-      const ns=Math.min(Math.max(t.s*f,0.15),4);
-      const rect=el.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
-      setVt({s:ns, x:mx-(mx-t.x)*(ns/t.s), y:my-(my-t.y)*(ns/t.s)});
+      const f = e.deltaY < 0 ? 1.1 : 0.9;
+      const newS = Math.min(Math.max(vt.current.s * f, 0.15), 4);
+      const rect = el.getBoundingClientRect(); 
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      
+      vt.current.x = mx - (mx - vt.current.x) * (newS / vt.current.s);
+      vt.current.y = my - (my - vt.current.y) * (newS / vt.current.s);
+      vt.current.s = newS;
+      updateWorldTransform();
     }
     el.addEventListener('wheel',onWheel,{passive:false});
     return()=>el.removeEventListener('wheel',onWheel);
@@ -655,19 +730,19 @@ function App(){
   function onTouchStart(e){
     const tag=e.target.tagName;
     if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
-    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup'))return;
+    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup,.drill-btn,.focus-banner'))return;
 
     if(e.touches.length===1){
       const t=e.touches[0];
       touchStartPos.current={x:t.clientX,y:t.clientY};
-      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastTouch.current={x:t.clientX-vt.current.x,y:t.clientY-vt.current.y};
       lastPinch.current=null;
     } else if(e.touches.length>=2){
       e.preventDefault(); 
       const t0=e.touches[0],t1=e.touches[1];
       const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
       lastPinch.current={
-        dist:Math.hypot(dx,dy), s:vtRef.current.s, x:vtRef.current.x, y:vtRef.current.y,
+        dist:Math.hypot(dx,dy), s:vt.current.s, x:vt.current.x, y:vt.current.y,
         mx:(t0.clientX+t1.clientX)/2, my:(t0.clientY+t1.clientY)/2,
       };
       lastTouch.current=null; touchStartPos.current=null;
@@ -679,8 +754,12 @@ function App(){
       const moved=sp?Math.hypot(t.clientX-sp.x,t.clientY-sp.y):TAP_SLOP+1;
       if(moved<TAP_SLOP)return;
       e.preventDefault();
-      const nx=t.clientX-lastTouch.current.x; const ny=t.clientY-lastTouch.current.y;
-      if(isFinite(nx)&&isFinite(ny)) setVt(prev=>({...prev,x:nx,y:ny}));
+      const nx = t.clientX - lastTouch.current.x; 
+      const ny = t.clientY - lastTouch.current.y;
+      if(isFinite(nx)&&isFinite(ny)) {
+        vt.current.x = nx; vt.current.y = ny;
+        updateWorldTransform();
+      }
     } else if(e.touches.length>=2&&lastPinch.current){
       e.preventDefault();
       const t0=e.touches[0],t1=e.touches[1];
@@ -690,30 +769,31 @@ function App(){
       const ns=Math.min(Math.max(lastPinch.current.s*ratio,0.15),4);
       const {mx,my,x:ox,y:oy,s:os}=lastPinch.current;
       const nx=mx-(mx-ox)*(ns/os); const ny=my-(my-oy)*(ns/os);
-      if(isFinite(ns)&&isFinite(nx)&&isFinite(ny)) setVt({s:ns,x:nx,y:ny});
+      if(isFinite(ns)&&isFinite(nx)&&isFinite(ny)) {
+        vt.current.s = ns; vt.current.x = nx; vt.current.y = ny;
+        updateWorldTransform();
+      }
     }
   }
   function onTouchEnd(e){
     if(e.touches.length===0){ lastTouch.current=null;lastPinch.current=null;touchStartPos.current=null; } 
     else if(e.touches.length===1){
       const t=e.touches[0];
-      lastTouch.current={x:t.clientX-vtRef.current.x,y:t.clientY-vtRef.current.y};
+      lastTouch.current={x:t.clientX-vt.current.x,y:t.clientY-vt.current.y};
       lastPinch.current=null; touchStartPos.current={x:t.clientX,y:t.clientY};
     }
   }
   useEffect(()=>{
     const el=vpRef.current;if(!el)return;
-    el.addEventListener('touchstart',onTouchStart,{passive:true});
+    el.addEventListener('touchstart',onTouchStart,{passive:false});
     el.addEventListener('touchmove',onTouchMove,{passive:false});
     el.addEventListener('touchend',onTouchEnd,{passive:true});
     return()=>{ el.removeEventListener('touchstart',onTouchStart); el.removeEventListener('touchmove',onTouchMove); el.removeEventListener('touchend',onTouchEnd); };
   },[]);
 
-  function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
+  function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.current.s-p.x,y:(e.clientY-vpTop)/vt.current.s-p.y};}
 
   /* ── 3. DATA HELPERS ── */
-  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
-  
   function getActiveParents(pid){ 
     const rs = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
     return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
@@ -764,13 +844,62 @@ function App(){
     }));
   }
 
+  // V1.10: PROGRESSIVE DEPTH LOGIC (HOMEPAGE VS FOCUS)
+  const isVisibleNode = useMemo(() => {
+    const vis = new Set();
+    if(!people.length) return vis;
+    
+    const rootTarget = focusRoot || 'p_ksr';
+    const isHome = rootTarget === 'p_ksr';
+    
+    // Breadth-First Search with Depth tracking
+    const depths = { [rootTarget]: 0 };
+    const queue = [rootTarget];
+    
+    while(queue.length) {
+      const curr = queue.shift();
+      const currentDepth = depths[curr];
+      
+      // Jika di Homepage (Kasirin), Stop load anak jika sudah kedalaman 1 (Gen 1)
+      if(isHome && currentDepth > 1) continue; 
+      
+      vis.add(curr);
+      
+      // Tambahkan Pasangan (Kedalamannya sama)
+      getPartners(curr).forEach(sp => {
+        if(depths[sp] === undefined) {
+          depths[sp] = currentDepth;
+          vis.add(sp);
+        }
+      });
+      
+      // Tambahkan Anak kandung (Kedalaman + 1)
+      getActiveChildren(curr).forEach(c => {
+        if(depths[c] === undefined) {
+          depths[c] = currentDepth + 1;
+          queue.push(c);
+        }
+      });
+    }
+    
+    // Tampilkan orang yang benar-benar tidak terhubung (hanya saat di Homepage)
+    if(isHome){
+      people.forEach(p => {
+         if(p.displayId === 'KSR-000') return;
+         const parents = getActiveParents(p.id);
+         if(parents.length === 0) vis.add(p.id); 
+      });
+    }
+    return vis;
+  }, [people, rels, focusRoot]);
+
   /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
       if(r.type==='married'){
         const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
-        if(!visibleIds.has(a)||!visibleIds.has(b)) return;
+        if(!isVisibleNode.has(a)||!isVisibleNode.has(b)) return;
         const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
         const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
         lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married', active:true});
@@ -778,9 +907,10 @@ function App(){
       if(r.type==='parent-child' && r.isActive){
         const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
         const pc=pos[cid]; if(!pc) return;
-        if(!visibleIds.has(cid)) return;
+        if(!isVisibleNode.has(cid)) return;
+        if(pids.some(pid => !isVisibleNode.has(pid))) return;
 
-        const valid = pids.filter(x=>pos[x]&&visibleIds.has(x)); if(!valid.length) return;
+        const valid = pids.filter(x=>pos[x]&&isVisibleNode.has(x)); if(!valid.length) return;
         
         const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
         const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
@@ -793,8 +923,6 @@ function App(){
         const midY = sy + (CH/2) + dropDepth; 
         const ex = CX(pc), ey = CY(pc) - (CH/2);
         
-        // V1.9-C: Because children might be on different Y levels, 
-        // the vertical line correctly drops down to whatever Y the child is at!
         lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child', active:r.isActive});
       }
     });
@@ -804,7 +932,7 @@ function App(){
 
   function onEdgeClick(e,line){
     if(!isAdmin)return;e.stopPropagation();
-    const sx=line.mx*vt.s+vt.x, sy=line.my*vt.s+vt.y+vpTop;
+    const sx=line.mx*vt.current.s+vt.current.x, sy=line.my*vt.current.s+vt.current.y+vpTop;
     setEdgeSel({rid:line.rid,sx,sy,label:line.label,type:line.type,active:line.active});
   }
   function toggleEdgeActive(){setRels(prev=>prev.map(r=>r.id===edgeSel.rid?{...r,isActive:!r.isActive}:r));setEdgeSel(null);}
@@ -875,109 +1003,110 @@ function App(){
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT (V1.9-C COMPACT GRID ROW-WRAPPING) ── */
-  function computeAutoLayout() {
-    const GAP_X = 40, GAP_Y = 160;
-    const MAX_PER_ROW = 4; // Maksimal 4 anak per baris horizontal
-    const root = people.find(p => p.displayId === 'KSR-000');
-    if (!root) { setModal(null); return; }
+  /* ── 6. DYNAMIC AUTO-LAYOUT ── */
+  function computeAutoLayout(rootTarget = focusRoot, moveCamera = true){
+    const GAP_X=40, GAP_Y=160;
+    const rootId = rootTarget || 'p_ksr';
+    const root = people.find(p=>p.id===rootId) || people.find(p=>p.displayId==='KSR-000'); 
+    if(!root){setModal(null);return;}
+    
+    function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
+    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
 
-    function getSpouses(pid) { return rels.filter(r => r.type === 'married' && r.pids.includes(pid)).map(r => r.pids.find(x => x !== pid)).map(id => people.find(p => p.id === id)).filter(Boolean).sort((a, b) => (a.spouseOrder || 99) - (b.spouseOrder || 99)); }
-    function getBloodChildren(pid) { return rels.filter(r => r.type === 'parent-child' && r.isActive && r.pids.slice(0, -1).includes(pid)).map(r => r.pids[r.pids.length - 1]); }
+    function subtreeWidth(pid, visited=new Set()){
+      if(visited.has(pid)) return CW; visited.add(pid);
+      const spouses=getSpouses(pid); const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
+      
+      // Jika di Homepage dan pid ini adalah anak Kasirin (Gen 1), stop hitung lebar anaknya
+      if(rootTarget === 'p_ksr' && pid !== root.id && getActiveParents(pid).includes(root.id)) return selfW;
 
-    // Hitung lebar dengan ROW WRAPPING
-    function subtreeWidth(pid, visited = new Set()) {
-      if (visited.has(pid)) return CW; visited.add(pid);
-      const spouses = getSpouses(pid);
-      const selfW = CW * (1 + spouses.length) + GAP_X * spouses.length;
-      const children = getBloodChildren(pid);
-      if (!children.length) return selfW;
-
-      let maxRowW = 0;
-      for (let i = 0; i < children.length; i += MAX_PER_ROW) {
-        const row = children.slice(i, i + MAX_PER_ROW);
-        const rowW = row.reduce((s, cid) => s + subtreeWidth(cid, new Set([...visited])), 0) + (row.length - 1) * GAP_X;
-        if (rowW > maxRowW) maxRowW = rowW;
-      }
-      return Math.max(selfW, maxRowW);
+      const children=getBloodChildren(pid); if(!children.length) return selfW;
+      const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
+      return Math.max(selfW, childTotal);
     }
 
-    const newPos = {};
+    const newPos={};
+    function layoutSubtree(pid, centerX, gen, visited=new Set()){
+      if(visited.has(pid)) return; visited.add(pid);
+      const yPos = gen*GAP_Y;
+      const spouses = getSpouses(pid), children = getBloodChildren(pid);
 
-    // Layout dengan koordinat Y dinamis
-    function layoutSubtree(pid, centerX, currentY, visited = new Set()) {
-      if (visited.has(pid)) return currentY + GAP_Y; visited.add(pid);
-      const spouses = getSpouses(pid);
-      const children = getBloodChildren(pid);
-
-      // 1. Letakkan Leluhur & Pasangan
-      const totalUnit = CW * (1 + spouses.length) + GAP_X * spouses.length;
-      let ux = centerX - totalUnit / 2;
-
-      if (spouses.length === 0) {
-        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) };
-      } else if (spouses.length === 1) {
-        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) };
-        ux += CW + GAP_X;
-        newPos[spouses[0].id] = { x: Math.round(ux), y: Math.round(currentY) };
-      } else {
-        const s1 = spouses.filter(s => s.spouseOrder === 1);
-        const s2 = spouses.filter(s => s.spouseOrder > 1);
-        s1.forEach(sp => { newPos[sp.id] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X; });
-        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X;
-        s2.forEach(sp => { newPos[sp.id] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X; });
-      }
-
-      if (!children.length) return currentY + GAP_Y;
-
-      // 2. Letakkan Anak-anak dalam bentuk Baris (Grid)
-      let nextY = currentY + GAP_Y;
-      let finalMaxY = nextY;
-
-      for (let i = 0; i < children.length; i += MAX_PER_ROW) {
-        const row = children.slice(i, i + MAX_PER_ROW);
-        const widths = row.map(cid => subtreeWidth(cid, new Set([pid])));
-        const rowTotalW = widths.reduce((s, w) => s + w, 0) + (row.length - 1) * GAP_X;
-        let cx = centerX - rowTotalW / 2;
-
-        let rowMaxY = nextY;
-        row.forEach((cid, idx) => {
-          const w = widths[idx];
-          const childCenter = cx + w / 2;
-          const childBottomY = layoutSubtree(cid, childCenter, nextY, new Set([...visited]));
-          if (childBottomY > rowMaxY) rowMaxY = childBottomY;
-          cx += w + GAP_X;
-        });
+      function placeUnit(selfCX){
+        const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
+        let ux = selfCX - totalUnit/2;
         
-        // Baris selanjutnya didorong ke bawah elemen terdalam dari baris ini
-        nextY = rowMaxY + GAP_Y; 
-        finalMaxY = nextY;
+        if (spouses.length === 0) {
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+        } else if (spouses.length === 1) {
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
+          ux += CW + GAP_X;
+          newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
+        } else {
+          const s1 = spouses.filter(s=>s.spouseOrder===1);
+          const s2 = spouses.filter(s=>s.spouseOrder>1);
+          s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
+          s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
+        }
       }
 
-      return finalMaxY - GAP_Y; 
+      // V1.10: PROGRESSIVE LAYOUT - Potong ranting jika di homepage
+      if(rootTarget === 'p_ksr' && gen >= 1) { placeUnit(centerX); return; }
+
+      if(!children.length){ placeUnit(centerX); return; }
+      
+      const widths = children.map(cid=>subtreeWidth(cid, new Set([pid])));
+      const totalChildW = widths.reduce((s,w)=>s+w,0) + (children.length-1)*GAP_X;
+      let cx = centerX - totalChildW/2;
+      
+      const childCenters = [];
+      children.forEach((cid,i)=>{
+        const w=widths[i];
+        const childCenter = cx + w/2;
+        childCenters.push(childCenter);
+        layoutSubtree(cid, childCenter, gen+1, new Set([...visited])); 
+        cx+=w+GAP_X;
+      });
+      
+      const selfCX = children.length === 1 ? childCenters[0] : (childCenters[0] + childCenters[childCenters.length-1]) / 2;
+      placeUnit(selfCX);
     }
 
     const w = subtreeWidth(root.id);
-    layoutSubtree(root.id, w / 2, 0);
+    layoutSubtree(root.id, w/2, 0);
 
-    // Truly unconnected nodes
-    const trulyUnconnected = people.filter(p => {
-       if(p.id in newPos) return false;
-       if(p.displayId === 'KSR-000') return false; 
-       const parents = getActiveParents(p.id);
-       return parents.length === 0;
-    });
-    
-    let ux2=0;
-    const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
-    trulyUnconnected.forEach(p=>{
-      newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
-      ux2+=CW+GAP_X;
-    });
+    if(rootId === 'p_ksr') {
+      const trulyUnconnected = people.filter(p => {
+         if(p.id in newPos) return false;
+         if(p.displayId === 'KSR-000') return false; 
+         const parents = getActiveParents(p.id);
+         return parents.length === 0;
+      });
+      
+      let ux2=0;
+      const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
+      trulyUnconnected.forEach(p=>{
+        newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
+        ux2+=CW+GAP_X;
+      });
+    }
 
-    setPos(newPos);
-    setTimeout(autoCamera, 100);
+    setPos(newPos); 
     setModal(null);
+    if(moveCamera) {
+       setTimeout(() => autoCamera(root.id), 50);
+    }
+  }
+
+  // V1.10 Handlers
+  function handleFocus(e, id) {
+    e.stopPropagation();
+    setFocusRoot(id);
+    computeAutoLayout(id, true);
+  }
+  function handleResetFocus() {
+    setFocusRoot('p_ksr');
+    computeAutoLayout('p_ksr', true);
   }
 
   /* ── 7. UI RENDERERS ── */
@@ -1008,8 +1137,10 @@ function App(){
   function centerPerson(id){
     const p=pos[id];
     if(p&&vpRef.current){
-      const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight; const ns=vt.s;
-      setVt({s:ns,x:vw/2-CX(p)*ns,y:vh/2-CY(p)*ns});
+      const vw=vpRef.current.clientWidth,vh=vpRef.current.clientHeight; 
+      vt.current.x = vw/2-CX(p)*vt.current.s;
+      vt.current.y = vh/2-CY(p)*vt.current.s;
+      updateWorldTransform();
     }
   }
 
@@ -1051,7 +1182,7 @@ function App(){
         {saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal':'Tersimpan'}
       </div>
 
-      {isAdmin&&<button className="btn accent hide-mob" onClick={()=>setModal('autolayout')}>⊞ Rapikan</button>}
+      {isAdmin&&<button className="btn accent hide-mob" onClick={()=>computeAutoLayout(focusRoot, true)}>⊞ Rapikan</button>}
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
       <button className="btn hide-mob" onClick={()=>setModal('registry')}>🪪 ID</button>
@@ -1075,8 +1206,16 @@ function App(){
       <div style={{position:'fixed',inset:0,zIndex:185}} onClick={()=>setShowSR(false)}/>
     </>}
 
+    {/* V1.10: FLOATING RESET BANNER */}
+    {focusRoot !== 'p_ksr' && (
+      <div className="focus-banner">
+        <span>👨‍👩‍👧‍👦 Ruang Keluarga: <strong>{nn(people.find(x => x.id === focusRoot) || {})}</strong></span>
+        <button className="focus-banner-close" onClick={handleResetFocus}>Kembali ke Utama ✕</button>
+      </div>
+    )}
+
     <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp} onClick={e=>{if(e.target===vpRef.current){setSel(null);setEdgeSel(null);}}}>
-      <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
+      <div id="world" ref={worldRef} style={{transform:`translate(${vt.current.x}px,${vt.current.y}px) scale(${vt.current.s})`}}>
         <svg id="csvg">
           {lines.map((l,i)=>(
             <g key={i}>
@@ -1086,8 +1225,12 @@ function App(){
           ))}
         </svg>
 
-        {people.filter(p => visibleIds.has(p.id)).map(p=>{
+        {people.filter(p => isVisibleNode.has(p.id)).map(p=>{
           const pp=pos[p.id]; if(!pp) return null;
+          const hasChildren = getActiveChildren(p.id).length > 0;
+          // Hanya tampilkan tombol jika dia punya anak, DAN dia adalah darah daging/akar
+          const showDrillBtn = hasChildren && focusRoot !== p.id && (p.isBlood || focusRoot === p.id);
+
           return (
             <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{e.stopPropagation();setSel(p.id);setSbMode('view');setEdgeSel(null);}}>
               <div className={`card ${p.status==='Wafat'?'wafat':''} ${sel===p.id?'sel':''}`}>
@@ -1098,6 +1241,14 @@ function App(){
                 <div className="card-nick">{nn(p)}</div>
                 {p.status==='Wafat'&&<div className="card-badge bwafat">Wafat</div>}
                 {p.status==='Cerai'&&<div className="card-badge bcerai">Cerai</div>}
+                
+                {/* V1.10 PATCH: TOMBOL MASUK KELUARGA (HANYA UNTUK KETURUNAN DARAH) */}
+                {showDrillBtn && (
+                  <div className="drill-btn" onClick={(e)=>handleFocus(e, p.id)} title="Lihat semua keturunan">
+                    Keturunan ↓
+                  </div>
+                )}
+
               </div>
             </div>
           );
@@ -1105,7 +1256,7 @@ function App(){
       </div>
 
       {edgeSel&&isAdmin&&(
-        <div className="edge-popup" style={{left:Math.min(edgeSel.mx*vt.s+vt.x, window.innerWidth-250), top:Math.min(edgeSel.my*vt.s+vt.y+vpTop, window.innerHeight-150)}} onClick={e=>e.stopPropagation()}>
+        <div className="edge-popup" style={{left:Math.min(edgeSel.mx*vt.current.s+vt.current.x, window.innerWidth-250), top:Math.min(edgeSel.my*vt.current.s+vt.current.y+vpTop, window.innerHeight-150)}} onClick={e=>e.stopPropagation()}>
           <h4>Edit Relasi</h4>
           <div className="edge-info">Jenis: <strong>{edgeSel.label}</strong>{edgeSel.type==='parent-child'&&<><br/>Status: <strong>{edgeSel.active?'Pengasuh aktif':'Biologis / historis'}</strong></>}</div>
           <div className="edge-actions">
@@ -1257,7 +1408,7 @@ function App(){
     {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
         <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
-        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <div className="frow"><button className="btn primary" onClick={()=>computeAutoLayout(focusRoot, true)}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
@@ -1306,14 +1457,14 @@ function App(){
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
       <div className="stat-sep"></div>
       <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div className="stat-sep hide-mob"></div>
-      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
+      <div className="stat-sep"></div>
+      <div><span className="stat-val">{totalWafat}</span> Wafat</div>
     </div>
 
     <div className={`ctrl ${sel?'sb-open':''}`}>
-      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
-      <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
-      <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
+      <button className="cbtn" onClick={()=>setZoom(1.2)}>+</button>
+      <button className="cbtn" onClick={()=>setZoom(0.8)}>−</button>
+      <button className="cbtn" onClick={()=>autoCamera(focusRoot)} style={{fontSize:22}}>⌂</button>
     </div>
   </>;
 }
