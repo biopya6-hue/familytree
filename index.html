@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.9-B (MODE FOKUS / DRILL-DOWN)
+   SILSILAH-MASTER-V1.9-C (COMPACT GRID LAYOUT)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw}
@@ -84,67 +84,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .card-badge{display:inline-block;font-size:8px;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:3px;letter-spacing:.04em;}
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
-
-/* V1.9-B: FOCUS BUTTON ON CARD */
-.focus-btn{
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background: #fff;
-  border: 1.5px solid #dbd6cf;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  z-index: 15;
-  transition: all 0.2s;
-}
-.focus-btn:hover{
-  background: #e8f2fa;
-  border-color: #6ea8d4;
-  transform: scale(1.15);
-}
-
-/* V1.9-B: FLOATING BANNER FOR RESET */
-.focus-banner {
-  position: fixed;
-  top: 64px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2e2820;
-  color: #fff;
-  padding: 6px 12px 6px 16px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  z-index: 190;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  animation: dropDown 0.3s ease-out forwards;
-}
-@keyframes dropDown {
-  from { top: 40px; opacity: 0; }
-  to { top: 64px; opacity: 1; }
-}
-.focus-banner-close {
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: #fff;
-  border-radius: 12px;
-  padding: 3px 10px;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 700;
-  transition: background 0.15s;
-}
-.focus-banner-close:hover { background: rgba(255,255,255,0.3); }
 
 /* Sidebar Profil */
 .sidebar{position:fixed;right:0;bottom:0;top:52px;width:310px;z-index:150;background:#fff;border-left:1px solid #dbd6cf;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease-out;box-shadow:-4px 0 24px rgba(0,0,0,.05);}
@@ -548,9 +487,6 @@ function App(){
   const [showSearch,setShowSearch]   = useState(false);
   const [registryFilter,setRegistryFilter] = useState(null); 
 
-  // V1.9-B STATE: FOCUS ROOT
-  const [focusRoot, setFocusRoot] = useState('p_ksr');
-
   const dragging=useRef(null), dragOff=useRef({});
   const panning=useRef(false), panStart=useRef({});
   const vpRef=useRef();
@@ -616,7 +552,7 @@ function App(){
         setPeople(SP);setRels(SR);setPos({...SPOS});
       } finally{
         setLoading(false);
-        setTimeout(() => computeAutoLayout('p_ksr', true), 100);
+        setTimeout(() => computeAutoLayout(), 100);
       }
     }
     load();
@@ -683,12 +619,12 @@ function App(){
     }catch(err){ setUploadPct(null); return null; }
   }
 
-  function autoCamera(rootId = focusRoot){
+  function autoCamera(){
     if(!vpRef.current)return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
     const isMobile = window.innerWidth < 600;
     const scale = isMobile ? 0.35 : 0.6;
-    const rootP = pos[rootId] || {x:1200, y:0};
+    const rootP = pos['p_ksr'] || {x:1200, y:0};
     setVt({ s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) });
   }
 
@@ -719,7 +655,7 @@ function App(){
   function onTouchStart(e){
     const tag=e.target.tagName;
     if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
-    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup,.focus-btn,.focus-banner'))return;
+    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup'))return;
 
     if(e.touches.length===1){
       const t=e.touches[0];
@@ -776,6 +712,8 @@ function App(){
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
 
   /* ── 3. DATA HELPERS ── */
+  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
+  
   function getActiveParents(pid){ 
     const rs = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
     return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
@@ -826,40 +764,13 @@ function App(){
     }));
   }
 
-  // V1.9-B: IS VISIBLE LOGIC (SUB-TREE FOCUS)
-  const isVisibleNode = useMemo(() => {
-    const vis = new Set();
-    if(!people.length) return vis;
-    const rootTarget = focusRoot || 'p_ksr';
-    const queue = [rootTarget];
-    while(queue.length) {
-      const curr = queue.shift();
-      if(vis.has(curr)) continue;
-      vis.add(curr);
-      getPartners(curr).forEach(sp => vis.add(sp));
-      getActiveChildren(curr).forEach(c => {
-        if(!vis.has(c)) queue.push(c);
-      });
-    }
-    
-    // Only show unconnected if we are viewing the full tree (p_ksr)
-    if(rootTarget === 'p_ksr'){
-      people.forEach(p => {
-         if(p.displayId === 'KSR-000') return;
-         const parents = getActiveParents(p.id);
-         if(parents.length === 0) vis.add(p.id); 
-      });
-    }
-    return vis;
-  }, [people, rels, focusRoot]);
-
   /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
       if(r.type==='married'){
         const [a,b] = r.pids; const pa=pos[a], pb=pos[b]; if(!pa||!pb) return;
-        if(!isVisibleNode.has(a)||!isVisibleNode.has(b)) return;
+        if(!visibleIds.has(a)||!visibleIds.has(b)) return;
         const key = [a,b].sort().join('-'); if(drawn.has(key)) return; drawn.add(key);
         const x1=CX(pa), y1=CY(pa), x2=CX(pb), y2=CY(pb);
         lines.push({rid:r.id, d:`M${x1},${y1} L${x2},${y2}`, stroke:'#c8a870', dash:'6 4', w:2.5, mx:(x1+x2)/2, my:(y1+y2)/2, label:'Pasangan', type:'married', active:true});
@@ -867,12 +778,9 @@ function App(){
       if(r.type==='parent-child' && r.isActive){
         const pids = r.pids.slice(0,-1), cid = r.pids[r.pids.length-1];
         const pc=pos[cid]; if(!pc) return;
-        if(!isVisibleNode.has(cid)) return;
+        if(!visibleIds.has(cid)) return;
 
-        // V1.9-B: Ensure all parents are visible before drawing line
-        if(pids.some(pid => !isVisibleNode.has(pid))) return;
-
-        const valid = pids.filter(x=>pos[x]&&isVisibleNode.has(x)); if(!valid.length) return;
+        const valid = pids.filter(x=>pos[x]&&visibleIds.has(x)); if(!valid.length) return;
         
         const sx = valid.reduce((s,x)=>s+CX(pos[x]),0)/valid.length;
         const sy = valid.reduce((s,x)=>s+CY(pos[x]),0)/valid.length;
@@ -885,6 +793,8 @@ function App(){
         const midY = sy + (CH/2) + dropDepth; 
         const ex = CX(pc), ey = CY(pc) - (CH/2);
         
+        // V1.9-C: Because children might be on different Y levels, 
+        // the vertical line correctly drops down to whatever Y the child is at!
         lines.push({rid:r.id, d:`M${sx},${sy} L${sx},${midY} L${ex},${midY} L${ex},${ey}`, stroke:'#90a8b8', dash:undefined, w:2, mx:ex, my:midY, label:'Orang tua → Anak', type:'parent-child', active:r.isActive});
       }
     });
@@ -965,104 +875,109 @@ function App(){
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT (V1.9-B AWARE) ── */
-  function computeAutoLayout(rootTarget = focusRoot, moveCamera = true){
-    const GAP_X=40, GAP_Y=160;
-    const rootId = rootTarget || 'p_ksr';
-    const root = people.find(p=>p.id===rootId) || people.find(p=>p.displayId==='KSR-000'); 
-    if(!root){setModal(null);return;}
-    
-    function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
-    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+  /* ── 6. DYNAMIC AUTO-LAYOUT (V1.9-C COMPACT GRID ROW-WRAPPING) ── */
+  function computeAutoLayout() {
+    const GAP_X = 40, GAP_Y = 160;
+    const MAX_PER_ROW = 4; // Maksimal 4 anak per baris horizontal
+    const root = people.find(p => p.displayId === 'KSR-000');
+    if (!root) { setModal(null); return; }
 
-    function subtreeWidth(pid, visited=new Set()){
-      if(visited.has(pid)) return CW; visited.add(pid);
-      const spouses=getSpouses(pid); const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
-      const children=getBloodChildren(pid); if(!children.length) return selfW;
-      const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
-      return Math.max(selfW, childTotal);
+    function getSpouses(pid) { return rels.filter(r => r.type === 'married' && r.pids.includes(pid)).map(r => r.pids.find(x => x !== pid)).map(id => people.find(p => p.id === id)).filter(Boolean).sort((a, b) => (a.spouseOrder || 99) - (b.spouseOrder || 99)); }
+    function getBloodChildren(pid) { return rels.filter(r => r.type === 'parent-child' && r.isActive && r.pids.slice(0, -1).includes(pid)).map(r => r.pids[r.pids.length - 1]); }
+
+    // Hitung lebar dengan ROW WRAPPING
+    function subtreeWidth(pid, visited = new Set()) {
+      if (visited.has(pid)) return CW; visited.add(pid);
+      const spouses = getSpouses(pid);
+      const selfW = CW * (1 + spouses.length) + GAP_X * spouses.length;
+      const children = getBloodChildren(pid);
+      if (!children.length) return selfW;
+
+      let maxRowW = 0;
+      for (let i = 0; i < children.length; i += MAX_PER_ROW) {
+        const row = children.slice(i, i + MAX_PER_ROW);
+        const rowW = row.reduce((s, cid) => s + subtreeWidth(cid, new Set([...visited])), 0) + (row.length - 1) * GAP_X;
+        if (rowW > maxRowW) maxRowW = rowW;
+      }
+      return Math.max(selfW, maxRowW);
     }
 
-    const newPos={};
-    function layoutSubtree(pid, centerX, gen, visited=new Set()){
-      if(visited.has(pid)) return; visited.add(pid);
-      const yPos = gen*GAP_Y;
-      const spouses = getSpouses(pid), children = getBloodChildren(pid);
+    const newPos = {};
 
-      function placeUnit(selfCX){
-        const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
-        let ux = selfCX - totalUnit/2;
-        
-        if (spouses.length === 0) {
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
-        } else if (spouses.length === 1) {
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)};
-          ux += CW + GAP_X;
-          newPos[spouses[0].id]={x:Math.round(ux), y:Math.round(yPos)};
-        } else {
-          const s1 = spouses.filter(s=>s.spouseOrder===1);
-          const s2 = spouses.filter(s=>s.spouseOrder>1);
-          s1.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
-          newPos[pid]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X;
-          s2.forEach(sp=>{ newPos[sp.id]={x:Math.round(ux), y:Math.round(yPos)}; ux+=CW+GAP_X; });
-        }
+    // Layout dengan koordinat Y dinamis
+    function layoutSubtree(pid, centerX, currentY, visited = new Set()) {
+      if (visited.has(pid)) return currentY + GAP_Y; visited.add(pid);
+      const spouses = getSpouses(pid);
+      const children = getBloodChildren(pid);
+
+      // 1. Letakkan Leluhur & Pasangan
+      const totalUnit = CW * (1 + spouses.length) + GAP_X * spouses.length;
+      let ux = centerX - totalUnit / 2;
+
+      if (spouses.length === 0) {
+        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) };
+      } else if (spouses.length === 1) {
+        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) };
+        ux += CW + GAP_X;
+        newPos[spouses[0].id] = { x: Math.round(ux), y: Math.round(currentY) };
+      } else {
+        const s1 = spouses.filter(s => s.spouseOrder === 1);
+        const s2 = spouses.filter(s => s.spouseOrder > 1);
+        s1.forEach(sp => { newPos[sp.id] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X; });
+        newPos[pid] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X;
+        s2.forEach(sp => { newPos[sp.id] = { x: Math.round(ux), y: Math.round(currentY) }; ux += CW + GAP_X; });
       }
 
-      if(!children.length){ placeUnit(centerX); return; }
-      
-      const widths = children.map(cid=>subtreeWidth(cid, new Set([pid])));
-      const totalChildW = widths.reduce((s,w)=>s+w,0) + (children.length-1)*GAP_X;
-      let cx = centerX - totalChildW/2;
-      
-      const childCenters = [];
-      children.forEach((cid,i)=>{
-        const w=widths[i];
-        const childCenter = cx + w/2;
-        childCenters.push(childCenter);
-        layoutSubtree(cid, childCenter, gen+1, new Set([...visited])); 
-        cx+=w+GAP_X;
-      });
-      
-      const selfCX = children.length === 1 ? childCenters[0] : (childCenters[0] + childCenters[childCenters.length-1]) / 2;
-      placeUnit(selfCX);
+      if (!children.length) return currentY + GAP_Y;
+
+      // 2. Letakkan Anak-anak dalam bentuk Baris (Grid)
+      let nextY = currentY + GAP_Y;
+      let finalMaxY = nextY;
+
+      for (let i = 0; i < children.length; i += MAX_PER_ROW) {
+        const row = children.slice(i, i + MAX_PER_ROW);
+        const widths = row.map(cid => subtreeWidth(cid, new Set([pid])));
+        const rowTotalW = widths.reduce((s, w) => s + w, 0) + (row.length - 1) * GAP_X;
+        let cx = centerX - rowTotalW / 2;
+
+        let rowMaxY = nextY;
+        row.forEach((cid, idx) => {
+          const w = widths[idx];
+          const childCenter = cx + w / 2;
+          const childBottomY = layoutSubtree(cid, childCenter, nextY, new Set([...visited]));
+          if (childBottomY > rowMaxY) rowMaxY = childBottomY;
+          cx += w + GAP_X;
+        });
+        
+        // Baris selanjutnya didorong ke bawah elemen terdalam dari baris ini
+        nextY = rowMaxY + GAP_Y; 
+        finalMaxY = nextY;
+      }
+
+      return finalMaxY - GAP_Y; 
     }
 
     const w = subtreeWidth(root.id);
-    layoutSubtree(root.id, w/2, 0);
+    layoutSubtree(root.id, w / 2, 0);
 
-    // Only layout truly unconnected nodes if we are viewing the FULL tree
-    if(rootId === 'p_ksr') {
-      const trulyUnconnected = people.filter(p => {
-         if(p.id in newPos) return false;
-         if(p.displayId === 'KSR-000') return false; 
-         const parents = getActiveParents(p.id);
-         return parents.length === 0;
-      });
-      
-      let ux2=0;
-      const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
-      trulyUnconnected.forEach(p=>{
-        newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
-        ux2+=CW+GAP_X;
-      });
-    }
+    // Truly unconnected nodes
+    const trulyUnconnected = people.filter(p => {
+       if(p.id in newPos) return false;
+       if(p.displayId === 'KSR-000') return false; 
+       const parents = getActiveParents(p.id);
+       return parents.length === 0;
+    });
+    
+    let ux2=0;
+    const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
+    trulyUnconnected.forEach(p=>{
+      newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
+      ux2+=CW+GAP_X;
+    });
 
-    setPos(newPos); 
+    setPos(newPos);
+    setTimeout(autoCamera, 100);
     setModal(null);
-    if(moveCamera) {
-       setTimeout(() => autoCamera(root.id), 100);
-    }
-  }
-
-  // V1.9-B Handlers
-  function handleFocus(e, id) {
-    e.stopPropagation();
-    setFocusRoot(id);
-    computeAutoLayout(id, true);
-  }
-  function handleResetFocus() {
-    setFocusRoot('p_ksr');
-    computeAutoLayout('p_ksr', true);
   }
 
   /* ── 7. UI RENDERERS ── */
@@ -1160,14 +1075,6 @@ function App(){
       <div style={{position:'fixed',inset:0,zIndex:185}} onClick={()=>setShowSR(false)}/>
     </>}
 
-    {/* V1.9-B: FLOATING RESET BANNER */}
-    {focusRoot !== 'p_ksr' && (
-      <div className="focus-banner">
-        <span>🎯 Fokus Silsilah: <strong>{nn(people.find(x => x.id === focusRoot) || {})}</strong></span>
-        <button className="focus-banner-close" onClick={handleResetFocus}>Kembali ke Utama ✕</button>
-      </div>
-    )}
-
     <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp} onClick={e=>{if(e.target===vpRef.current){setSel(null);setEdgeSel(null);}}}>
       <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
         <svg id="csvg">
@@ -1179,9 +1086,8 @@ function App(){
           ))}
         </svg>
 
-        {people.filter(p => isVisibleNode.has(p.id)).map(p=>{
+        {people.filter(p => visibleIds.has(p.id)).map(p=>{
           const pp=pos[p.id]; if(!pp) return null;
-          const hasChildren = getActiveChildren(p.id).length > 0;
           return (
             <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{e.stopPropagation();setSel(p.id);setSbMode('view');setEdgeSel(null);}}>
               <div className={`card ${p.status==='Wafat'?'wafat':''} ${sel===p.id?'sel':''}`}>
@@ -1192,14 +1098,6 @@ function App(){
                 <div className="card-nick">{nn(p)}</div>
                 {p.status==='Wafat'&&<div className="card-badge bwafat">Wafat</div>}
                 {p.status==='Cerai'&&<div className="card-badge bcerai">Cerai</div>}
-                
-                {/* V1.9-B PATCH: TOMBOL FOKUS DRILL-DOWN */}
-                {hasChildren && focusRoot !== p.id && (
-                  <div className="focus-btn" onClick={(e)=>handleFocus(e, p.id)} title="Fokus ke keluarga ini">
-                    🎯
-                  </div>
-                )}
-
               </div>
             </div>
           );
@@ -1359,7 +1257,7 @@ function App(){
     {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
         <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
-        <div className="frow"><button className="btn primary" onClick={()=>computeAutoLayout(focusRoot, true)}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <div className="frow"><button className="btn primary" onClick={computeAutoLayout}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
@@ -1395,7 +1293,7 @@ function App(){
       </div>
     </div>}
 
-    {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
+    {/* ── UI MELAYANG ── */}
     <div className={`legend ${sel?'sb-open':''}`}>
       <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
       <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
@@ -1415,7 +1313,7 @@ function App(){
     <div className={`ctrl ${sel?'sb-open':''}`}>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
-      <button className="cbtn" onClick={()=>autoCamera(focusRoot)} style={{fontSize:22}}>⌂</button>
+      <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
     </div>
   </>;
 }
