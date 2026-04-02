@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.10 (PATCH 10 - GPU PANNING & PROGRESSIVE UI)
+   SILSILAH-MASTER-V1.11 (PATCH 11 - BUG FIXES)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
@@ -44,7 +44,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .search-expand.open{display:flex;}
 .search-expand input{flex:1;padding:8px 14px;border-radius:20px;border:1.5px solid #8a7a6a;background:#fff;font-size:13px;outline:none;}
 .search-expand .se-close{width:34px;height:34px;border-radius:10px;border:1px solid #d0cbc2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#7a7060;}
-@media(max-width:600px){ .search-wrap{display:none;} .search-icon-btn{display:flex;} }
 
 .save-status{display:flex;align-items:center;gap:6px;background:#f5f2ed;border-radius:20px;padding:5px 12px;font-size:10.5px;font-weight:600;color:#7a7060;border:1px solid #e8e3da;white-space:nowrap;}
 .save-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -63,13 +62,20 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .btn.accent{background:#4a7a9b;border-color:#4a7a9b;color:#fff}
 .btn.accent:hover{background:#3a6a8b}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-@media(max-width:650px){ .hide-mob{display:none;} }
 
-/* Viewport & Nodes - V1.10 GPU ACCELERATED */
+/* V1.11 PATCH: Responsive Mobile Buttons (Icon Only) */
+@media(max-width:650px){ 
+  .search-wrap{display:none;} 
+  .search-icon-btn{display:flex;}
+  .hide-mob{display:none;} 
+  .btn-text{display:none;}
+  .btn { padding: 6px 10px; font-size: 14.5px; }
+}
+
+/* Viewport & Nodes */
 #vp{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;z-index:10;touch-action:none;}
 #vp.pan{cursor:grabbing}
 #world{position:absolute;top:0;left:0;transform-origin:0 0; will-change:transform;} 
-/* Transisi dihapus dari #world untuk pergerakan jari yang realtime 0-delay */
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
 .node{position:absolute;z-index:10;transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);}
@@ -86,7 +92,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
 
-/* V1.10: DRILL-DOWN / FOCUS BUTTON (NEW DESIGN) */
+/* DRILL-DOWN BUTTON */
 .drill-btn{
   position: absolute;
   bottom: -12px;
@@ -114,7 +120,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
   transform: translateX(-50%) translateY(-2px);
 }
 
-/* V1.10: FLOATING BANNER FOR RESET */
+/* FLOATING BANNER */
 .focus-banner {
   position: fixed;
   top: 64px;
@@ -197,7 +203,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7060;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-/* V1.10 FIX: STAT PILL MOBILE WAFAT */
 .statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;flex-wrap:wrap;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;white-space:nowrap;}
 .stat-val{color:#2a2218;font-weight:800;font-size:13.5px;margin-right:4px}
 .stat-sep{width:4px;height:4px;border-radius:50%;background:#d0cbc2;}
@@ -297,15 +302,18 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER (1.8 INJECTION KEPT INTACT)
+   DATA MASTER 
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
   { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   
+  // GENERASI 1: KARMILAH
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  
+  // GENERASI 2: ANAK KARMILAH 
   { id:'p_krm_2', displayId:'KRM-002', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Naris', nickname:'Naris', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_2_w1', displayId:'KRM-002-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Yuti', nickname:'Yuti', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_3', displayId:'KRM-003', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Lasemi', nickname:'Lasemi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -316,6 +324,7 @@ const SP=[
   { id:'p_krm_5_w1', displayId:'KRM-005-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami ke-1 Sri', nickname:'Suami 1 Sri', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_5_w2', displayId:'KRM-005-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Ehsan', nickname:'Ehsan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  // GENERASI 3: CUCU KARMILAH DARI JALUR NARIS
   { id:'p_krm_6', displayId:'KRM-006', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Natik', nickname:'Natik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_6_w1', displayId:'KRM-006-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Rob', nickname:'Rob', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_7', displayId:'KRM-007', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Sulami', nickname:'Sulami', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -333,6 +342,7 @@ const SP=[
   { id:'p_krm_13', displayId:'KRM-013', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Eni', nickname:'Eni', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_13_w1', displayId:'KRM-013-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Eni', nickname:'Suami Eni', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  // GENERASI 3: CUCU KARMILAH DARI JALUR LASEMI
   { id:'p_krm_14', displayId:'KRM-014', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Win', nickname:'Win', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_14_w1', displayId:'KRM-014-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami 1 Win', nickname:'Suami 1 Win', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_14_w2', displayId:'KRM-014-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Eko', nickname:'Eko', gender:'M', status:'Wafat', notes:'', bioNote:'' },
@@ -345,6 +355,7 @@ const SP=[
   { id:'p_krm_19', displayId:'KRM-019', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Dartik', nickname:'Dartik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_19_w1', displayId:'KRM-019-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Joko', nickname:'Joko', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  // GENERASI 3: CUCU KARMILAH DARI JALUR MARTAM
   { id:'p_krm_20', displayId:'KRM-020', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Yun', nickname:'Yun', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_20_w1', displayId:'KRM-020-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Budi', nickname:'Budi', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_21', displayId:'KRM-021', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Rini', nickname:'Rini', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -352,11 +363,13 @@ const SP=[
   { id:'p_krm_21_w2', displayId:'KRM-021-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Suami 2 Rini', nickname:'Suami 2 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_21_w3', displayId:'KRM-021-S3', bani:'KRM', isBlood:false, spouseOrder:3, fullName:'Suami 3 Rini', nickname:'Suami 3 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  // GENERASI 3: CUCU KARMILAH DARI JALUR SRI
   { id:'p_krm_22', displayId:'KRM-022', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Tin', nickname:'Tin', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_22_w1', displayId:'KRM-022-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Lani', nickname:'Lani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  // BANI SAID 
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -368,6 +381,7 @@ const SP=[
   { id:'p_sad_4b', displayId:'SAD-005', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 2', nickname:'Cucu 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_4c', displayId:'SAD-006', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 3', nickname:'Cucu 3', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   
+  // BANI PANIDJAN 
   { id:'p_pan_1', displayId:'PAN-001', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Panidjan', nickname:'Panidjan', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_pan_1_w1', displayId:'PAN-001-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_pan_2a', displayId:'PAN-002', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Mukayani', nickname:'Mukayani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
@@ -397,6 +411,7 @@ const SP=[
   { id:'p_pan_3j', displayId:'PAN-018', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Hafiz', nickname:'Hafiz', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_pan_4a', displayId:'PAN-019', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Ishita Hirya Mahesani', nickname:'Hirya', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   
+  // BANI SURAHMAN
   { id:'p_sur_1', displayId:'SUR-001', bani:'SUR', isBlood:true, spouseOrder:null, fullName:'Surahman', nickname:'Surahman', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sur_1_w1', displayId:'SUR-001-S1', bani:'SUR', isBlood:false, spouseOrder:1, fullName:'Menik', nickname:'Menik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sur_1_w2', displayId:'SUR-001-S2', bani:'SUR', isBlood:false, spouseOrder:2, fullName:'Istri ke-2 Surahman', nickname:'Istri 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -412,6 +427,8 @@ const SR=[
   { id:'c4', type:'parent-child', pids:['p_ksr','p_ksr_w2','p_sur_1'], isActive:true },
   
   { id:'m3', type:'married', pids:['p_krm_1','p_krm_1_w1'], isActive:true },
+  
+  // RELASI GENERASI 2 KARMILAH 
   { id:'c_krm_1', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_2'], isActive:true }, 
   { id:'c_krm_2', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_3'], isActive:true }, 
   { id:'c_krm_3', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_4'], isActive:true }, 
@@ -421,6 +438,8 @@ const SR=[
   { id:'m_krm_4', type:'married', pids:['p_krm_4','p_krm_4_w1'], isActive:true }, 
   { id:'m_krm_5', type:'married', pids:['p_krm_5','p_krm_5_w1'], isActive:true }, 
   { id:'m_krm_5b', type:'married', pids:['p_krm_5','p_krm_5_w2'], isActive:true }, 
+
+  // RELASI GENERASI 3 DARI JALUR NARIS
   { id:'c_krm_5', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_6'], isActive:true }, 
   { id:'c_krm_6', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_7'], isActive:true }, 
   { id:'c_krm_7', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_8'], isActive:true }, 
@@ -437,6 +456,8 @@ const SR=[
   { id:'m_krm_11', type:'married', pids:['p_krm_11','p_krm_11_w1'], isActive:true },
   { id:'m_krm_12', type:'married', pids:['p_krm_12','p_krm_12_w1'], isActive:true },
   { id:'m_krm_13', type:'married', pids:['p_krm_13','p_krm_13_w1'], isActive:true },
+
+  // RELASI GENERASI 3 DARI JALUR LASEMI
   { id:'c_krm_13', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_14'], isActive:true }, 
   { id:'c_krm_14', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_15'], isActive:true }, 
   { id:'c_krm_15', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_16'], isActive:true }, 
@@ -448,17 +469,22 @@ const SR=[
   { id:'m_krm_15', type:'married', pids:['p_krm_15','p_krm_15_w1'], isActive:true }, 
   { id:'m_krm_17', type:'married', pids:['p_krm_17','p_krm_17_w1'], isActive:true }, 
   { id:'m_krm_19', type:'married', pids:['p_krm_19','p_krm_19_w1'], isActive:true }, 
+
+  // RELASI GENERASI 3 DARI JALUR MARTAM 
   { id:'c_krm_19', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_20'], isActive:true }, 
   { id:'c_krm_20', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_21'], isActive:true }, 
   { id:'m_krm_20', type:'married', pids:['p_krm_20','p_krm_20_w1'], isActive:true }, 
   { id:'m_krm_21a', type:'married', pids:['p_krm_21','p_krm_21_w1'], isActive:true }, 
   { id:'m_krm_21b', type:'married', pids:['p_krm_21','p_krm_21_w2'], isActive:true }, 
   { id:'m_krm_21c', type:'married', pids:['p_krm_21','p_krm_21_w3'], isActive:true }, 
+
+  // RELASI GENERASI 3 DARI JALUR SRI
   { id:'c_krm_21', type:'parent-child', pids:['p_krm_5','p_krm_5_w1','p_krm_22'], isActive:true }, 
   { id:'m_krm_22', type:'married', pids:['p_krm_22','p_krm_22_w1'], isActive:true }, 
   { id:'c_krm_22', type:'parent-child', pids:['p_krm_5','p_krm_5_w2','p_krm_23'], isActive:true }, 
   { id:'m_krm_23', type:'married', pids:['p_krm_23','p_krm_23_w1'], isActive:true }, 
 
+  // RELASI SAID CS
   { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
   { id:'m5', type:'married', pids:['p_sad_1','p_sad_1_w2'], isActive:true },
   { id:'c5', type:'parent-child', pids:['p_sad_1','p_sad_1_w1','p_sad_2'], isActive:true },
@@ -469,6 +495,7 @@ const SR=[
   { id:'c8', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4b'], isActive:true },
   { id:'c9', type:'parent-child', pids:['p_sad_3','p_sad_3_w1','p_sad_4c'], isActive:true },
   
+  // RELASI PANIDJAN CS
   { id:'m8', type:'married', pids:['p_pan_1','p_pan_1_w1'], isActive:true },
   { id:'c10', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2a'], isActive:true },
   { id:'c11', type:'parent-child', pids:['p_pan_1','p_pan_1_w1','p_pan_2b'], isActive:true },
@@ -498,6 +525,7 @@ const SR=[
   { id:'m16', type:'married', pids:['p_pan_3c','p_pan_3c_w1'], isActive:true },
   { id:'c28', type:'parent-child', pids:['p_pan_3c','p_pan_3c_w1','p_pan_4a'], isActive:true },
   
+  // RELASI SURAHMAN
   { id:'m17', type:'married', pids:['p_sur_1','p_sur_1_w1'], isActive:true },
   { id:'m18', type:'married', pids:['p_sur_1','p_sur_1_w2'], isActive:true },
   { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
@@ -526,10 +554,10 @@ function App(){
   const [relSearchQ,setRelSearchQ]=useState('');
   const [pendingRel,setPendingRel] = useState(null); 
   
-  // V1.10: STATE FOKUS ROOT & WORLD REF (UNTUK GPU PANNING)
+  // STATE FOKUS ROOT & WORLD REF (UNTUK GPU PANNING)
   const [focusRoot, setFocusRoot] = useState('p_ksr');
   const worldRef = useRef(null);
-  const vt = useRef({x:0, y:0, s:0.55}); // Disimpan di Ref agar tidak re-render saat digeser
+  const vt = useRef({x:0, y:0, s:0.55});
 
   const [edgeSel,setEdgeSel] = useState(null);
   const [showSearch,setShowSearch]   = useState(false);
@@ -680,12 +708,9 @@ function App(){
   function setZoom(factor) {
     let newS = vt.current.s * factor;
     newS = Math.min(Math.max(newS, 0.15), 4);
-    
-    // Zoom ke tengah viewport
     if(!vpRef.current) return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
     const mx = vw/2, my = vh/2;
-    
     vt.current.x = mx - (mx - vt.current.x) * (newS / vt.current.s);
     vt.current.y = my - (my - vt.current.y) * (newS / vt.current.s);
     vt.current.s = newS;
@@ -703,7 +728,7 @@ function App(){
     if(panning.current) {
       vt.current.x = e.clientX - panStart.current.x;
       vt.current.y = e.clientY - panStart.current.y;
-      updateWorldTransform(); // Gerakan seketika via DOM
+      updateWorldTransform(); 
     }
   }
   function vpUp(){panning.current=false;dragging.current=null;}
@@ -844,7 +869,7 @@ function App(){
     }));
   }
 
-  // V1.10: PROGRESSIVE DEPTH LOGIC (HOMEPAGE VS FOCUS)
+  // V1.11: PROGRESSIVE DEPTH LOGIC & BUG 1 FIX (ORPHANED NODE)
   const isVisibleNode = useMemo(() => {
     const vis = new Set();
     if(!people.length) return vis;
@@ -852,7 +877,6 @@ function App(){
     const rootTarget = focusRoot || 'p_ksr';
     const isHome = rootTarget === 'p_ksr';
     
-    // Breadth-First Search with Depth tracking
     const depths = { [rootTarget]: 0 };
     const queue = [rootTarget];
     
@@ -865,7 +889,6 @@ function App(){
       
       vis.add(curr);
       
-      // Tambahkan Pasangan (Kedalamannya sama)
       getPartners(curr).forEach(sp => {
         if(depths[sp] === undefined) {
           depths[sp] = currentDepth;
@@ -873,7 +896,6 @@ function App(){
         }
       });
       
-      // Tambahkan Anak kandung (Kedalaman + 1)
       getActiveChildren(curr).forEach(c => {
         if(depths[c] === undefined) {
           depths[c] = currentDepth + 1;
@@ -882,12 +904,15 @@ function App(){
       });
     }
     
-    // Tampilkan orang yang benar-benar tidak terhubung (hanya saat di Homepage)
+    // PATCH 11 (BUG 1 FIX): Hanya tampilkan orang tak terhubung jika dia sedarah atau orang baru
+    // Pasangan (isBlood: false) tidak akan melayang ke bawah jika pasangannya disembunyikan.
     if(isHome){
       people.forEach(p => {
          if(p.displayId === 'KSR-000') return;
          const parents = getActiveParents(p.id);
-         if(parents.length === 0) vis.add(p.id); 
+         if(parents.length === 0 && (p.isBlood === true || p.bani === 'BARU')) {
+           vis.add(p.id); 
+         }
       });
     }
     return vis;
@@ -1050,7 +1075,7 @@ function App(){
         }
       }
 
-      // V1.10: PROGRESSIVE LAYOUT - Potong ranting jika di homepage
+      // Potong ranting jika di homepage
       if(rootTarget === 'p_ksr' && gen >= 1) { placeUnit(centerX); return; }
 
       if(!children.length){ placeUnit(centerX); return; }
@@ -1075,12 +1100,13 @@ function App(){
     const w = subtreeWidth(root.id);
     layoutSubtree(root.id, w/2, 0);
 
+    // PATCH 11 FIX (ORPHANED NODES)
     if(rootId === 'p_ksr') {
       const trulyUnconnected = people.filter(p => {
          if(p.id in newPos) return false;
          if(p.displayId === 'KSR-000') return false; 
          const parents = getActiveParents(p.id);
-         return parents.length === 0;
+         return parents.length === 0 && (p.isBlood === true || p.bani === 'BARU');
       });
       
       let ux2=0;
@@ -1171,7 +1197,7 @@ function App(){
         <div className="brand-sub">Silsilah Keluarga</div>
       </div>
       <div className="sep"/>
-      <div className="search-wrap hide-mob">
+      <div className="search-wrap">
         <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       </div>
       <button className="search-icon-btn" onClick={()=>{setShowSearch(true);setSearchQ('');setShowSR(false);}}>🔍</button>
@@ -1182,11 +1208,12 @@ function App(){
         {saveStatus==='syncing'?'Menyimpan...':saveStatus==='error'?'Gagal':'Tersimpan'}
       </div>
 
-      {isAdmin&&<button className="btn accent hide-mob" onClick={()=>computeAutoLayout(focusRoot, true)}>⊞ Rapikan</button>}
-      {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>+ Orang</button>}
-      {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>+ Relasi</button>}
-      <button className="btn hide-mob" onClick={()=>setModal('registry')}>🪪 ID</button>
-      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>{isAdmin?'Admin Aktif':'Login'}</button>
+      {/* V1.11 PATCH: RESPONSIVE MOBILE ICONS */}
+      {isAdmin&&<button className="btn accent" onClick={()=>computeAutoLayout(focusRoot, true)}>⊞ <span className="btn-text">Rapikan</span></button>}
+      {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>👤+ <span className="btn-text">Orang</span></button>}
+      {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>🔗 <span className="btn-text">Relasi</span></button>}
+      <button className="btn" onClick={()=>setModal('registry')}>👤 <span className="btn-text">ID</span></button>
+      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>🔑 <span className="btn-text">{isAdmin?'Admin Aktif':'Login'}</span></button>
     </div>
 
     <div className={`search-expand${showSearch?' open':''}`}>
@@ -1228,8 +1255,10 @@ function App(){
         {people.filter(p => isVisibleNode.has(p.id)).map(p=>{
           const pp=pos[p.id]; if(!pp) return null;
           const hasChildren = getActiveChildren(p.id).length > 0;
-          // Hanya tampilkan tombol jika dia punya anak, DAN dia adalah darah daging/akar
-          const showDrillBtn = hasChildren && focusRoot !== p.id && (p.isBlood || focusRoot === p.id);
+          
+          // V1.11 PATCH: BUG 2 FIX (BATASI TOMBOL FOKUS HANYA UNTUK GEN 1)
+          const isGen1 = getActiveParents(p.id).includes('p_ksr');
+          const showDrillBtn = hasChildren && focusRoot === 'p_ksr' && p.isBlood && isGen1;
 
           return (
             <div key={p.id} className="node" style={{left:pp.x, top:pp.y, width:CW}} onMouseDown={e=>nodeDown(e,p.id)} onClick={e=>{e.stopPropagation();setSel(p.id);setSbMode('view');setEdgeSel(null);}}>
@@ -1242,7 +1271,7 @@ function App(){
                 {p.status==='Wafat'&&<div className="card-badge bwafat">Wafat</div>}
                 {p.status==='Cerai'&&<div className="card-badge bcerai">Cerai</div>}
                 
-                {/* V1.10 PATCH: TOMBOL MASUK KELUARGA (HANYA UNTUK KETURUNAN DARAH) */}
+                {/* V1.11 PATCH: TOMBOL MASUK KELUARGA HANYA GEN 1 */}
                 {showDrillBtn && (
                   <div className="drill-btn" onClick={(e)=>handleFocus(e, p.id)} title="Lihat semua keturunan">
                     Keturunan ↓
@@ -1457,8 +1486,8 @@ function App(){
       <div><span className="stat-val">{totalOrang}</span> Individu</div>
       <div className="stat-sep"></div>
       <div><span className="stat-val">{totalPasangan}</span> Pasangan</div>
-      <div className="stat-sep"></div>
-      <div><span className="stat-val">{totalWafat}</span> Wafat</div>
+      <div className="stat-sep hide-mob"></div>
+      <div className="hide-mob"><span className="stat-val">{totalWafat}</span> Wafat</div>
     </div>
 
     <div className={`ctrl ${sel?'sb-open':''}`}>
