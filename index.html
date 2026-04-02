@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.7
+   SILSILAH-MASTER-V1.8 (Patch 8 - Injeksi Data 2)
    CSS RESET & TEMA MINIMALIS ANTI-OVERLAP
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -237,6 +237,7 @@ function fmtBirth(pl,dt){
 
 /* ══════════════════════════════════════════════════
    FASE 2: STRUKTUR DATA ATRIBUT LACI (Bebas Regex)
+   PATCH 8: INJEKSI KETURUNAN LASEMI, MARTAM, SRI
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
@@ -247,7 +248,7 @@ const SP=[
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   
-  // GENERASI 2: ANAK KARMILAH (INJEKSI BARU)
+  // GENERASI 2: ANAK KARMILAH 
   { id:'p_krm_2', displayId:'KRM-002', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Naris', nickname:'Naris', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_2_w1', displayId:'KRM-002-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Yuti', nickname:'Yuti', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_3', displayId:'KRM-003', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Lasemi', nickname:'Lasemi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -255,9 +256,10 @@ const SP=[
   { id:'p_krm_4', displayId:'KRM-004', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Martam', nickname:'Martam', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_4_w1', displayId:'KRM-004-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Yu Yah', nickname:'Yu Yah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_5', displayId:'KRM-005', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Sri', nickname:'Sri', gender:'F', status:'Wafat', notes:'', bioNote:'' },
-  { id:'p_krm_5_w1', displayId:'KRM-005-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Sri', nickname:'Suami Sri', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_5_w1', displayId:'KRM-005-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami ke-1 Sri', nickname:'Suami 1 Sri', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_5_w2', displayId:'KRM-005-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Ehsan', nickname:'Ehsan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3: CUCU KARMILAH DARI JALUR NARIS (INJEKSI BARU)
+  // GENERASI 3: CUCU KARMILAH DARI JALUR NARIS
   { id:'p_krm_6', displayId:'KRM-006', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Natik', nickname:'Natik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_6_w1', displayId:'KRM-006-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Rob', nickname:'Rob', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_7', displayId:'KRM-007', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Sulami', nickname:'Sulami', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -274,6 +276,33 @@ const SP=[
   { id:'p_krm_12_w1', displayId:'KRM-012-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Istri Mimin', nickname:'Istri Mimin', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_13', displayId:'KRM-013', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Eni', nickname:'Eni', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_13_w1', displayId:'KRM-013-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Eni', nickname:'Suami Eni', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+
+  // GENERASI 3: CUCU KARMILAH DARI JALUR LASEMI (PATCH 8)
+  { id:'p_krm_14', displayId:'KRM-014', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Win', nickname:'Win', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_14_w1', displayId:'KRM-014-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami 1 Win', nickname:'Suami 1 Win', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_14_w2', displayId:'KRM-014-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Eko', nickname:'Eko', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_15', displayId:'KRM-015', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Takim', nickname:'Takim', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_15_w1', displayId:'KRM-015-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Rupi', nickname:'Rupi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_16', displayId:'KRM-016', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak ke-3 Lasemi', nickname:'Anak 3', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_17', displayId:'KRM-017', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Tutik', nickname:'Tutik', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_17_w1', displayId:'KRM-017-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Tutik', nickname:'Suami Tutik', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_18', displayId:'KRM-018', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak ke-5 Lasemi', nickname:'Anak 5', gender:'F', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_19', displayId:'KRM-019', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Dartik', nickname:'Dartik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_19_w1', displayId:'KRM-019-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Joko', nickname:'Joko', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+
+  // GENERASI 3: CUCU KARMILAH DARI JALUR MARTAM (PATCH 8)
+  { id:'p_krm_20', displayId:'KRM-020', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Yun', nickname:'Yun', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_20_w1', displayId:'KRM-020-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Budi', nickname:'Budi', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_21', displayId:'KRM-021', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Rini', nickname:'Rini', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_21_w1', displayId:'KRM-021-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami 1 Rini', nickname:'Suami 1 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_21_w2', displayId:'KRM-021-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Suami 2 Rini', nickname:'Suami 2 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_21_w3', displayId:'KRM-021-S3', bani:'KRM', isBlood:false, spouseOrder:3, fullName:'Suami 3 Rini', nickname:'Suami 3 Rini', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+
+  // GENERASI 3: CUCU KARMILAH DARI JALUR SRI (PATCH 8)
+  { id:'p_krm_22', displayId:'KRM-022', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Tin', nickname:'Tin', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_22_w1', displayId:'KRM-022-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Lani', nickname:'Lani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
   // BANI SAID (TETAP UTUH)
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
@@ -334,33 +363,61 @@ const SR=[
   
   { id:'m3', type:'married', pids:['p_krm_1','p_krm_1_w1'], isActive:true },
   
-  // RELASI GENERASI 2 KARMILAH (INJEKSI BARU)
-  { id:'c_krm_1', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_2'], isActive:true }, // Anak 1: Naris
-  { id:'c_krm_2', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_3'], isActive:true }, // Anak 2: Lasemi
-  { id:'c_krm_3', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_4'], isActive:true }, // Anak 3: Martam
-  { id:'c_krm_4', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_5'], isActive:true }, // Anak 4: Sri
-  { id:'m_krm_2', type:'married', pids:['p_krm_2','p_krm_2_w1'], isActive:true }, // Naris x Yuti
-  { id:'m_krm_3', type:'married', pids:['p_krm_3','p_krm_3_w1'], isActive:true }, // Lasemi x Dipo
-  { id:'m_krm_4', type:'married', pids:['p_krm_4','p_krm_4_w1'], isActive:true }, // Martam x Yu Yah
-  { id:'m_krm_5', type:'married', pids:['p_krm_5','p_krm_5_w1'], isActive:true }, // Sri x Suami Sri
+  // RELASI GENERASI 2 KARMILAH 
+  { id:'c_krm_1', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_2'], isActive:true }, 
+  { id:'c_krm_2', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_3'], isActive:true }, 
+  { id:'c_krm_3', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_4'], isActive:true }, 
+  { id:'c_krm_4', type:'parent-child', pids:['p_krm_1','p_krm_1_w1','p_krm_5'], isActive:true }, 
+  { id:'m_krm_2', type:'married', pids:['p_krm_2','p_krm_2_w1'], isActive:true }, 
+  { id:'m_krm_3', type:'married', pids:['p_krm_3','p_krm_3_w1'], isActive:true }, 
+  { id:'m_krm_4', type:'married', pids:['p_krm_4','p_krm_4_w1'], isActive:true }, 
+  { id:'m_krm_5', type:'married', pids:['p_krm_5','p_krm_5_w1'], isActive:true }, 
+  { id:'m_krm_5b', type:'married', pids:['p_krm_5','p_krm_5_w2'], isActive:true }, // Sri x Ehsan
 
-  // RELASI GENERASI 3 DARI JALUR NARIS (INJEKSI BARU)
-  { id:'c_krm_5', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_6'], isActive:true }, // Natik
-  { id:'c_krm_6', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_7'], isActive:true }, // Sulami
-  { id:'c_krm_7', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_8'], isActive:true }, // Supar
-  { id:'c_krm_8', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_9'], isActive:true }, // Lutini
-  { id:'c_krm_9', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_10'], isActive:true },// Muji
-  { id:'c_krm_10', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_11'], isActive:true },// Agus Darah
-  { id:'c_krm_11', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_12'], isActive:true },// Mimin
-  { id:'c_krm_12', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_13'], isActive:true },// Eni
-  { id:'m_krm_6', type:'married', pids:['p_krm_6','p_krm_6_w1'], isActive:true }, // Natik x Rob
-  { id:'m_krm_7', type:'married', pids:['p_krm_7','p_krm_7_w1'], isActive:true }, // Sulami x Bandi
-  { id:'m_krm_8', type:'married', pids:['p_krm_8','p_krm_8_w1'], isActive:true }, // Supar x Narti
-  { id:'m_krm_9', type:'married', pids:['p_krm_9','p_krm_9_w1'], isActive:true }, // Lutini x Agus Luar
-  { id:'m_krm_10', type:'married', pids:['p_krm_10','p_krm_10_w1'], isActive:true },// Muji x Suami
-  { id:'m_krm_11', type:'married', pids:['p_krm_11','p_krm_11_w1'], isActive:true },// Agus Darah x Meti
-  { id:'m_krm_12', type:'married', pids:['p_krm_12','p_krm_12_w1'], isActive:true },// Mimin x Istri
-  { id:'m_krm_13', type:'married', pids:['p_krm_13','p_krm_13_w1'], isActive:true },// Eni x Suami
+  // RELASI GENERASI 3 DARI JALUR NARIS
+  { id:'c_krm_5', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_6'], isActive:true }, 
+  { id:'c_krm_6', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_7'], isActive:true }, 
+  { id:'c_krm_7', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_8'], isActive:true }, 
+  { id:'c_krm_8', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_9'], isActive:true }, 
+  { id:'c_krm_9', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_10'], isActive:true },
+  { id:'c_krm_10', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_11'], isActive:true },
+  { id:'c_krm_11', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_12'], isActive:true },
+  { id:'c_krm_12', type:'parent-child', pids:['p_krm_2','p_krm_2_w1','p_krm_13'], isActive:true },
+  { id:'m_krm_6', type:'married', pids:['p_krm_6','p_krm_6_w1'], isActive:true }, 
+  { id:'m_krm_7', type:'married', pids:['p_krm_7','p_krm_7_w1'], isActive:true }, 
+  { id:'m_krm_8', type:'married', pids:['p_krm_8','p_krm_8_w1'], isActive:true }, 
+  { id:'m_krm_9', type:'married', pids:['p_krm_9','p_krm_9_w1'], isActive:true }, 
+  { id:'m_krm_10', type:'married', pids:['p_krm_10','p_krm_10_w1'], isActive:true },
+  { id:'m_krm_11', type:'married', pids:['p_krm_11','p_krm_11_w1'], isActive:true },
+  { id:'m_krm_12', type:'married', pids:['p_krm_12','p_krm_12_w1'], isActive:true },
+  { id:'m_krm_13', type:'married', pids:['p_krm_13','p_krm_13_w1'], isActive:true },
+
+  // RELASI GENERASI 3 DARI JALUR LASEMI (PATCH 8)
+  { id:'c_krm_13', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_14'], isActive:true }, 
+  { id:'c_krm_14', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_15'], isActive:true }, 
+  { id:'c_krm_15', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_16'], isActive:true }, 
+  { id:'c_krm_16', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_17'], isActive:true }, 
+  { id:'c_krm_17', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_18'], isActive:true }, 
+  { id:'c_krm_18', type:'parent-child', pids:['p_krm_3','p_krm_3_w1','p_krm_19'], isActive:true }, 
+  { id:'m_krm_14a', type:'married', pids:['p_krm_14','p_krm_14_w1'], isActive:true }, // Win x Suami 1
+  { id:'m_krm_14b', type:'married', pids:['p_krm_14','p_krm_14_w2'], isActive:true }, // Win x Eko
+  { id:'m_krm_15', type:'married', pids:['p_krm_15','p_krm_15_w1'], isActive:true }, // Takim x Rupi
+  { id:'m_krm_17', type:'married', pids:['p_krm_17','p_krm_17_w1'], isActive:true }, // Tutik x Suami
+  { id:'m_krm_19', type:'married', pids:['p_krm_19','p_krm_19_w1'], isActive:true }, // Dartik x Joko
+
+  // RELASI GENERASI 3 DARI JALUR MARTAM (PATCH 8)
+  { id:'c_krm_19', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_20'], isActive:true }, 
+  { id:'c_krm_20', type:'parent-child', pids:['p_krm_4','p_krm_4_w1','p_krm_21'], isActive:true }, 
+  { id:'m_krm_20', type:'married', pids:['p_krm_20','p_krm_20_w1'], isActive:true }, // Yun x Budi
+  { id:'m_krm_21a', type:'married', pids:['p_krm_21','p_krm_21_w1'], isActive:true }, // Rini x S1
+  { id:'m_krm_21b', type:'married', pids:['p_krm_21','p_krm_21_w2'], isActive:true }, // Rini x S2
+  { id:'m_krm_21c', type:'married', pids:['p_krm_21','p_krm_21_w3'], isActive:true }, // Rini x S3
+
+  // RELASI GENERASI 3 DARI JALUR SRI (PATCH 8)
+  { id:'c_krm_21', type:'parent-child', pids:['p_krm_5','p_krm_5_w1','p_krm_22'], isActive:true }, // Sri+Suami1 -> Tin
+  { id:'m_krm_22', type:'married', pids:['p_krm_22','p_krm_22_w1'], isActive:true }, // Tin x Lani
+  { id:'c_krm_22', type:'parent-child', pids:['p_krm_5','p_krm_5_w2','p_krm_23'], isActive:true }, // Sri+Ehsan -> Luluk
+  { id:'m_krm_23', type:'married', pids:['p_krm_23','p_krm_23_w1'], isActive:true }, // Luluk x Suami Luluk
 
   // RELASI SAID CS (TETAP UTUH)
   { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
@@ -414,10 +471,11 @@ const SPOS={
   p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
   p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
   
+  // KOORDINAT DUMMY FASE 1
   p_krm_2: {x:0, y:400}, p_krm_2_w1: {x:150, y:400},
   p_krm_3: {x:300, y:400}, p_krm_3_w1: {x:450, y:400},
   p_krm_4: {x:600, y:400}, p_krm_4_w1: {x:750, y:400},
-  p_krm_5: {x:900, y:400}, p_krm_5_w1: {x:1050, y:400},
+  p_krm_5: {x:900, y:400}, p_krm_5_w1: {x:1050, y:400}, p_krm_5_w2: {x:1200, y:400},
   
   p_krm_6: {x:-800, y:600}, p_krm_6_w1: {x:-650, y:600},
   p_krm_7: {x:-500, y:600}, p_krm_7_w1: {x:-350, y:600},
@@ -427,6 +485,18 @@ const SPOS={
   p_krm_11: {x:700, y:600}, p_krm_11_w1: {x:850, y:600},
   p_krm_12: {x:1000, y:600}, p_krm_12_w1: {x:1150, y:600},
   p_krm_13: {x:1300, y:600}, p_krm_13_w1: {x:1450, y:600},
+
+  // KOORDINAT DUMMY FASE 2
+  p_krm_14: {x:1600, y:600}, p_krm_14_w1: {x:1750, y:600}, p_krm_14_w2: {x:1900, y:600},
+  p_krm_15: {x:2050, y:600}, p_krm_15_w1: {x:2200, y:600},
+  p_krm_16: {x:2350, y:600},
+  p_krm_17: {x:2500, y:600}, p_krm_17_w1: {x:2650, y:600},
+  p_krm_18: {x:2800, y:600},
+  p_krm_19: {x:2950, y:600}, p_krm_19_w1: {x:3100, y:600},
+  p_krm_20: {x:3250, y:600}, p_krm_20_w1: {x:3400, y:600},
+  p_krm_21: {x:3550, y:600}, p_krm_21_w1: {x:3700, y:600}, p_krm_21_w2: {x:3850, y:600}, p_krm_21_w3: {x:4000, y:600},
+  p_krm_22: {x:4150, y:600}, p_krm_22_w1: {x:4300, y:600},
+  p_krm_23: {x:4450, y:600}, p_krm_23_w1: {x:4600, y:600},
 
   p_sad_1: {x:610, y:200}, p_sad_1_w1: {x:440, y:200}, p_sad_1_w2: {x:780, y:200},
   p_sad_2: {x:440, y:400}, p_sad_2_w1: {x:610, y:400},
@@ -699,7 +769,7 @@ function App(){
 
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
 
-  /* ── 3. DATA HELPERS (V1.2 FIX: REDUCE) ── */
+  /* ── 3. DATA HELPERS ── */
   const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
   const selP=people.find(p=>p.id===sel)||null;
   
@@ -832,7 +902,7 @@ function App(){
       const child=prev.find(p=>p.id===childId);
       const bloodParent=parentIds.map(id=>prev.find(p=>p.id===id)).find(p=>p&&p.isBlood===true);
       if(!child || !bloodParent || !bloodParent.bani) return prev;
-      if(child.bani && child.bani!=='BARU') return prev; // sudah punya bani asli
+      if(child.bani && child.bani!=='BARU') return prev; 
       const bloodsInBani = prev.filter(p=>p.bani===bloodParent.bani && p.isBlood===true).length;
       const childNum = String(bloodsInBani+1).padStart(3,'0');
       return prev.map(p=>{
@@ -1092,7 +1162,6 @@ function App(){
             <div className="profile-avatar" style={{background:MB(selP.gender)}}>
               {selP.photo?<img src={selP.photo} alt=""/>:<span style={{color:MC(selP.gender)}}>{ini(selP.fullName)}</span>}
             </div>
-            
             <div className="profile-nick" style={{fontSize:16}}>{nn(selP)}</div>
             <div className="profile-fullname" style={{fontSize:11}}>{selP.fullName}</div>
             
@@ -1102,7 +1171,6 @@ function App(){
             </div>
           </div>
           
-          {/* V1.5 PATCH: ID REGISTRY DINAMIS DI DALAM INFO KHUSUS ADMIN */}
           <div className="sec">
             <div className="sec-title">Info</div>
             {isAdmin && selP.displayId && (
