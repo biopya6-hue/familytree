@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.9-A (COLLAPSIBLE BRANCHES)
+   SILSILAH-MASTER-V1.9-B (MODE FOKUS / DRILL-DOWN)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw}
@@ -68,10 +68,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 /* Viewport & Nodes */
 #vp{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;z-index:10;}
 #vp.pan{cursor:grabbing}
-#world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform; transition: transform 0.3s ease-out;}
+#world{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform; transition: transform 0.4s ease-out;}
 #csvg{position:absolute;top:0;left:0;overflow:visible;z-index:1}
 
-.node{position:absolute;z-index:10;transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);}
+.node{position:absolute;z-index:10;transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);}
 .card{width:110px;background:#fff;border:1.5px solid #dbd6cf;border-radius:14px;text-align:center;padding:10px 8px 8px;cursor:pointer;position:relative;}
 .card:hover{border-color:#9a8e7e;box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-1px)}
 .card.sel{border-color:#6a5a48;box-shadow:0 0 0 3px rgba(106,90,72,.15),0 6px 20px rgba(0,0,0,.1)}
@@ -85,12 +85,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .bwafat{background:#f0e8e0;color:#905030}
 .bcerai{background:#ede8f0;color:#705090}
 
-/* V1.9-A: COLLAPSE BUTTON */
-.collapse-btn{
+/* V1.9-B: FOCUS BUTTON ON CARD */
+.focus-btn{
   position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -8px;
+  right: -8px;
   width: 24px;
   height: 24px;
   background: #fff;
@@ -99,20 +98,53 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 800;
-  color: #7a7060;
+  font-size: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   z-index: 15;
   transition: all 0.2s;
 }
-.collapse-btn:hover{
-  background: #f0ede8;
-  border-color: #8a7a6a;
-  color: #2a2218;
-  transform: translateX(-50%) scale(1.15);
+.focus-btn:hover{
+  background: #e8f2fa;
+  border-color: #6ea8d4;
+  transform: scale(1.15);
 }
+
+/* V1.9-B: FLOATING BANNER FOR RESET */
+.focus-banner {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2e2820;
+  color: #fff;
+  padding: 6px 12px 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 190;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: dropDown 0.3s ease-out forwards;
+}
+@keyframes dropDown {
+  from { top: 40px; opacity: 0; }
+  to { top: 64px; opacity: 1; }
+}
+.focus-banner-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: background 0.15s;
+}
+.focus-banner-close:hover { background: rgba(255,255,255,0.3); }
 
 /* Sidebar Profil */
 .sidebar{position:fixed;right:0;bottom:0;top:52px;width:310px;z-index:150;background:#fff;border-left:1px solid #dbd6cf;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease-out;box-shadow:-4px 0 24px rgba(0,0,0,.05);}
@@ -267,7 +299,7 @@ const SP=[
   { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   
-  // GENERASI 1: KARMILAH (KRM-001)
+  // GENERASI 1: KARMILAH
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   
@@ -327,7 +359,7 @@ const SP=[
   { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // BANI SAID
+  // BANI SAID (TETAP UTUH)
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -339,7 +371,7 @@ const SP=[
   { id:'p_sad_4b', displayId:'SAD-005', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 2', nickname:'Cucu 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_4c', displayId:'SAD-006', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Cucu Said 3', nickname:'Cucu 3', gender:'?', status:'Hidup', notes:'', bioNote:'' },
   
-  // BANI PANIDJAN
+  // BANI PANIDJAN (TETAP UTUH)
   { id:'p_pan_1', displayId:'PAN-001', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Panidjan', nickname:'Panidjan', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_pan_1_w1', displayId:'PAN-001-S1', bani:'PAN', isBlood:false, spouseOrder:1, fullName:'Wiji', nickname:'Wiji', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_pan_2a', displayId:'PAN-002', bani:'PAN', isBlood:true, spouseOrder:null, fullName:'Mukayani', nickname:'Mukayani', gender:'M', status:'Hidup', notes:'', bioNote:'' },
@@ -483,35 +515,14 @@ const SR=[
   { id:'m16', type:'married', pids:['p_pan_3c','p_pan_3c_w1'], isActive:true },
   { id:'c28', type:'parent-child', pids:['p_pan_3c','p_pan_3c_w1','p_pan_4a'], isActive:true },
   
-  // RELASI SURAHMAN CS
+  // RELASI SURAHMAN
   { id:'m17', type:'married', pids:['p_sur_1','p_sur_1_w1'], isActive:true },
   { id:'m18', type:'married', pids:['p_sur_1','p_sur_1_w2'], isActive:true },
   { id:'c29', type:'parent-child', pids:['p_sur_1','p_sur_1_w2','p_sur_2'], isActive:true }
 ];
 
 const SPOS={
-  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
-  p_krm_1: {x:100, y:200}, p_krm_1_w1: {x:270, y:200},
-  p_sad_1: {x:610, y:200}, p_sad_1_w1: {x:440, y:200}, p_sad_1_w2: {x:780, y:200},
-  p_sad_2: {x:440, y:400}, p_sad_2_w1: {x:610, y:400},
-  p_sad_3: {x:525, y:600}, p_sad_3_w1: {x:695, y:600},
-  p_sad_4a: {x:440, y:800}, p_sad_4b: {x:610, y:800}, p_sad_4c: {x:780, y:800},
-  p_pan_1: {x:1280, y:200}, p_pan_1_w1: {x:1450, y:200},
-  p_pan_2a: {x:900, y:400}, p_pan_2a_w1: {x:1070, y:400},
-  p_pan_2b: {x:1280, y:400}, p_pan_2b_w1: {x:1450, y:400},
-  p_pan_2c: {x:1660, y:400},
-  p_pan_2d: {x:1950, y:400}, p_pan_2d_w1: {x:1780, y:400}, p_pan_2d_w2: {x:2120, y:400},
-  p_pan_2e: {x:2420, y:400}, p_pan_2e_w1: {x:2590, y:400},
-  p_pan_2f: {x:2800, y:400}, p_pan_2f_w1: {x:2970, y:400},
-  p_pan_2g: {x:3180, y:400}, p_pan_2g_w1: {x:3350, y:400},
-  p_pan_3a: {x:900, y:600}, p_pan_3b: {x:1070, y:600},
-  p_pan_3c: {x:1280, y:600}, p_pan_3c_w1: {x:1450, y:600},
-  p_pan_3d: {x:1660, y:600},
-  p_pan_3e: {x:1780, y:600}, p_pan_3f: {x:2035, y:600}, p_pan_3g: {x:2205, y:600},
-  p_pan_3h: {x:2505, y:600}, p_pan_3i: {x:2885, y:600}, p_pan_3j: {x:3265, y:600},
-  p_pan_4a: {x:1365, y:800},
-  p_sur_1: {x:3800, y:200}, p_sur_1_w1: {x:3630, y:200}, p_sur_1_w2: {x:3970, y:200},
-  p_sur_2: {x:3885, y:400}
+  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0}
 };
 
 /* ── APP ── */
@@ -537,8 +548,8 @@ function App(){
   const [showSearch,setShowSearch]   = useState(false);
   const [registryFilter,setRegistryFilter] = useState(null); 
 
-  // V1.9-A STATE: COLLAPSED NODES
-  const [collapsed, setCollapsed] = useState(new Set());
+  // V1.9-B STATE: FOCUS ROOT
+  const [focusRoot, setFocusRoot] = useState('p_ksr');
 
   const dragging=useRef(null), dragOff=useRef({});
   const panning=useRef(false), panStart=useRef({});
@@ -560,6 +571,7 @@ function App(){
   const COL_RELATIONSHIPS = ()=>db.collection('relationships');
   const COL_POSITIONS     = ()=>db.collection('positions');
 
+  /* ── 1. FIREBASE LOAD & INTELLIGENT AUTO-MERGE ── */
   useEffect(()=>{
     async function load(){
       try{
@@ -604,7 +616,7 @@ function App(){
         setPeople(SP);setRels(SR);setPos({...SPOS});
       } finally{
         setLoading(false);
-        setTimeout(autoCamera, 100);
+        setTimeout(() => computeAutoLayout('p_ksr', true), 100);
       }
     }
     load();
@@ -671,12 +683,12 @@ function App(){
     }catch(err){ setUploadPct(null); return null; }
   }
 
-  function autoCamera(){
+  function autoCamera(rootId = focusRoot){
     if(!vpRef.current)return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
     const isMobile = window.innerWidth < 600;
     const scale = isMobile ? 0.35 : 0.6;
-    const rootP = pos['p_ksr'] || {x:1200, y:0};
+    const rootP = pos[rootId] || {x:1200, y:0};
     setVt({ s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) });
   }
 
@@ -707,7 +719,7 @@ function App(){
   function onTouchStart(e){
     const tag=e.target.tagName;
     if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='A')return;
-    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup,.collapse-btn'))return;
+    if(e.target.closest('.sidebar,.modal,.overlay,.ctrl,.legend,.statpill,.topbar,.sresults,.edge-popup,.focus-btn,.focus-banner'))return;
 
     if(e.touches.length===1){
       const t=e.touches[0];
@@ -764,9 +776,6 @@ function App(){
   function nodeDown(e,id){if(!isAdmin)return;e.stopPropagation();dragging.current=id;const p=pos[id]||{x:0,y:0};dragOff.current={x:e.clientX/vt.s-p.x,y:(e.clientY-vpTop)/vt.s-p.y};}
 
   /* ── 3. DATA HELPERS ── */
-  const visibleIds = useMemo(()=>new Set(people.map(p=>p.id)),[people]);
-  const selP=people.find(p=>p.id===sel)||null;
-  
   function getActiveParents(pid){ 
     const rs = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid);
     return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
@@ -817,50 +826,34 @@ function App(){
     }));
   }
 
-  /* ── V1.9-A: COLLAPSIBLE & AUTO-LAYOUT LOGIC ── */
-
-  // Toggle Function
-  function toggleCollapse(e, id) {
-    e.stopPropagation();
-    let nextCol;
-    setCollapsed(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      nextCol = next;
-      return next;
-    });
-    // Trigger auto layout automatically so user doesn't have to click "Rapikan" manually
-    setTimeout(() => computeAutoLayout(nextCol), 10);
-  }
-
-  // Calculate which nodes are visible based on root and collapsed state
+  // V1.9-B: IS VISIBLE LOGIC (SUB-TREE FOCUS)
   const isVisibleNode = useMemo(() => {
     const vis = new Set();
-    const root = people.find(p=>p.displayId==='KSR-000');
-    if(!root) return vis;
-    const queue = [root.id];
-    while(queue.length){
+    if(!people.length) return vis;
+    const rootTarget = focusRoot || 'p_ksr';
+    const queue = [rootTarget];
+    while(queue.length) {
       const curr = queue.shift();
+      if(vis.has(curr)) continue;
       vis.add(curr);
-      // Add spouses
       getPartners(curr).forEach(sp => vis.add(sp));
-      // Add children ONLY IF NOT COLLAPSED
-      if(!collapsed.has(curr)){
-        getActiveChildren(curr).forEach(c => {
-          if(!vis.has(c)) queue.push(c);
-        });
-      }
+      getActiveChildren(curr).forEach(c => {
+        if(!vis.has(c)) queue.push(c);
+      });
     }
-    // Also show truly unconnected nodes so they don't disappear forever
-    people.forEach(p => {
-       if(p.displayId==='KSR-000') return;
-       const parents = getActiveParents(p.id);
-       if(parents.length === 0) vis.add(p.id); 
-    });
+    
+    // Only show unconnected if we are viewing the full tree (p_ksr)
+    if(rootTarget === 'p_ksr'){
+      people.forEach(p => {
+         if(p.displayId === 'KSR-000') return;
+         const parents = getActiveParents(p.id);
+         if(parents.length === 0) vis.add(p.id); 
+      });
+    }
     return vis;
-  }, [people, rels, collapsed]);
+  }, [people, rels, focusRoot]);
 
+  /* ── 4. GARIS SIKU (ORTHOGONAL) ── */
   function buildOrthogonalLines(){
     const lines=[], drawn=new Set();
     rels.forEach(r=>{
@@ -876,8 +869,8 @@ function App(){
         const pc=pos[cid]; if(!pc) return;
         if(!isVisibleNode.has(cid)) return;
 
-        // V1.9-A FIX: Do not draw line if any parent is collapsed
-        if(pids.some(pid => collapsed.has(pid))) return;
+        // V1.9-B: Ensure all parents are visible before drawing line
+        if(pids.some(pid => !isVisibleNode.has(pid))) return;
 
         const valid = pids.filter(x=>pos[x]&&isVisibleNode.has(x)); if(!valid.length) return;
         
@@ -966,31 +959,26 @@ function App(){
   function confirmSingleParent(){ commitRel([pendingRel.parentIds[0]],pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
 
   async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
-  
   function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
-  
   function delPerson(){
     setPeople(prev=>prev.filter(p=>p.id!==sel)); setRels(prev=>prev.filter(r=>!r.pids.includes(sel)));
     setPos(prev=>{const n={...prev};delete n[sel];return n;}); setSel(null); setSbMode('view'); setModal(null);
   }
 
-  /* ── 6. DYNAMIC AUTO-LAYOUT (V1.9-A AWARE) ── */
-  function computeAutoLayout(colSet = collapsed){
+  /* ── 6. DYNAMIC AUTO-LAYOUT (V1.9-B AWARE) ── */
+  function computeAutoLayout(rootTarget = focusRoot, moveCamera = true){
     const GAP_X=40, GAP_Y=160;
-    const root = people.find(p=>p.displayId==='KSR-000'); if(!root){setModal(null);return;}
+    const rootId = rootTarget || 'p_ksr';
+    const root = people.find(p=>p.id===rootId) || people.find(p=>p.displayId==='KSR-000'); 
+    if(!root){setModal(null);return;}
     
-    // Modification: Don't map children if parent is collapsed
-    function getBloodChildrenForLayout(pid){ 
-      if(colSet.has(pid)) return []; // V1.9-A: Ignored in layout if collapsed
-      return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); 
-    }
-
     function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
+    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
 
     function subtreeWidth(pid, visited=new Set()){
       if(visited.has(pid)) return CW; visited.add(pid);
       const spouses=getSpouses(pid); const selfW = CW*(1+spouses.length) + GAP_X*spouses.length;
-      const children=getBloodChildrenForLayout(pid); if(!children.length) return selfW;
+      const children=getBloodChildren(pid); if(!children.length) return selfW;
       const childTotal = children.reduce((s,cid)=>s+subtreeWidth(cid,new Set([...visited])),0) + (children.length-1)*GAP_X;
       return Math.max(selfW, childTotal);
     }
@@ -999,7 +987,7 @@ function App(){
     function layoutSubtree(pid, centerX, gen, visited=new Set()){
       if(visited.has(pid)) return; visited.add(pid);
       const yPos = gen*GAP_Y;
-      const spouses = getSpouses(pid), children = getBloodChildrenForLayout(pid);
+      const spouses = getSpouses(pid), children = getBloodChildren(pid);
 
       function placeUnit(selfCX){
         const totalUnit = CW*(1+spouses.length) + GAP_X*spouses.length;
@@ -1042,26 +1030,43 @@ function App(){
     const w = subtreeWidth(root.id);
     layoutSubtree(root.id, w/2, 0);
 
-    // Truly unconnected nodes
-    const trulyUnconnected = people.filter(p => {
-       if(p.id in newPos) return false;
-       if(p.displayId === 'KSR-000') return false; 
-       const parents = getActiveParents(p.id);
-       return parents.length === 0;
-    });
-    
-    let ux2=0;
-    const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
-    trulyUnconnected.forEach(p=>{
-      newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
-      ux2+=CW+GAP_X;
-    });
+    // Only layout truly unconnected nodes if we are viewing the FULL tree
+    if(rootId === 'p_ksr') {
+      const trulyUnconnected = people.filter(p => {
+         if(p.id in newPos) return false;
+         if(p.displayId === 'KSR-000') return false; 
+         const parents = getActiveParents(p.id);
+         return parents.length === 0;
+      });
+      
+      let ux2=0;
+      const maxY=Math.max(...Object.values(newPos).map(p=>p.y), 0);
+      trulyUnconnected.forEach(p=>{
+        newPos[p.id]={x:Math.round(ux2), y:Math.round(maxY+GAP_Y+120)};
+        ux2+=CW+GAP_X;
+      });
+    }
 
     setPos(newPos); 
     setModal(null);
+    if(moveCamera) {
+       setTimeout(() => autoCamera(root.id), 100);
+    }
+  }
+
+  // V1.9-B Handlers
+  function handleFocus(e, id) {
+    e.stopPropagation();
+    setFocusRoot(id);
+    computeAutoLayout(id, true);
+  }
+  function handleResetFocus() {
+    setFocusRoot('p_ksr');
+    computeAutoLayout('p_ksr', true);
   }
 
   /* ── 7. UI RENDERERS ── */
+  const selP=people.find(p=>p.id===sel)||null;
   const activeParents = sel ? getActiveParents(sel) : [];
   const partners = sel ? getPartners(sel) : [];
   const siblings = sel ? getSiblings(sel) : [];
@@ -1155,6 +1160,14 @@ function App(){
       <div style={{position:'fixed',inset:0,zIndex:185}} onClick={()=>setShowSR(false)}/>
     </>}
 
+    {/* V1.9-B: FLOATING RESET BANNER */}
+    {focusRoot !== 'p_ksr' && (
+      <div className="focus-banner">
+        <span>🎯 Fokus Silsilah: <strong>{nn(people.find(x => x.id === focusRoot) || {})}</strong></span>
+        <button className="focus-banner-close" onClick={handleResetFocus}>Kembali ke Utama ✕</button>
+      </div>
+    )}
+
     <div id="vp" ref={vpRef} onMouseDown={vpDown} onMouseMove={vpMove} onMouseUp={vpUp} onMouseLeave={vpUp} onClick={e=>{if(e.target===vpRef.current){setSel(null);setEdgeSel(null);}}}>
       <div id="world" style={{transform:`translate(${vt.x}px,${vt.y}px) scale(${vt.s})`}}>
         <svg id="csvg">
@@ -1180,10 +1193,10 @@ function App(){
                 {p.status==='Wafat'&&<div className="card-badge bwafat">Wafat</div>}
                 {p.status==='Cerai'&&<div className="card-badge bcerai">Cerai</div>}
                 
-                {/* V1.9-A PATCH: TOMBOL COLLAPSE */}
-                {hasChildren && (
-                  <div className="collapse-btn" onClick={(e)=>toggleCollapse(e, p.id)}>
-                    {collapsed.has(p.id) ? '+' : '−'}
+                {/* V1.9-B PATCH: TOMBOL FOKUS DRILL-DOWN */}
+                {hasChildren && focusRoot !== p.id && (
+                  <div className="focus-btn" onClick={(e)=>handleFocus(e, p.id)} title="Fokus ke keluarga ini">
+                    🎯
                   </div>
                 )}
 
@@ -1346,7 +1359,7 @@ function App(){
     {modal==='autolayout'&&<div className="overlay" onClick={()=>setModal(null)}>
       <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
         <h3>⊞ Rapikan Otomatis</h3><p className="modal-sub">Algoritma cerdas akan menyusun ulang pohon keluargamu agar tidak tumpang tindih.</p>
-        <div className="frow"><button className="btn primary" onClick={()=>computeAutoLayout(collapsed)}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
+        <div className="frow"><button className="btn primary" onClick={()=>computeAutoLayout(focusRoot, true)}>Rapikan Sekarang</button><button className="btn" onClick={()=>setModal(null)}>Batal</button></div>
       </div>
     </div>}
 
@@ -1382,7 +1395,7 @@ function App(){
       </div>
     </div>}
 
-    {/* ── UI MELAYANG ── */}
+    {/* ── UI MELAYANG (LEGEND, STATS, CONTROLS) ── */}
     <div className={`legend ${sel?'sb-open':''}`}>
       <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#90a8b8" strokeWidth="2.5" strokeLinecap="round"/></svg> Garis Sedarah</div>
       <div className="li"><svg width="24" height="10"><path d="M2,5 L22,5" stroke="#c8a870" strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round"/></svg> Pasangan</div>
@@ -1402,7 +1415,7 @@ function App(){
     <div className={`ctrl ${sel?'sb-open':''}`}>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.min(t.s*1.2,4)}))}>+</button>
       <button className="cbtn" onClick={()=>setVt(t=>({...t,s:Math.max(t.s*.8,0.15)}))}>−</button>
-      <button className="cbtn" onClick={autoCamera} style={{fontSize:22}}>⌂</button>
+      <button className="cbtn" onClick={()=>autoCamera(focusRoot)} style={{fontSize:22}}>⌂</button>
     </div>
   </>;
 }
