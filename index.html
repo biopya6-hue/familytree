@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.12 (PATCH 12 - FINAL POLISH)
+   SILSILAH-MASTER-V1.13 (PATCH 13 - FIX CAMERA & UI MOBILE)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
@@ -67,7 +67,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 @media(max-width:650px){ 
   .search-wrap{display:none;} 
   .search-icon-btn{display:flex;}
-  .hide-mob{display:none;} 
+  .hide-mob{display:none !important;} 
   .btn-text{display:none;}
   .btn { padding: 6px 10px; font-size: 14.5px; }
 }
@@ -120,7 +120,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
   transform: translateX(-50%) translateY(-2px);
 }
 
-/* FLOATING BANNER (PATCH 12: RESPONSIVE FIX) */
+/* FLOATING BANNER (V1.13 RESPONSIVE FIX) */
 .focus-banner {
   position: fixed;
   top: 64px;
@@ -139,6 +139,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   animation: dropDown 0.3s ease-out forwards;
   white-space: nowrap;
+  width: max-content;
+  max-width: 90vw;
 }
 @keyframes dropDown {
   from { top: 40px; opacity: 0; }
@@ -163,11 +165,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
     gap: 6px;
     padding: 8px 16px;
     width: auto;
-    max-width: 90%;
     border-radius: 16px;
     text-align: center;
     white-space: normal;
   }
+  .focus-banner span { font-size: 10px; line-height: 1.4; }
 }
 
 /* Sidebar Profil */
@@ -217,9 +219,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7060;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-/* V1.12 PATCH: STAT PILL WRAP FIX */
-.statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;flex-wrap:wrap;gap:14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;}
-.statpill > div {white-space:nowrap;} /* Anak tidak terpotong */
+/* V1.13 PATCH: STAT PILL WRAP FIX */
+.statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px 14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;width:max-content;max-width:90%;}
+.statpill > div {white-space:nowrap; display:flex; align-items:center;}
 .stat-val{color:#2a2218;font-weight:800;font-size:13.5px;margin-right:4px}
 .stat-sep{width:4px;height:4px;border-radius:50%;background:#d0cbc2;}
 
@@ -229,7 +231,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 /* Responsif Mobile */
 @media(max-width:768px) and (orientation: portrait){ 
   .legend.sb-open, .ctrl.sb-open, .statpill.sb-open {opacity:0; pointer-events:none;}
-  .statpill { bottom: 12px; width: max-content; max-width: 90%; padding: 8px 16px; font-size: 10px; gap: 8px; justify-content: center; border-radius: 20px; }
+  .statpill { bottom: 12px; max-width: 95%; padding: 8px 16px; font-size: 10px; gap: 6px 12px; border-radius: 20px; }
   .stat-val { font-size: 12px; margin-right: 3px; }
   .legend { bottom: 58px; left: 12px; padding: 10px 12px; }
   .legend .li { font-size: 9.5px; margin-bottom: 5px; }
@@ -318,7 +320,7 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER
+   DATA MASTER 
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
@@ -623,13 +625,12 @@ function App(){
         setPeople(SP);setRels(SR);setPos({...SPOS});
       } finally{
         setLoading(false);
-        // V1.12 PATCH: Wait for DOM to paint completely before calculating viewport bounds
         requestAnimationFrame(() => {
           setTimeout(() => {
             if(vpRef.current && vpRef.current.clientWidth > 0) {
               computeAutoLayout('p_ksr', true);
             } else {
-              setTimeout(() => computeAutoLayout('p_ksr', true), 500); // safety fallback
+              setTimeout(() => computeAutoLayout('p_ksr', true), 500); 
             }
           }, 150);
         });
@@ -694,19 +695,20 @@ function App(){
     }catch(err){ return null; }
   }
 
-  /* ── 2. V1.12 DIRECT DOM CAMERA CONTROLS (NO LAG + VALIDATION) ── */
+  /* ── 2. V1.13 DIRECT DOM CAMERA CONTROLS (NO LAG + VALIDATION) ── */
   function updateWorldTransform() {
     if (worldRef.current) {
       worldRef.current.style.transform = `translate(${vt.current.x}px, ${vt.current.y}px) scale(${vt.current.s})`;
     }
   }
 
-  function autoCamera(rootId = focusRoot){
+  // V1.13: Gunakan parameter customPos langsung agar tidak menunggu React State!
+  function autoCamera(rootId = focusRoot, customPos = pos){
     if(!vpRef.current || vpRef.current.clientWidth === 0) return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
     const isMobile = window.innerWidth < 600;
     const scale = isMobile ? 0.35 : 0.6;
-    const rootP = pos[rootId] || {x:1200, y:0};
+    const rootP = customPos[rootId] || {x:1200, y:0};
     vt.current = { s: scale, x: (vw/2) - (rootP.x * scale), y: (vh/4) - (rootP.y * scale) };
     updateWorldTransform();
   }
@@ -875,7 +877,7 @@ function App(){
     }));
   }
 
-  // V1.12: PROGRESSIVE DEPTH LOGIC
+  // V1.13: PROGRESSIVE DEPTH LOGIC & BUG 1 FIX (ORPHANED NODE)
   const isVisibleNode = useMemo(() => {
     const vis = new Set();
     if(!people.length) return vis;
@@ -913,7 +915,9 @@ function App(){
       people.forEach(p => {
          if(p.displayId === 'KSR-000') return;
          const parents = getActiveParents(p.id);
-         if(parents.length === 0 && (p.isBlood === true || p.bani === 'BARU')) {
+         const spouses = getPartners(p.id); // V1.13 Fix
+         // JARING PENGAMAN: Hanya selamatkan jika benar-benar tidak punya ortu & tidak punya pasangan!
+         if(parents.length === 0 && spouses.length === 0 && (p.isBlood === true || p.bani === 'BARU')) {
            vis.add(p.id); 
          }
       });
@@ -1101,12 +1105,14 @@ function App(){
     const w = subtreeWidth(root.id);
     layoutSubtree(root.id, w/2, 0);
 
+    // V1.13 FIX (ORPHANED NODES) - Cek pasangan juga
     if(rootId === 'p_ksr') {
       const trulyUnconnected = people.filter(p => {
          if(p.id in newPos) return false;
          if(p.displayId === 'KSR-000') return false; 
          const parents = getActiveParents(p.id);
-         return parents.length === 0 && (p.isBlood === true || p.bani === 'BARU');
+         const spouses = getPartners(p.id);
+         return parents.length === 0 && spouses.length === 0 && (p.isBlood === true || p.bani === 'BARU');
       });
       
       let ux2=0;
@@ -1120,11 +1126,12 @@ function App(){
     setPos(newPos); 
     setModal(null);
     if(moveCamera) {
-       setTimeout(() => autoCamera(root.id), 50);
+       // V1.13 FIX: Gunakan newPos agar kamera tidak menunggu React State!
+       setTimeout(() => autoCamera(root.id, newPos), 0);
     }
   }
 
-  // V1.12 Handlers
+  // V1.13 Handlers
   function handleFocus(e, id) {
     e.stopPropagation();
     setFocusRoot(id);
