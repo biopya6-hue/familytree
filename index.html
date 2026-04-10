@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.13 (PATCH 13 - FIX CAMERA & UI MOBILE)
+   SILSILAH-MASTER-V1.14 (PATCH 14 - ADMIN SESSION & CAMERA OBSERVER)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
@@ -120,7 +120,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
   transform: translateX(-50%) translateY(-2px);
 }
 
-/* FLOATING BANNER (V1.13 RESPONSIVE FIX) */
+/* FLOATING BANNER */
 .focus-banner {
   position: fixed;
   top: 64px;
@@ -219,7 +219,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a
 .li{display:flex;align-items:center;gap:8px;font-size:11px;color:#7a7060;margin-bottom:6px;font-weight:600}
 .li:last-child{margin-bottom:0}
 
-/* V1.13 PATCH: STAT PILL WRAP FIX */
+/* STAT PILL WRAP */
 .statpill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px 14px;background:rgba(255,255,255,.96);border:1px solid #dbd6cf;border-radius:30px;padding:10px 24px;font-size:11px;font-weight:600;color:#7a7060;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:opacity .2s;width:max-content;max-width:90%;}
 .statpill > div {white-space:nowrap; display:flex; align-items:center;}
 .stat-val{color:#2a2218;font-weight:800;font-size:13.5px;margin-right:4px}
@@ -320,18 +320,15 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER 
+   DATA MASTER
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
   { id:'p_ksr_w1', displayId:'KSR-S1', bani:'KSR', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Kasirin', nickname:'Istri 1', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_ksr_w2', displayId:'KSR-S2', bani:'KSR', isBlood:false, spouseOrder:2, fullName:'Paenem', nickname:'Paenem', gender:'F', status:'Wafat', notes:'', bioNote:'' },
   
-  // GENERASI 1
   { id:'p_krm_1', displayId:'KRM-001', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Karmilah', nickname:'Karmilah', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_1_w1', displayId:'KRM-001-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Karmilah', nickname:'Suami', gender:'M', status:'Hidup', notes:'', bioNote:'' },
-  
-  // GENERASI 2
   { id:'p_krm_2', displayId:'KRM-002', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Naris', nickname:'Naris', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_2_w1', displayId:'KRM-002-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Yuti', nickname:'Yuti', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_3', displayId:'KRM-003', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Lasemi', nickname:'Lasemi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -342,7 +339,6 @@ const SP=[
   { id:'p_krm_5_w1', displayId:'KRM-005-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami ke-1 Sri', nickname:'Suami 1 Sri', gender:'M', status:'Wafat', notes:'', bioNote:'' },
   { id:'p_krm_5_w2', displayId:'KRM-005-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Ehsan', nickname:'Ehsan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // GENERASI 3
   { id:'p_krm_6', displayId:'KRM-006', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Natik', nickname:'Natik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_6_w1', displayId:'KRM-006-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Rob', nickname:'Rob', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_7', displayId:'KRM-007', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Sulami', nickname:'Sulami', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -384,7 +380,6 @@ const SP=[
   { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
-  // BANI SAID DLL
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -542,7 +537,10 @@ function App(){
   const [pos,setPos]         = useState({});
   const [sel,setSel]         = useState(null);
   const [sbMode,setSbMode]   = useState('view');
-  const [isAdmin,setIsAdmin] = useState(false);
+  
+  // V1.14 PATCH: Kunci Sesi Admin di Session Storage
+  const [isAdmin,setIsAdmin] = useState(() => sessionStorage.getItem('isAdmin') === 'true');
+  
   const [searchQ,setSearchQ] = useState('');
   const [showSR,setShowSR]   = useState(false);
   const [modal,setModal]     = useState(null); 
@@ -571,6 +569,9 @@ function App(){
   const fileInputRef = useRef();
   const saveTimer = useRef(null);
   const isFirstLoad = useRef(true);
+  
+  // V1.14 PATCH: Observer Flag
+  const initialLayoutDone = useRef(false);
 
   const lastSyncedPeople = useRef({}); 
   const lastSyncedRels   = useRef({}); 
@@ -625,19 +626,35 @@ function App(){
         setPeople(SP);setRels(SR);setPos({...SPOS});
       } finally{
         setLoading(false);
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            if(vpRef.current && vpRef.current.clientWidth > 0) {
-              computeAutoLayout('p_ksr', true);
-            } else {
-              setTimeout(() => computeAutoLayout('p_ksr', true), 500); 
-            }
-          }, 150);
-        });
       }
     }
     load();
   },[]);
+
+  // V1.14 PATCH: Kamera Observer Murni (Menjamin Viewport Sempurna)
+  useEffect(() => {
+    if (loading || !people.length) return;
+    const el = vpRef.current;
+    if (!el) return;
+    
+    // Jika layar langsung terbaca utuh
+    if (el.clientWidth > 0 && !initialLayoutDone.current) {
+      initialLayoutDone.current = true;
+      computeAutoLayout('p_ksr', true);
+      return;
+    }
+
+    // Jika layar membandel, intai menggunakan ResizeObserver
+    const observer = new ResizeObserver(entries => {
+      if (entries[0].contentRect.width > 0 && !initialLayoutDone.current) {
+        initialLayoutDone.current = true;
+        computeAutoLayout('p_ksr', true);
+        observer.disconnect();
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loading, people.length]);
 
   useEffect(()=>{
     if(!people.length)return;
@@ -695,14 +712,13 @@ function App(){
     }catch(err){ return null; }
   }
 
-  /* ── 2. V1.13 DIRECT DOM CAMERA CONTROLS (NO LAG + VALIDATION) ── */
+  /* ── 2. V1.14 DIRECT DOM CAMERA CONTROLS ── */
   function updateWorldTransform() {
     if (worldRef.current) {
       worldRef.current.style.transform = `translate(${vt.current.x}px, ${vt.current.y}px) scale(${vt.current.s})`;
     }
   }
 
-  // V1.13: Gunakan parameter customPos langsung agar tidak menunggu React State!
   function autoCamera(rootId = focusRoot, customPos = pos){
     if(!vpRef.current || vpRef.current.clientWidth === 0) return;
     const vw=vpRef.current.clientWidth, vh=vpRef.current.clientHeight;
@@ -877,7 +893,6 @@ function App(){
     }));
   }
 
-  // V1.13: PROGRESSIVE DEPTH LOGIC & BUG 1 FIX (ORPHANED NODE)
   const isVisibleNode = useMemo(() => {
     const vis = new Set();
     if(!people.length) return vis;
@@ -915,8 +930,7 @@ function App(){
       people.forEach(p => {
          if(p.displayId === 'KSR-000') return;
          const parents = getActiveParents(p.id);
-         const spouses = getPartners(p.id); // V1.13 Fix
-         // JARING PENGAMAN: Hanya selamatkan jika benar-benar tidak punya ortu & tidak punya pasangan!
+         const spouses = getPartners(p.id); 
          if(parents.length === 0 && spouses.length === 0 && (p.isBlood === true || p.bani === 'BARU')) {
            vis.add(p.id); 
          }
@@ -1028,7 +1042,20 @@ function App(){
   function confirmBothParents(){ commitRel(pendingRel.parentIds,pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
   function confirmSingleParent(){ commitRel([pendingRel.parentIds[0]],pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
 
-  async function tryPin(){const ok=await checkPin(pinVal);if(ok){setIsAdmin(true);setModal(null);setPinVal('');setPinErr('');}else setPinErr('PIN salah.');}
+  // V1.14 PATCH: SESSION STORAGE UNTUK ADMIN
+  async function tryPin(){
+    const ok=await checkPin(pinVal);
+    if(ok){
+      setIsAdmin(true);
+      sessionStorage.setItem('isAdmin', 'true');
+      setModal(null);
+      setPinVal('');
+      setPinErr('');
+    } else {
+      setPinErr('PIN salah.');
+    }
+  }
+  
   function saveEdit(){ setPeople(prev=>prev.map(p=>p.id===editF.id?{...editF}:p)); setSbMode('view'); }
   function delPerson(){
     setPeople(prev=>prev.filter(p=>p.id!==sel)); setRels(prev=>prev.filter(r=>!r.pids.includes(sel)));
@@ -1105,7 +1132,6 @@ function App(){
     const w = subtreeWidth(root.id);
     layoutSubtree(root.id, w/2, 0);
 
-    // V1.13 FIX (ORPHANED NODES) - Cek pasangan juga
     if(rootId === 'p_ksr') {
       const trulyUnconnected = people.filter(p => {
          if(p.id in newPos) return false;
@@ -1126,12 +1152,10 @@ function App(){
     setPos(newPos); 
     setModal(null);
     if(moveCamera) {
-       // V1.13 FIX: Gunakan newPos agar kamera tidak menunggu React State!
        setTimeout(() => autoCamera(root.id, newPos), 0);
     }
   }
 
-  // V1.13 Handlers
   function handleFocus(e, id) {
     e.stopPropagation();
     setFocusRoot(id);
@@ -1204,7 +1228,7 @@ function App(){
         <div className="brand-sub">Silsilah Keluarga</div>
       </div>
       <div className="sep"/>
-      <div className="search-wrap">
+      <div className="search-wrap hide-mob">
         <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       </div>
       <button className="search-icon-btn" onClick={()=>{setShowSearch(true);setSearchQ('');setShowSR(false);}}>🔍</button>
@@ -1219,7 +1243,18 @@ function App(){
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>👤+ <span className="btn-text">Orang</span></button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>🔗 <span className="btn-text">Relasi</span></button>}
       <button className="btn" onClick={()=>setModal('registry')}>👤 <span className="btn-text">ID</span></button>
-      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>isAdmin?setIsAdmin(false):setModal('pin')}>🔑 <span className="btn-text">{isAdmin?'Admin Aktif':'Login'}</span></button>
+      
+      {/* V1.14 PATCH: LOGOUT HANDLER */}
+      <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>{
+        if(isAdmin) {
+          setIsAdmin(false);
+          sessionStorage.removeItem('isAdmin');
+        } else {
+          setModal('pin');
+        }
+      }}>
+        🔑 <span className="btn-text">{isAdmin?'Logout':'Login'}</span>
+      </button>
     </div>
 
     <div className={`search-expand${showSearch?' open':''}`}>
