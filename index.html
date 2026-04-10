@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.14 (PATCH 14 - ADMIN SESSION & CAMERA OBSERVER)
+   SILSILAH-MASTER-V1.15 (PATCH 15 - STRICT SIBLING SORTING)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
@@ -320,7 +320,7 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER
+   DATA MASTER 
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
@@ -537,10 +537,7 @@ function App(){
   const [pos,setPos]         = useState({});
   const [sel,setSel]         = useState(null);
   const [sbMode,setSbMode]   = useState('view');
-  
-  // V1.14 PATCH: Kunci Sesi Admin di Session Storage
   const [isAdmin,setIsAdmin] = useState(() => sessionStorage.getItem('isAdmin') === 'true');
-  
   const [searchQ,setSearchQ] = useState('');
   const [showSR,setShowSR]   = useState(false);
   const [modal,setModal]     = useState(null); 
@@ -569,8 +566,6 @@ function App(){
   const fileInputRef = useRef();
   const saveTimer = useRef(null);
   const isFirstLoad = useRef(true);
-  
-  // V1.14 PATCH: Observer Flag
   const initialLayoutDone = useRef(false);
 
   const lastSyncedPeople = useRef({}); 
@@ -631,20 +626,17 @@ function App(){
     load();
   },[]);
 
-  // V1.14 PATCH: Kamera Observer Murni (Menjamin Viewport Sempurna)
   useEffect(() => {
     if (loading || !people.length) return;
     const el = vpRef.current;
     if (!el) return;
     
-    // Jika layar langsung terbaca utuh
     if (el.clientWidth > 0 && !initialLayoutDone.current) {
       initialLayoutDone.current = true;
       computeAutoLayout('p_ksr', true);
       return;
     }
 
-    // Jika layar membandel, intai menggunakan ResizeObserver
     const observer = new ResizeObserver(entries => {
       if (entries[0].contentRect.width > 0 && !initialLayoutDone.current) {
         initialLayoutDone.current = true;
@@ -712,7 +704,7 @@ function App(){
     }catch(err){ return null; }
   }
 
-  /* ── 2. V1.14 DIRECT DOM CAMERA CONTROLS ── */
+  /* ── 2. DIRECT DOM CAMERA CONTROLS ── */
   function updateWorldTransform() {
     if (worldRef.current) {
       worldRef.current.style.transform = `translate(${vt.current.x}px, ${vt.current.y}px) scale(${vt.current.s})`;
@@ -852,7 +844,15 @@ function App(){
     return [...new Set(rs.reduce((acc, r) => acc.concat(r.pids.slice(0,-1)), []))];
   }
   function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
-  function getActiveChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+  
+  // V1.15 PATCH: ABSOLUTE LEXICOGRAPHICAL SIBLING SORTING
+  function getActiveChildren(pid){ 
+    const c = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); 
+    return c.sort((a,b)=>{
+       const pa=people.find(x=>x.id===a), pb=people.find(x=>x.id===b);
+       return (pa?.displayId||a).localeCompare(pb?.displayId||b, undefined, {numeric:true});
+    });
+  }
   
   function getPartners(pid){ 
     const rs = rels.filter(r=>r.type==='married'&&r.pids.includes(pid));
@@ -1042,7 +1042,6 @@ function App(){
   function confirmBothParents(){ commitRel(pendingRel.parentIds,pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
   function confirmSingleParent(){ commitRel([pendingRel.parentIds[0]],pendingRel.childId,pendingRel.isActive); setPendingRel(null);setRelF({type:'married',pid:'',isActive:true});setModal(null); }
 
-  // V1.14 PATCH: SESSION STORAGE UNTUK ADMIN
   async function tryPin(){
     const ok=await checkPin(pinVal);
     if(ok){
@@ -1070,7 +1069,15 @@ function App(){
     if(!root){setModal(null);return;}
     
     function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
-    function getBloodChildren(pid){ return rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); }
+    
+    // V1.15 PATCH: AUTO-LAYOUT BLOOD CHILDREN STRICT SORTING
+    function getBloodChildren(pid){ 
+      const c = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); 
+      return c.sort((a,b)=>{
+         const pa=people.find(x=>x.id===a), pb=people.find(x=>x.id===b);
+         return (pa?.displayId||a).localeCompare(pb?.displayId||b, undefined, {numeric:true});
+      });
+    }
 
     function subtreeWidth(pid, visited=new Set()){
       if(visited.has(pid)) return CW; visited.add(pid);
@@ -1228,7 +1235,7 @@ function App(){
         <div className="brand-sub">Silsilah Keluarga</div>
       </div>
       <div className="sep"/>
-      <div className="search-wrap hide-mob">
+      <div className="search-wrap">
         <input placeholder="Cari nama..." value={searchQ} onChange={e=>{setSearchQ(e.target.value);setShowSR(true);}} onFocus={()=>setShowSR(true)}/>
       </div>
       <button className="search-icon-btn" onClick={()=>{setShowSearch(true);setSearchQ('');setShowSR(false);}}>🔍</button>
@@ -1243,8 +1250,6 @@ function App(){
       {isAdmin&&<button className="btn" onClick={()=>setModal('addperson')}>👤+ <span className="btn-text">Orang</span></button>}
       {isAdmin&&sel&&<button className="btn" onClick={()=>{setRelF(f=>({...f,pid:''}));setRelSearchQ('');setModal('addrel');}}>🔗 <span className="btn-text">Relasi</span></button>}
       <button className="btn" onClick={()=>setModal('registry')}>👤 <span className="btn-text">ID</span></button>
-      
-      {/* V1.14 PATCH: LOGOUT HANDLER */}
       <button className={`btn ${isAdmin?'primary':''}`} onClick={()=>{
         if(isAdmin) {
           setIsAdmin(false);
@@ -1494,7 +1499,7 @@ function App(){
               const members = groups[activeGrp].sort((a,b)=>{
                 if(a.isBlood!==b.isBlood) return a.isBlood?-1:1;
                 if(!a.isBlood) return (a.spouseOrder||99)-(b.spouseOrder||99);
-                return a.displayId.localeCompare(b.displayId);
+                return a.displayId.localeCompare(b.displayId, undefined, {numeric: true});
               });
               return <table className="reg-table">
                 <thead><tr><th>ID Registrasi</th><th>Nama</th><th>Status Darah</th></tr></thead>
