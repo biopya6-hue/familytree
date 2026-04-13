@@ -25,7 +25,7 @@ const storage = firebase.storage();
 </script>
 <style>
 /* ══════════════════════════════════════════════════
-   SILSILAH-MASTER-V1.15 (PATCH 15 - STRICT SIBLING SORTING)
+   SILSILAH-MASTER-V1.16 (PATCH 16 - GEN 4 & 5 INJECTION)
 ══════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f0ede8;color:#1a1a1a;overflow:hidden;height:100vh;width:100vw; overscroll-behavior: none;}
@@ -320,7 +320,7 @@ function fmtBirth(pl,dt){
 }
 
 /* ══════════════════════════════════════════════════
-   DATA MASTER 
+   DATA MASTER (INJEKSI GEN 4 & 5 KARMILAH)
 ══════════════════════════════════════════════════ */
 const SP=[
   { id:'p_ksr', displayId:'KSR-000', bani:'KSR', isBlood:true, spouseOrder:null, fullName:'Kasirin', nickname:'Kasirin', gender:'M', status:'Wafat', notes:'', bioNote:'', birthPlace:'', birthDate:'', deathDate:'', domicile:'', photo:'' },
@@ -380,6 +380,58 @@ const SP=[
   { id:'p_krm_23', displayId:'KRM-023', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Luluk', nickname:'Luluk', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_krm_23_w1', displayId:'KRM-023-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Luluk', nickname:'Suami Luluk', gender:'M', status:'Hidup', notes:'', bioNote:'' },
 
+  /* --- INJEKSI GEN 4 --- */
+  { id:'p_krm_24', displayId:'KRM-024', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Jum', nickname:'Jum', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_24_w1', displayId:'KRM-024-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Imam', nickname:'Imam', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_25', displayId:'KRM-025', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Wiwik', nickname:'Wiwik', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_26', displayId:'KRM-026', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Efa', nickname:'Efa', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_26_w1', displayId:'KRM-026-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Bambang', nickname:'Bambang', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_27', displayId:'KRM-027', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Susi', nickname:'Susi', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_27_w1', displayId:'KRM-027-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Istri Susi', nickname:'Istri Susi', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_28', displayId:'KRM-028', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Yeni', nickname:'Yeni', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_29', displayId:'KRM-029', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Supar', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_29_w1', displayId:'KRM-029-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Istri Anak 1 Supar', nickname:'Istri', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_30', displayId:'KRM-030', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Supar', nickname:'Anak 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_31', displayId:'KRM-031', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Intan', nickname:'Intan', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_31_w1', displayId:'KRM-031-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Suami Intan', nickname:'Suami Intan', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_32', displayId:'KRM-032', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Berlian', nickname:'Berlian', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_33', displayId:'KRM-033', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Muji', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_33_w1', displayId:'KRM-033-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Istri Anak Muji', nickname:'Istri', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_34', displayId:'KRM-034', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Agus', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_35', displayId:'KRM-035', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Agus', nickname:'Anak 2', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_36', displayId:'KRM-036', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Mimin', nickname:'Anak 1', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_37', displayId:'KRM-037', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Mimin', nickname:'Anak 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_38', displayId:'KRM-038', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 3 Mimin', nickname:'Anak 3', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_39', displayId:'KRM-039', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Salsa', nickname:'Salsa', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  
+  { id:'p_krm_40', displayId:'KRM-040', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak Win', nickname:'Anak Win', gender:'?', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_41', displayId:'KRM-041', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Ari', nickname:'Ari', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_41_w1', displayId:'KRM-041-S1', bani:'KRM', isBlood:false, spouseOrder:1, fullName:'Istri 1 Ari', nickname:'Istri 1', gender:'F', status:'Cerai', notes:'', bioNote:'' },
+  { id:'p_krm_41_w2', displayId:'KRM-041-S2', bani:'KRM', isBlood:false, spouseOrder:2, fullName:'Istri 2 Ari', nickname:'Istri 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_42', displayId:'KRM-042', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Dartik', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_43', displayId:'KRM-043', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Dartik', nickname:'Anak 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+
+  { id:'p_krm_44', displayId:'KRM-044', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak Yun', nickname:'Anak Yun', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+
+  { id:'p_krm_45', displayId:'KRM-045', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Tin', nickname:'Anak 1', gender:'M', status:'Wafat', notes:'', bioNote:'' },
+  { id:'p_krm_46', displayId:'KRM-046', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Tin', nickname:'Anak 2', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_47', displayId:'KRM-047', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Luluk', nickname:'Anak 1', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_48', displayId:'KRM-048', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Luluk', nickname:'Anak 2', gender:'F', status:'Hidup', notes:'', bioNote:'' },
+
+  /* --- INJEKSI GEN 5 --- */
+  { id:'p_krm_49', displayId:'KRM-049', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Angga', nickname:'Angga', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_50', displayId:'KRM-050', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Jum', nickname:'Anak 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_51', displayId:'KRM-051', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Helga', nickname:'Helga', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_52', displayId:'KRM-052', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Helgi', nickname:'Helgi', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_53', displayId:'KRM-053', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Helgo', nickname:'Helgo', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_54', displayId:'KRM-054', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Helge', nickname:'Helge', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_55', displayId:'KRM-055', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Susi', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_56', displayId:'KRM-056', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Intan', nickname:'Anak 1', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_57', displayId:'KRM-057', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 2 Intan', nickname:'Anak 2', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_58', displayId:'KRM-058', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Cucu 1 Muji', nickname:'Cucu 1', gender:'?', status:'Hidup', notes:'', bioNote:'' },
+  { id:'p_krm_59', displayId:'KRM-059', bani:'KRM', isBlood:true, spouseOrder:null, fullName:'Anak 1 Ari', nickname:'Anak 1', gender:'M', status:'Hidup', notes:'', bioNote:'Anak biologis Istri 1, diasuh Istri 2' },
+
+  // BANI SAID DLL
   { id:'p_sad_1', displayId:'SAD-001', bani:'SAD', isBlood:true, spouseOrder:null, fullName:'Said', nickname:'Said', gender:'M', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w1', displayId:'SAD-001-S1', bani:'SAD', isBlood:false, spouseOrder:1, fullName:'Istri ke-1 Said', nickname:'Istri 1 Said', gender:'F', status:'Hidup', notes:'', bioNote:'' },
   { id:'p_sad_1_w2', displayId:'SAD-001-S2', bani:'SAD', isBlood:false, spouseOrder:2, fullName:'Rasih', nickname:'Rasih', gender:'F', status:'Hidup', notes:'', bioNote:'' },
@@ -482,6 +534,60 @@ const SR=[
   { id:'c_krm_22', type:'parent-child', pids:['p_krm_5','p_krm_5_w2','p_krm_23'], isActive:true }, 
   { id:'m_krm_23', type:'married', pids:['p_krm_23','p_krm_23_w1'], isActive:true }, 
 
+  /* --- RELASI GEN 4 --- */
+  { id:'c_krm_24', type:'parent-child', pids:['p_krm_6','p_krm_6_w1','p_krm_24'], isActive:true },
+  { id:'c_krm_25', type:'parent-child', pids:['p_krm_6','p_krm_6_w1','p_krm_25'], isActive:true },
+  { id:'m_krm_24', type:'married', pids:['p_krm_24','p_krm_24_w1'], isActive:true },
+  { id:'c_krm_26', type:'parent-child', pids:['p_krm_7','p_krm_7_w1','p_krm_26'], isActive:true },
+  { id:'c_krm_27', type:'parent-child', pids:['p_krm_7','p_krm_7_w1','p_krm_27'], isActive:true },
+  { id:'c_krm_28', type:'parent-child', pids:['p_krm_7','p_krm_7_w1','p_krm_28'], isActive:true },
+  { id:'m_krm_26', type:'married', pids:['p_krm_26','p_krm_26_w1'], isActive:true },
+  { id:'m_krm_27', type:'married', pids:['p_krm_27','p_krm_27_w1'], isActive:true },
+  { id:'c_krm_29', type:'parent-child', pids:['p_krm_8','p_krm_8_w1','p_krm_29'], isActive:true },
+  { id:'c_krm_30', type:'parent-child', pids:['p_krm_8','p_krm_8_w1','p_krm_30'], isActive:true },
+  { id:'m_krm_29', type:'married', pids:['p_krm_29','p_krm_29_w1'], isActive:true },
+  { id:'c_krm_31', type:'parent-child', pids:['p_krm_9','p_krm_9_w1','p_krm_31'], isActive:true },
+  { id:'c_krm_32', type:'parent-child', pids:['p_krm_9','p_krm_9_w1','p_krm_32'], isActive:true },
+  { id:'m_krm_31', type:'married', pids:['p_krm_31','p_krm_31_w1'], isActive:true },
+  { id:'c_krm_33', type:'parent-child', pids:['p_krm_10','p_krm_10_w1','p_krm_33'], isActive:true },
+  { id:'m_krm_33', type:'married', pids:['p_krm_33','p_krm_33_w1'], isActive:true },
+  { id:'c_krm_34', type:'parent-child', pids:['p_krm_11','p_krm_11_w1','p_krm_34'], isActive:true },
+  { id:'c_krm_35', type:'parent-child', pids:['p_krm_11','p_krm_11_w1','p_krm_35'], isActive:true },
+  { id:'c_krm_36', type:'parent-child', pids:['p_krm_12','p_krm_12_w1','p_krm_36'], isActive:true },
+  { id:'c_krm_37', type:'parent-child', pids:['p_krm_12','p_krm_12_w1','p_krm_37'], isActive:true },
+  { id:'c_krm_38', type:'parent-child', pids:['p_krm_12','p_krm_12_w1','p_krm_38'], isActive:true },
+  { id:'c_krm_39', type:'parent-child', pids:['p_krm_13','p_krm_13_w1','p_krm_39'], isActive:true },
+
+  { id:'c_krm_40', type:'parent-child', pids:['p_krm_14','p_krm_14_w1','p_krm_40'], isActive:true },
+  { id:'c_krm_41', type:'parent-child', pids:['p_krm_15','p_krm_15_w1','p_krm_41'], isActive:true },
+  { id:'m_krm_41a', type:'married', pids:['p_krm_41','p_krm_41_w1'], isActive:false }, 
+  { id:'m_krm_41b', type:'married', pids:['p_krm_41','p_krm_41_w2'], isActive:true },
+  { id:'c_krm_42', type:'parent-child', pids:['p_krm_19','p_krm_19_w1','p_krm_42'], isActive:true },
+  { id:'c_krm_43', type:'parent-child', pids:['p_krm_19','p_krm_19_w1','p_krm_43'], isActive:true },
+
+  { id:'c_krm_44', type:'parent-child', pids:['p_krm_20','p_krm_20_w1','p_krm_44'], isActive:true },
+
+  { id:'c_krm_45', type:'parent-child', pids:['p_krm_22','p_krm_22_w1','p_krm_45'], isActive:true },
+  { id:'c_krm_46', type:'parent-child', pids:['p_krm_22','p_krm_22_w1','p_krm_46'], isActive:true },
+  { id:'c_krm_47', type:'parent-child', pids:['p_krm_23','p_krm_23_w1','p_krm_47'], isActive:true },
+  { id:'c_krm_48', type:'parent-child', pids:['p_krm_23','p_krm_23_w1','p_krm_48'], isActive:true },
+
+  /* --- RELASI GEN 5 --- */
+  { id:'c_krm_49', type:'parent-child', pids:['p_krm_24','p_krm_24_w1','p_krm_49'], isActive:true },
+  { id:'c_krm_50', type:'parent-child', pids:['p_krm_24','p_krm_24_w1','p_krm_50'], isActive:true },
+  { id:'c_krm_51', type:'parent-child', pids:['p_krm_26','p_krm_26_w1','p_krm_51'], isActive:true },
+  { id:'c_krm_52', type:'parent-child', pids:['p_krm_26','p_krm_26_w1','p_krm_52'], isActive:true },
+  { id:'c_krm_53', type:'parent-child', pids:['p_krm_26','p_krm_26_w1','p_krm_53'], isActive:true },
+  { id:'c_krm_54', type:'parent-child', pids:['p_krm_26','p_krm_26_w1','p_krm_54'], isActive:true },
+  { id:'c_krm_55', type:'parent-child', pids:['p_krm_27','p_krm_27_w1','p_krm_55'], isActive:true },
+  { id:'c_krm_56', type:'parent-child', pids:['p_krm_31','p_krm_31_w1','p_krm_56'], isActive:true },
+  { id:'c_krm_57', type:'parent-child', pids:['p_krm_31','p_krm_31_w1','p_krm_57'], isActive:true },
+  { id:'c_krm_58', type:'parent-child', pids:['p_krm_33','p_krm_33_w1','p_krm_58'], isActive:true },
+  // RELASI BLENDED FAMILY (ARI & 2 ISTRI)
+  { id:'c_krm_59_bio', type:'parent-child', pids:['p_krm_41','p_krm_41_w1','p_krm_59'], isActive:false }, // Biologis (Tidak ditarik garis lurus UI, tampil di sidebar)
+  { id:'c_krm_59_asuh', type:'parent-child', pids:['p_krm_41','p_krm_41_w2','p_krm_59'], isActive:true }, // Asuh (Ditarik garis lurus UI dari Istri 2)
+
+  // BANI SAID DLL
   { id:'m4', type:'married', pids:['p_sad_1','p_sad_1_w1'], isActive:true },
   { id:'m5', type:'married', pids:['p_sad_1','p_sad_1_w2'], isActive:true },
   { id:'c5', type:'parent-child', pids:['p_sad_1','p_sad_1_w1','p_sad_2'], isActive:true },
@@ -527,7 +633,21 @@ const SR=[
 ];
 
 const SPOS={
-  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0}
+  p_ksr: {x:1200, y:0}, p_ksr_w1: {x:1030, y:0}, p_ksr_w2: {x:1370, y:0},
+  
+  // Dummy Pos untuk Gen 4 dan 5 (Auto-layout akan menghitung ulang)
+  p_krm_24: {x:0, y:1200}, p_krm_25: {x:0, y:1200}, p_krm_26: {x:0, y:1200},
+  p_krm_27: {x:0, y:1200}, p_krm_28: {x:0, y:1200}, p_krm_29: {x:0, y:1200},
+  p_krm_30: {x:0, y:1200}, p_krm_31: {x:0, y:1200}, p_krm_32: {x:0, y:1200},
+  p_krm_33: {x:0, y:1200}, p_krm_34: {x:0, y:1200}, p_krm_35: {x:0, y:1200},
+  p_krm_36: {x:0, y:1200}, p_krm_37: {x:0, y:1200}, p_krm_38: {x:0, y:1200},
+  p_krm_39: {x:0, y:1200}, p_krm_40: {x:0, y:1200}, p_krm_41: {x:0, y:1200},
+  p_krm_42: {x:0, y:1200}, p_krm_43: {x:0, y:1200}, p_krm_44: {x:0, y:1200},
+  p_krm_45: {x:0, y:1200}, p_krm_46: {x:0, y:1200}, p_krm_47: {x:0, y:1200},
+  p_krm_48: {x:0, y:1200}, p_krm_49: {x:0, y:1200}, p_krm_50: {x:0, y:1200},
+  p_krm_51: {x:0, y:1200}, p_krm_52: {x:0, y:1200}, p_krm_53: {x:0, y:1200},
+  p_krm_54: {x:0, y:1200}, p_krm_55: {x:0, y:1200}, p_krm_56: {x:0, y:1200},
+  p_krm_57: {x:0, y:1200}, p_krm_58: {x:0, y:1200}, p_krm_59: {x:0, y:1200}
 };
 
 /* ── APP ── */
@@ -845,7 +965,6 @@ function App(){
   }
   function isAdopted(pid){ return rels.some(r=>r.type==='parent-child'&&!r.isActive&&r.pids[r.pids.length-1]===pid)&&rels.some(r=>r.type==='parent-child'&&r.isActive&&r.pids[r.pids.length-1]===pid); }
   
-  // V1.15 PATCH: ABSOLUTE LEXICOGRAPHICAL SIBLING SORTING
   function getActiveChildren(pid){ 
     const c = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); 
     return c.sort((a,b)=>{
@@ -1070,7 +1189,6 @@ function App(){
     
     function getSpouses(pid){ return rels.filter(r=>r.type==='married'&&r.pids.includes(pid)).map(r=>r.pids.find(x=>x!==pid)).map(id=>people.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>(a.spouseOrder||99)-(b.spouseOrder||99)); }
     
-    // V1.15 PATCH: AUTO-LAYOUT BLOOD CHILDREN STRICT SORTING
     function getBloodChildren(pid){ 
       const c = rels.filter(r=>r.type==='parent-child'&&r.isActive&&r.pids.slice(0,-1).includes(pid)).map(r=>r.pids[r.pids.length-1]); 
       return c.sort((a,b)=>{
